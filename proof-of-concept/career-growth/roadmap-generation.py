@@ -4,7 +4,7 @@ import os
 import json
 from TTS.api import TTS
 from PIL import Image, ImageDraw, ImageFont
-
+from moviepy.editor import ImageClip, AudioFileClip, concatenate_videoclips
 
 # Generate Roadmap Script using Groq 
 client = Groq(api_key=os.getenv("career-growth"))
@@ -53,7 +53,7 @@ def generate_slide_image(title:str, bullets: list, index: int):
     font_text = ImageFont.truetype("arial.ttf", 40)
 
     # Title
-    draw.text((50, 50)), title, fill="white", font=font_title)
+    draw.text((50, 50), title, fill="white", font=font_title)
 
     # Bullets
     y = 200
@@ -67,3 +67,12 @@ def generate_slide_image(title:str, bullets: list, index: int):
 
 
 # Combine Audio + Images Into a Video
+def assemble_video(slide_assets):
+    clips = []
+    for img_path, audio_path in slide_assets:
+        audio = AudioFileClip(audio_path)
+        clip = ImageClip(img_path).set_duration(audio.duration).set_audio(audio)
+        clips.append(clip)
+
+    final = concatenate_videoclips(clips)
+    final.write_videofile("career_overview.mp4", fps=24)
