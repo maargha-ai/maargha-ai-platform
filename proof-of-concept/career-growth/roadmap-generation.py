@@ -2,9 +2,9 @@ from groq import Groq
 from dotenv import load_dotenv
 import os
 import json
-from TTS.api import TTS
+from gtts import gTTS
 from PIL import Image, ImageDraw, ImageFont
-from moviepy.editor import ImageClip, AudioFileClip, concatenate_videoclips
+from moviepy import ImageClip, AudioFileClip, concatenate_videoclips
 
 # Generate Roadmap Script using Groq 
 client = Groq(api_key=os.getenv("career-growth"))
@@ -37,11 +37,10 @@ def generate_roadmap_script(career: str):
 
 
 # Convert Voiceover to Audio (Coqui TTS)
-tts = TTS(modelname="tts_models/en/ljspeech/tacotron2-DDC", progress_bar=False)
-
 def generate_slide_audio(slide_text: str, index: int):
     output_path = f"audio_{index}.wav"
-    tts.tts_to_file(text=slide_text, file_path=output_path)
+    tts = gTTS(text=slide_text, lang="en")
+    tts.save(output_path)
     return output_path
 
 
