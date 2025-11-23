@@ -6,7 +6,7 @@ import os
 load_dotenv()
 
 # Initialize Groq client
-client = Groq(api_key=os.getenv("career-growth-career-prediction"))
+client = Groq(api_key=os.getenv("career-growth"))
 
 # Questions
 QUESTIONS = [
