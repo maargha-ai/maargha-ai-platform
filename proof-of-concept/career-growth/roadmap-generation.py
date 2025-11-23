@@ -76,3 +76,21 @@ def assemble_video(slide_assets):
 
     final = concatenate_videoclips(clips)
     final.write_videofile("career_overview.mp4", fps=24)
+
+
+# Full Pipeline Execution
+def generate_career_video(career: str):
+    slides = generate_roadmap_script(career)
+    slide_assets = []
+
+    for i, slide in enumerate(slides):
+        img_path = generate_slide_image(slide["title"], slide["bullets"], i)
+        audio_path = generate_slide_audio(slide["voiceover"], i)
+        slide_assets.append((img_path, audio_path))
+
+    assemble_video(slide_assets)
+    print("Video generated: roadmap_overview.mp4")
+
+
+if __name__ == "__main__":
+    generate_career_video("Data Science")
