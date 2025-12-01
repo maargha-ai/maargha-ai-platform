@@ -39,7 +39,7 @@ def generate_roadmap_script(career: str):
     return json.loads(response.choices[0].message.content)
 
 
-# Convert Voiceover to Audio (Coqui TTS), this is in memory and not saved
+# Convert Voiceover to Audio (gTTS), this is in memory and not saved
 def generate_audio_bytes(slide_text: str):
     audio_bytes = BytesIO()
     tts = gTTS(text=slide_text, lang="en")
