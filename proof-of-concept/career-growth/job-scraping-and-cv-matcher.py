@@ -1,0 +1,298 @@
+import asyncio
+from playwright.async_api import async_playwright
+from PyPDF2 import PdfReader
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import random
+
+SITES = ["Indeed", "Naukri", "Internshala", "Glassdoor", "LinkedIn"]
+
+async def scrape_jobs_from_site(page, site_name, query, location):
+    jobs = []
+    try:
+        print(f"Scraping {site_name}...", end=" ")
+
+        if site_name == "Indeed":
+            # Fixed URL: Exact phrase + recent jobs param to boost results & reduce caching
+            base_query = query.replace(" ", "+")
+            encoded_query = f"%22{base_query}%22"  # Exact "Data Science" match
+            location_plus = location.replace(" ", "+")
+            url = f"https://in.indeed.com/jobs?q={encoded_query}&l={location_plus}&fromage=7"  # Last 7 days for fresh hits
+            await page.goto(url, wait_until="domcontentloaded", timeout=90000)  # networkidle waits for AJAX
+            await page.wait_for_timeout(random.randint(3000, 5000))  # Random human pause
+            # Enhanced scrolling: 3 gradual scrolls to load ~20-30 jobs
+            for i in range(3):
+                await page.evaluate(f"window.scrollBy(0, {800 * (i + 1)})")  # Incremental scroll
+                await page.wait_for_timeout(random.randint(1500, 3000))
+            # === PRIORITY SELECTORS (Dec 2025 - India Layout) ===
+            cards = await page.query_selector_all('li[data-testid="jobsearch-JobCard"]')
+            # Fallback 1: Grid item wrapper (common in mosaic view)
+            if not cards:
+                cards = await page.query_selector_all('div[data-testid="job-container"]')
+            # Fallback 2: Legacy with data-jk (still ~10% of pages)
+            if not cards:
+                cards = await page.query_selector_all('div[data-jk]')     
+            # Fallback 3: Broad beacon (for beacon-tracked jobs)
+            if not cards:
+                cards = await page.query_selector_all('div.job_seen_beacon')
+            print(f"({len(cards)} cards found)", end=" → ")
+            success_count = 0
+            for card in cards[:30]:  # Cap at 30 to avoid overload
+                try:
+                    # === Title (Multi-fallback) ===
+                    title = "N/A"
+                    title_elem = await card.query_selector('[data-testid="jobTitle"] span[title]')
+                    if title_elem:
+                        title = await title_elem.get_attribute("title")
+                    else:
+                        title_elem = await card.query_selector('h2 a span[title]')
+                        if title_elem:
+                            title = await title_elem.get_attribute("title") or await title_elem.inner_text()                   
+                    # === Company ===
+                    company = "N/A"
+                    company_elem = await card.query_selector('[data-testid="company-name"]')
+                    if company_elem:
+                        company = await company_elem.inner_text()
+                    else:
+                        company_elem = await card.query_selector('span.companyName')
+                        if company_elem:
+                            company = await company_elem.inner_text()
+                    # === Link ===
+                    link = ""
+                    link_elem = await card.query_selector('a[data-jk]')
+                    if link_elem:
+                        href = await link_elem.get_attribute("href")
+                        link = f"https://in.indeed.com{href}" if href and href.startswith("/") else href
+                    else:
+                        link_elem = await card.query_selector('h2 a')
+                        if link_elem:
+                            href = await link_elem.get_attribute("href")
+                            link = f"https://in.indeed.com{href}" if href and href.startswith("/") else href
+                    # === Description ===
+                    desc = ""
+                    desc_elem = await card.query_selector('[data-testid="jobsearch-JobCard-description"]')
+                    if desc_elem:
+                        desc = await desc_elem.inner_text()
+                    else:
+                        desc_elems = await card.query_selector_all('div[data-testid="jobsearch-JobCard-reqSnippet"] li')
+                        desc_parts = []
+                        for li in desc_elems[:3]:  # Top 3 bullets
+                            text = await li.inner_text()
+                            if text:
+                                desc_parts.append(text)
+                        desc = " • ".join(desc_parts)
+                    if title != "N/A" and link and "indeed" in link:
+                        jobs.append({
+                            "title": title.strip(),
+                            "company": company.strip(),
+                            "link": link,
+                            "desc": (desc.strip()[:400] + "...") if len(desc) > 400 else desc.strip(),  # Truncate
+                            "source": "Indeed"
+                        })
+                        success_count += 1
+                except Exception:
+                    continue  # Skip broken cards
+            print(f"Success: {success_count} jobs")
+            if success_count == 0:
+                print("Debug: Check console for page errors or try without quotes in query.")
+
+        elif site_name == "Naukri":
+            url = f"https://www.naukri.com/{query.replace(' ', '-')}-jobs-in-{location.replace(' ', '-')}"
+            await page.goto(url, wait_until="domcontentloaded", timeout=90000)
+            await page.wait_for_timeout(5000)
+            try:
+                await page.click("span.nI-gNb-icon-close", timeout=2000)
+            except: pass
+            for _ in range(3):
+                await page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
+                await page.wait_for_timeout(1500)
+            cards = await page.query_selector_all(".cust-job-tuple")
+            print(f"({len(cards)} cards found)", end=" → ")
+            for card in cards[:20]:
+                try:
+                    title_elem = await card.query_selector("a.title")
+                    title = await title_elem.inner_text() if title_elem else "N/A"
+                    company_elem = await card.query_selector("a.subTitle, span.comp-name")
+                    company = await company_elem.inner_text() if company_elem else "N/A"
+                    link = await title_elem.get_attribute("href") if title_elem else ""
+                    desc_elem = await card.query_selector(".job-desc")
+                    desc = await desc_elem.inner_text() if desc_elem else ""
+                    if title != "N/A" and link:
+                        jobs.append({"title": title.strip(),"company": company.strip(),"link": link,"desc": desc.strip(),"source": "Naukri"})
+                except:
+                    continue
+            print(f"Success: {len(jobs)} jobs")
+
+        elif site_name == "Glassdoor":
+            url = f"https://www.glassdoor.co.in/Job/{query.replace(' ', '-')}-jobs-SRCH_KO0,{len(query)}.htm"
+            await page.add_init_script("""
+                Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            """)
+            await page.goto(url, wait_until="domcontentloaded", timeout=120000)
+            await page.wait_for_timeout(5000)
+            for _ in range(4):
+                await page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
+                await page.wait_for_timeout(1500)
+            cards = await page.query_selector_all("div.jobCard.css-1v4whg0")
+            print(f"({len(cards)} cards found)", end=" → ")
+            for card in cards[:25]:
+                try:
+                    title_elem = await card.query_selector("a[data-test='job-link']")
+                    title = await title_elem.inner_text() if title_elem else "N/A"
+                    company_elem = await card.query_selector("span.EmployerProfile_compactEmployerName__9tR6_")
+                    company = await company_elem.inner_text() if company_elem else "N/A"
+                    href = await title_elem.get_attribute("href") if title_elem else ""
+                    link = f"https://www.glassdoor.co.in{href}" if href.startswith("/") else href
+                    desc_elem = await card.query_selector("div.JobCard_jobDescriptionSnippet__jXlJg")
+                    desc = await desc_elem.inner_text() if desc_elem else ""
+                    if title != "N/A" and link:
+                        jobs.append({"title": title.strip(),"company": company.strip(),"link": link,"desc": desc.strip(),"source": "Glassdoor"})
+                except:
+                    continue
+            print(f"Success: {len(jobs)} jobs")
+
+        elif site_name == "Internshala":
+            url = f"https://internshala.com/jobs/{query.replace(' ', '-')}-jobs/"
+            await page.goto(url, wait_until="domcontentloaded", timeout=90000)
+            await page.wait_for_timeout(4000)
+            cards = await page.query_selector_all(".internship_meta")
+            print(f"({len(cards)} cards found)", end=" → ")
+            for card in cards[:25]:
+                try:
+                    title_elem = await card.query_selector("a[href*='/job/detail']")
+                    title = await title_elem.inner_text() if title_elem else "N/A"
+                    company_elem = await card.query_selector(".company-name")
+                    company = await company_elem.inner_text() if company_elem else "N/A"
+                    link_elem = await card.query_selector("a[href*='/job/detail']")
+                    link = "https://internshala.com" + await link_elem.get_attribute("href") if link_elem else ""
+                    desc_elem = await card.query_selector(".internship-details")
+                    desc = await desc_elem.inner_text() if desc_elem else ""
+                    if title != "N/A" and link:
+                        jobs.append({"title": title.strip(), "company": company.strip(), "link": link, "desc": desc.strip(), "source": "Internshala"})
+                except: continue
+            print(f"Success: {len(jobs)} jobs")
+
+        elif site_name == "LinkedIn":
+            url = f"https://www.linkedin.com/jobs/search?keywords={query.replace(' ', '%20')}&location={location}"
+            await page.goto(url, wait_until="domcontentloaded", timeout=90000)
+            await page.wait_for_timeout(8000)
+            cards = await page.query_selector_all(".base-card, .jobs-search-results__list-item")
+            print(f"({len(cards)} cards found)", end=" → ")
+            for card in cards[:20]:
+                try:
+                    title_elem = await card.query_selector("h3.base-search-card__title")
+                    title = await title_elem.inner_text() if title_elem else "N/A"
+                    company_elem = await card.query_selector(".base-search-card__subtitle")
+                    company = await company_elem.inner_text() if company_elem else "N/A"
+                    link_elem = await card.query_selector("a.base-card__full-link")
+                    link = await link_elem.get_attribute("href") if link_elem else ""
+                    if title != "N/A" and link:
+                        jobs.append({"title": title.strip(), "company": company.strip(), "link": link.split("?")[0], "desc": "", "source": "LinkedIn"})
+                except: continue
+            print(f"Success: {len(jobs)} jobs")
+
+    except Exception as e:
+        print(f"Failed: {str(e)[:60]}")
+
+    return jobs
+    
+
+async def scrape_all_jobs(query: str, location: str, max_jobs: int):
+    all_jobs = []
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=False,  
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--disable-gpu",
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+            ]
+        )
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            viewport={"width": 1920, "height": 1080},
+            locale="en-IN"
+        )
+        page = await context.new_page()
+
+        await context.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            window.navigator.chrome = { runtime: {} };
+            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+            Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+        """)
+        
+        for site in SITES:
+            jobs = await scrape_jobs_from_site(page, site, query, location)
+            all_jobs.extend(jobs)
+            if len(all_jobs) >= max_jobs:
+                break
+            await page.wait_for_timeout(2000)
+
+        await browser.close()
+    return all_jobs
+
+
+def extract_cv_text(path: str):
+    try:
+        reader = PdfReader(path)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+        return text.lower()
+    except Exception as e:
+        print(f"CV Read Error: {e}")
+        return ""
+    
+
+def match_and_rank(cv_text: str, jobs: list):
+    if not cv_text or not jobs:
+        return []
+    vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(1,2), max_features=10000)
+    try:
+        texts = [cv_text] + [f"{j['title']} {j['company']}".lower() for j in jobs]
+        matrix = vectorizer.fit_transform(texts)
+        similarities = cosine_similarity(matrix[0:1], matrix[1:])[0]
+        ranked = [(sim, job) for sim, job in zip(similarities, jobs)]
+        ranked.sort(key=lambda x: x[0], reverse=True)
+        return ranked[:50]
+    except:
+        return [(0.0, job) for job in jobs[:50]]
+    
+
+# Main
+async def main():
+    print("   JOB MATCHER   ")
+    # cv_path = input("\nEnter your CV PDF path: ").strip().strip('"')
+    # if not os.path.exists(cv_path):
+    #     print("File not found!")
+    #     return
+    cv_path = "/MUHAMMED_SHAHAN_P_P_RESUME__Data_Scientist_ (1).pdf"
+
+    cv_text = extract_cv_text(cv_path)
+    if not cv_text:
+        return
+    
+    query = input("\nEnter job title (e.g. Data Engineer, Python Developer, Intern): ").strip()
+    location = input(f"\nSuggested role: {query}\nEnter location (e.g. Bangalore, Remote): ").strip() or ""
+
+    print(f"\nScraping jobs for: '{query}' in '{location}'...")
+    jobs = await scrape_all_jobs(query, location, max_jobs=400)
+
+    if not jobs:
+        print("No jobs found. Try different keywords.")
+        return
+
+    print(f"\nFound {len(jobs)} jobs. Matching to your CV...")
+    ranked = match_and_rank(cv_text, jobs)
+
+    print(f"\nTOP 50 BEST MATCHES FOR YOUR CV:")
+    for i, (score, job) in enumerate(ranked, 1):
+        print(f"{i:2}. [{job['source']:10}] {job['title'][:60]:60} at {job['company'][:30]:30}")
+        print(f"     Match Score: {score:.3f} | Link → {job['link']}")
+        print("-" * 100)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
