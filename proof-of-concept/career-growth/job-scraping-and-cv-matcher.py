@@ -1,127 +1,228 @@
-import asyncio, re, os
+import asyncio
 from playwright.async_api import async_playwright
 from PyPDF2 import PdfReader
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import random
 
-# List of sites to scrape (80%-90% coverage)
-SITES = ["Indeed", "Naukri", "Internshala", "Glassdoor", "LinkedIn", "ZipRecruiter"]
+SITES = ["Indeed", "Naukri", "Internshala", "Glassdoor", "LinkedIn"]
 
 async def scrape_jobs_from_site(page, site_name, query, location):
     jobs = []
     try:
-        print(f"Scraping {site_name}...")
+        print(f"Scraping {site_name}...", end=" ")
 
         if site_name == "Indeed":
-            url = f"https://in.indeed.com/jobs?q={query.replace(' ', '+')}&l={location.replace(' ', '+')}"
-            await page.goto(url, wait_until="domcontentloaded", timeout=90000)  # ← Changed
-            await page.wait_for_timeout(5000)
-            await page.wait_for_selector("ul.jobsearch-ResultsList", timeout=10000)
-            cards = await page.query_selector_all("a[data-jk]")
-            for card in cards[:25]:
+            # Fixed URL: Exact phrase + recent jobs param to boost results & reduce caching
+            base_query = query.replace(" ", "+")
+            encoded_query = f"%22{base_query}%22"  # Exact "Data Science" match
+            location_plus = location.replace(" ", "+")
+            url = f"https://in.indeed.com/jobs?q={encoded_query}&l={location_plus}&fromage=7"  # Last 7 days for fresh hits
+            await page.goto(url, wait_until="domcontentloaded", timeout=90000)  # networkidle waits for AJAX
+            await page.wait_for_timeout(random.randint(3000, 5000))  # Random human pause
+            # Enhanced scrolling: 3 gradual scrolls to load ~20-30 jobs
+            for i in range(3):
+                await page.evaluate(f"window.scrollBy(0, {800 * (i + 1)})")  # Incremental scroll
+                await page.wait_for_timeout(random.randint(1500, 3000))
+            # === PRIORITY SELECTORS (Dec 2025 - India Layout) ===
+            cards = await page.query_selector_all('li[data-testid="jobsearch-JobCard"]')
+            # Fallback 1: Grid item wrapper (common in mosaic view)
+            if not cards:
+                cards = await page.query_selector_all('div[data-testid="job-container"]')
+            # Fallback 2: Legacy with data-jk (still ~10% of pages)
+            if not cards:
+                cards = await page.query_selector_all('div[data-jk]')     
+            # Fallback 3: Broad beacon (for beacon-tracked jobs)
+            if not cards:
+                cards = await page.query_selector_all('div.job_seen_beacon')
+            print(f"({len(cards)} cards found)", end=" → ")
+            success_count = 0
+            for card in cards[:30]:  # Cap at 30 to avoid overload
                 try:
-                    title = await (await card.query_selector("h2 a span")).inner_text()
-                    company = await (await card.query_selector(".companyName")).inner_text()
-                    link = "https://in.indeed.com" + await (await card.query_selector("a")).get_attribute("href")
-                    desc = await (await card.query_selector(".job-snippet")).inner_text() if await card.query_selector(".job-snippet") else ""
-                    jobs.append({"title": title.strip(), "company": company.strip(), "link": link, "desc": desc.strip(), "source": "Indeed"})
-                except: continue
+                    # === Title (Multi-fallback) ===
+                    title = "N/A"
+                    title_elem = await card.query_selector('[data-testid="jobTitle"] span[title]')
+                    if title_elem:
+                        title = await title_elem.get_attribute("title")
+                    else:
+                        title_elem = await card.query_selector('h2 a span[title]')
+                        if title_elem:
+                            title = await title_elem.get_attribute("title") or await title_elem.inner_text()                   
+                    # === Company ===
+                    company = "N/A"
+                    company_elem = await card.query_selector('[data-testid="company-name"]')
+                    if company_elem:
+                        company = await company_elem.inner_text()
+                    else:
+                        company_elem = await card.query_selector('span.companyName')
+                        if company_elem:
+                            company = await company_elem.inner_text()
+                    # === Link ===
+                    link = ""
+                    link_elem = await card.query_selector('a[data-jk]')
+                    if link_elem:
+                        href = await link_elem.get_attribute("href")
+                        link = f"https://in.indeed.com{href}" if href and href.startswith("/") else href
+                    else:
+                        link_elem = await card.query_selector('h2 a')
+                        if link_elem:
+                            href = await link_elem.get_attribute("href")
+                            link = f"https://in.indeed.com{href}" if href and href.startswith("/") else href
+                    # === Description ===
+                    desc = ""
+                    desc_elem = await card.query_selector('[data-testid="jobsearch-JobCard-description"]')
+                    if desc_elem:
+                        desc = await desc_elem.inner_text()
+                    else:
+                        desc_elems = await card.query_selector_all('div[data-testid="jobsearch-JobCard-reqSnippet"] li')
+                        desc_parts = []
+                        for li in desc_elems[:3]:  # Top 3 bullets
+                            text = await li.inner_text()
+                            if text:
+                                desc_parts.append(text)
+                        desc = " • ".join(desc_parts)
+                    if title != "N/A" and link and "indeed" in link:
+                        jobs.append({
+                            "title": title.strip(),
+                            "company": company.strip(),
+                            "link": link,
+                            "desc": (desc.strip()[:400] + "...") if len(desc) > 400 else desc.strip(),  # Truncate
+                            "source": "Indeed"
+                        })
+                        success_count += 1
+                except Exception:
+                    continue  # Skip broken cards
+            print(f"Success: {success_count} jobs")
+            if success_count == 0:
+                print("Debug: Check console for page errors or try without quotes in query.")
 
         elif site_name == "Naukri":
-            url = f"https://www.naukri.com/{query.replace(' ', '-')}-jobs"
-            await page.goto(url, wait_until="networkidle", timeout=60000)
-            await page.wait_for_timeout(4000)
-            cards = await page.query_selector_all("article.jobTuple")
+            url = f"https://www.naukri.com/{query.replace(' ', '-')}-jobs-in-{location.replace(' ', '-')}"
+            await page.goto(url, wait_until="domcontentloaded", timeout=90000)
+            await page.wait_for_timeout(5000)
+            try:
+                await page.click("span.nI-gNb-icon-close", timeout=2000)
+            except: pass
+            for _ in range(3):
+                await page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
+                await page.wait_for_timeout(1500)
+            cards = await page.query_selector_all(".cust-job-tuple")
+            print(f"({len(cards)} cards found)", end=" → ")
+            for card in cards[:20]:
+                try:
+                    title_elem = await card.query_selector("a.title")
+                    title = await title_elem.inner_text() if title_elem else "N/A"
+                    company_elem = await card.query_selector("a.subTitle, span.comp-name")
+                    company = await company_elem.inner_text() if company_elem else "N/A"
+                    link = await title_elem.get_attribute("href") if title_elem else ""
+                    desc_elem = await card.query_selector(".job-desc")
+                    desc = await desc_elem.inner_text() if desc_elem else ""
+                    if title != "N/A" and link:
+                        jobs.append({"title": title.strip(),"company": company.strip(),"link": link,"desc": desc.strip(),"source": "Naukri"})
+                except:
+                    continue
+            print(f"Success: {len(jobs)} jobs")
+
+        elif site_name == "Glassdoor":
+            url = f"https://www.glassdoor.co.in/Job/{query.replace(' ', '-')}-jobs-SRCH_KO0,{len(query)}.htm"
+            await page.add_init_script("""
+                Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            """)
+            await page.goto(url, wait_until="domcontentloaded", timeout=120000)
+            await page.wait_for_timeout(5000)
+            for _ in range(4):
+                await page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
+                await page.wait_for_timeout(1500)
+            cards = await page.query_selector_all("div.jobCard.css-1v4whg0")
+            print(f"({len(cards)} cards found)", end=" → ")
             for card in cards[:25]:
-                title_elem = await card.query_selector("a.title")
-                company_elem = await card.query_selector("a.subTitle")
-                link_elem = await card.query_selector("a.title")
-                desc_elem = await card.query_selector(".job-description")
-                title = await title_elem.inner_text() if title_elem else "N/A"
-                company = await company_elem.inner_text() if company_elem else "N/A"
-                link = await link_elem.get_attribute("href") if link_elem else ""
-                desc = await desc_elem.inner_text() if desc_elem else ""
-                jobs.append({"title": title.strip(), "company": company.strip(), "link": link, "desc": desc.strip(), "source": site_name})
+                try:
+                    title_elem = await card.query_selector("a[data-test='job-link']")
+                    title = await title_elem.inner_text() if title_elem else "N/A"
+                    company_elem = await card.query_selector("span.EmployerProfile_compactEmployerName__9tR6_")
+                    company = await company_elem.inner_text() if company_elem else "N/A"
+                    href = await title_elem.get_attribute("href") if title_elem else ""
+                    link = f"https://www.glassdoor.co.in{href}" if href.startswith("/") else href
+                    desc_elem = await card.query_selector("div.JobCard_jobDescriptionSnippet__jXlJg")
+                    desc = await desc_elem.inner_text() if desc_elem else ""
+                    if title != "N/A" and link:
+                        jobs.append({"title": title.strip(),"company": company.strip(),"link": link,"desc": desc.strip(),"source": "Glassdoor"})
+                except:
+                    continue
+            print(f"Success: {len(jobs)} jobs")
 
         elif site_name == "Internshala":
             url = f"https://internshala.com/jobs/{query.replace(' ', '-')}-jobs/"
-            await page.goto(url, wait_until="networkidle", timeout=60000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=90000)
             await page.wait_for_timeout(4000)
             cards = await page.query_selector_all(".internship_meta")
+            print(f"({len(cards)} cards found)", end=" → ")
             for card in cards[:25]:
-                title_elem = await card.query_selector("a[href*='/job/detail']")
-                company_elem = await card.query_selector(".company-name")
-                link_elem = await card.query_selector("a[href*='/job/detail']")
-                desc_elem = await card.query_selector(".internship-details")
-                title = await title_elem.inner_text() if title_elem else "N/A"
-                company = await company_elem.inner_text() if company_elem else "N/A"
-                link = "https://internshala.com" + (await link_elem.get_attribute("href")) if link_elem else ""
-                desc = await desc_elem.inner_text() if desc_elem else ""
-                jobs.append({"title": title.strip(), "company": company.strip(), "link": link, "desc": desc.strip(), "source": site_name})
-
-        elif site_name == "Glassdoor":
-            url = f"https://www.glassdoor.co.in/Job/jobs.htm?sc.keyword={query.replace(' ', '%20')}"
-            await page.goto(url, wait_until="networkidle", timeout=60000)
-            await page.wait_for_timeout(4000)
-            cards = await page.query_selector_all("li[data-test='job-listing']")
-            for card in cards[:20]:
-                title_elem = await card.query_selector("a.job-title")
-                company_elem = await card.query_selector("a.employer-name")
-                link_elem = await card.query_selector("a.job-title")
-                desc_elem = await card.query_selector(".job-description")
-                title = await title_elem.inner_text() if title_elem else "N/A"
-                company = await company_elem.inner_text() if company_elem else "N/A"
-                link = await link_elem.get_attribute("href") if link_elem else ""
-                if link and not link.startswith("http"):
-                    link = "https://www.glassdoor.co.in" + link
-                desc = await desc_elem.inner_text() if desc_elem else ""
-                jobs.append({"title": title.strip(), "company": company.strip(), "link": link, "desc": desc.strip(), "source": site_name})
+                try:
+                    title_elem = await card.query_selector("a[href*='/job/detail']")
+                    title = await title_elem.inner_text() if title_elem else "N/A"
+                    company_elem = await card.query_selector(".company-name")
+                    company = await company_elem.inner_text() if company_elem else "N/A"
+                    link_elem = await card.query_selector("a[href*='/job/detail']")
+                    link = "https://internshala.com" + await link_elem.get_attribute("href") if link_elem else ""
+                    desc_elem = await card.query_selector(".internship-details")
+                    desc = await desc_elem.inner_text() if desc_elem else ""
+                    if title != "N/A" and link:
+                        jobs.append({"title": title.strip(), "company": company.strip(), "link": link, "desc": desc.strip(), "source": "Internshala"})
+                except: continue
+            print(f"Success: {len(jobs)} jobs")
 
         elif site_name == "LinkedIn":
             url = f"https://www.linkedin.com/jobs/search?keywords={query.replace(' ', '%20')}&location={location}"
             await page.goto(url, wait_until="domcontentloaded", timeout=90000)
             await page.wait_for_timeout(8000)
-            await page.wait_for_selector(".jobs-search__results-list", timeout=15000)
-            cards = await page.query_selector_all(".base-card")
+            cards = await page.query_selector_all(".base-card, .jobs-search-results__list-item")
+            print(f"({len(cards)} cards found)", end=" → ")
             for card in cards[:20]:
                 try:
-                    title = await (await card.query_selector("h3")).inner_text()
-                    company = await (await card.query_selector(".base-search-card__subtitle")).inner_text()
-                    link = await (await card.query_selector("a")).get_attribute("href")
-                    jobs.append({"title": title.strip(), "company": company.strip(), "link": link.split("?")[0], "desc": "", "source": "LinkedIn"})
+                    title_elem = await card.query_selector("h3.base-search-card__title")
+                    title = await title_elem.inner_text() if title_elem else "N/A"
+                    company_elem = await card.query_selector(".base-search-card__subtitle")
+                    company = await company_elem.inner_text() if company_elem else "N/A"
+                    link_elem = await card.query_selector("a.base-card__full-link")
+                    link = await link_elem.get_attribute("href") if link_elem else ""
+                    if title != "N/A" and link:
+                        jobs.append({"title": title.strip(), "company": company.strip(), "link": link.split("?")[0], "desc": "", "source": "LinkedIn"})
                 except: continue
+            print(f"Success: {len(jobs)} jobs")
 
-        elif site_name == "ZipRecruiter":
-            url = f"https://www.ziprecruiter.com/jobs/search?search={query.replace(' ', '+')}"
-            await page.goto(url, wait_until="domcontentloaded", timeout=90000)
-            await page.wait_for_timeout(6000)
-            cards = await page.query_selector_all(".job_content")
-            for card in cards[:20]:
-                try:
-                    title = await (await card.query_selector("h2 a")).inner_text()
-                    company = await (await card.query_selector(".name")).inner_text()
-                    link = "https://www.ziprecruiter.com" + await (await card.query_selector("a")).get_attribute("href")
-                    jobs.append({"title": title.strip(), "company": company.strip(), "link": link, "desc": "", "source": "ZipRecruiter"})
-                except: continue
-
-            print(f" Got {len(jobs)} jobs from {site_name}")
     except Exception as e:
-        print(f"Error on {site_name}: {e}")
-    return jobs
+        print(f"Failed: {str(e)[:60]}")
 
+    return jobs
+    
 
 async def scrape_all_jobs(query: str, location: str, max_jobs: int):
     all_jobs = []
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=False,  
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--disable-gpu",
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+            ]
+        )
         context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             viewport={"width": 1920, "height": 1080},
-            java_script_enabled=True,
-            bypass_csp=True
+            locale="en-IN"
         )
         page = await context.new_page()
 
+        await context.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            window.navigator.chrome = { runtime: {} };
+            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+            Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+        """)
+        
         for site in SITES:
             jobs = await scrape_jobs_from_site(page, site, query, location)
             all_jobs.extend(jobs)
