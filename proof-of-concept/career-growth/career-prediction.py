@@ -11,10 +11,10 @@ client = Groq(api_key=os.getenv("career-growth"))
 # Questions
 QUESTIONS = [
     "Do you enjoy solving mathematical problems? (yes/no)",
-    "Are you interested in cybersecurity or ethical hacking? (yes/no)",
+    "Are you interested in ethical hacking? (yes/no)",
     "Do you find networking, servers, infrastructure appealing? (yes/no)",
     "Do you like writing code and building software? (yes/no)",
-    "Are you intrested in databases and data engineering? (yes/no)",
+    "Are you intrested in databases? (yes/no)",
     "Do you enjoy machine learning or AI research? (yes/no)",
     "Do you prefer working on UI/UX and front-end design? (yes/no)",
     "Do you like debugging and maintaining production systems? (yes/no)",
@@ -32,7 +32,7 @@ QUESTIONS = [
 ]
 
 # Prompt Builder
-def build_prompt(answers: dict) -> str:
+def build_prompt(answers: dict):
     bullet_text = "\n".join([f"- {q}: {a}" for q, a in answers.items()])
 
     return f"""
@@ -58,7 +58,7 @@ def build_prompt(answers: dict) -> str:
     """
 
 # LLM call
-def call_llm(prompt: str)->str:
+def call_llm(prompt: str):
     response = client.chat.completions.create(
         model="llama-3.3-70B-versatile",
         messages=[{"role": "user", "content": prompt}],
@@ -73,19 +73,16 @@ def run_career_prediction():
     print("\n==== IT Career Predictor ====n")
     answers = {}
 
-    # ask questions interactively 
+    # ask questions 
     for q in QUESTIONS:
         ans = input(q + "\n> ")
         answers[q] = ans
 
-    # create LLM prompt
     prompt = build_prompt(answers)
 
-    # call LLM
     print("\nGenerating career suggestions...\n")
     response = call_llm(prompt)
 
-    # parse and print result
     result_json = response.choices[0].message.content
     careers = json.loads(result_json)  # Convert string to Json format
 
