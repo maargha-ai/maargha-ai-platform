@@ -1,4 +1,6 @@
 .env
 
 #venv
-maarghaenv
+maarghaenv*
+*.mp4
+*.pdf

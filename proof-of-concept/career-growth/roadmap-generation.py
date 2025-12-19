@@ -67,11 +67,9 @@ def wrap_text(draw, text, font, max_width):
 # Generate Images for Each Slide (Pillow)
 def generate_slide_image(title:str, bullets: list):
     width, height = 1280, 720
-
     # Cartoon gradient background
     img = Image.new("RGB", (width, height), color=(60, 120, 200))
     draw = ImageDraw.Draw(img)
-
     # Cartoon fonts (fallback to default if not found)
     try:
         font_title = ImageFont.truetype("arial.ttf", 60)
@@ -79,14 +77,11 @@ def generate_slide_image(title:str, bullets: list):
     except:
         font_title = ImageFont.load_default()
         font_bullet = ImageFont.load_default()
-
     # Draw Title
     draw.text((50, 40), title, fill="yellow", font=font_title)
-
     # Draw bullets with auto-wrap
     max_width = width - 100
     y = 200
-
     for b in bullets:
         lines = wrap_text(draw, f"- {b}", font_bullet, max_width)
         for line in lines:
