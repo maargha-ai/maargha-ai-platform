@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import random
 
-SITES = ["Indeed", "Naukri", "Internshala", "Glassdoor", "LinkedIn"]
+SITES = ["Indeed", "Naukri", "Internshala", "LinkedIn"]
 
 async def scrape_jobs_from_site(page, site_name, query, location):
     jobs = []
@@ -119,34 +119,6 @@ async def scrape_jobs_from_site(page, site_name, query, location):
                     desc = await desc_elem.inner_text() if desc_elem else ""
                     if title != "N/A" and link:
                         jobs.append({"title": title.strip(),"company": company.strip(),"link": link,"desc": desc.strip(),"source": "Naukri"})
-                except:
-                    continue
-            print(f"Success: {len(jobs)} jobs")
-
-        elif site_name == "Glassdoor":
-            url = f"https://www.glassdoor.co.in/Job/{query.replace(' ', '-')}-jobs-SRCH_KO0,{len(query)}.htm"
-            await page.add_init_script("""
-                Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-            """)
-            await page.goto(url, wait_until="domcontentloaded", timeout=120000)
-            await page.wait_for_timeout(5000)
-            for _ in range(4):
-                await page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
-                await page.wait_for_timeout(1500)
-            cards = await page.query_selector_all("div.jobCard.css-1v4whg0")
-            print(f"({len(cards)} cards found)", end=" → ")
-            for card in cards[:25]:
-                try:
-                    title_elem = await card.query_selector("a[data-test='job-link']")
-                    title = await title_elem.inner_text() if title_elem else "N/A"
-                    company_elem = await card.query_selector("span.EmployerProfile_compactEmployerName__9tR6_")
-                    company = await company_elem.inner_text() if company_elem else "N/A"
-                    href = await title_elem.get_attribute("href") if title_elem else ""
-                    link = f"https://www.glassdoor.co.in{href}" if href.startswith("/") else href
-                    desc_elem = await card.query_selector("div.JobCard_jobDescriptionSnippet__jXlJg")
-                    desc = await desc_elem.inner_text() if desc_elem else ""
-                    if title != "N/A" and link:
-                        jobs.append({"title": title.strip(),"company": company.strip(),"link": link,"desc": desc.strip(),"source": "Glassdoor"})
                 except:
                     continue
             print(f"Success: {len(jobs)} jobs")
