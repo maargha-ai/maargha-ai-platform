@@ -1,0 +1,5 @@
+#secretfile
+.env
+
+#venv
+userenv*
