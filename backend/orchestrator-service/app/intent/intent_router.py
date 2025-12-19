@@ -10,7 +10,8 @@ IntentType = Literal[
     "job_search",
     "cv_matching",
     "networking_events",
-    "linkedin_assistant"
+    "linkedin_assistant",
+    "quiz_section",
     "emotional_support",
     "general_chat",
     "unknown"
@@ -35,6 +36,7 @@ Categories:
 - dev events
 - linkedin optimization
 - grow linkedin
+- quiz_section
 - emotional_support
 - general_chat
 - unknown

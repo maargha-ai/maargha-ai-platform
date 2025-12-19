@@ -19,7 +19,10 @@ def should_enter_planner(intent: IntentType, state: AgentState) -> bool:
         "roadmap_generation",
         "job_search",
         "cv_matching",
-        "emotional_support",
+        "networking_events",
+        "linkedin_assistant",
+        "quiz_section",
+        "emotional_support"
     }:
         return True
 

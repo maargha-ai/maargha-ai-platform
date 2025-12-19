@@ -118,21 +118,21 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
     except WebSocketDisconnect:
         print(f"[main 6] User disconnected: {user_id}")
 
-@app.post("/upload-cv/{user_id}")
-async def upload_cv(user_id: str, file: UploadFile = File(...)):
-    user_dir = STATIC_DIR / "cvs" / user_id
-    user_dir.mkdir(parents=True, exist_ok=True)
+# @app.post("/upload-cv/{user_id}")
+# async def upload_cv(user_id: str, file: UploadFile = File(...)):
+#     user_dir = STATIC_DIR / "cvs" / user_id
+#     user_dir.mkdir(parents=True, exist_ok=True)
 
-    cv_path = user_dir / file.filename
-    with open(cv_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
+#     cv_path = user_dir / file.filename
+#     with open(cv_path, "wb") as f:
+#         shutil.copyfileobj(file.file, f)
 
-    # THIS IS THE CRITICAL PART
-    if user_id not in USER_STATE:
-        USER_STATE[user_id] = {}
+#     # THIS IS THE CRITICAL PART
+#     if user_id not in USER_STATE:
+#         USER_STATE[user_id] = {}
 
-    USER_STATE[user_id]["cv_path"] = str(cv_path)
-    return {
-        "message": "CV uploaded successfully",
-        "cv_path": str(cv_path)
-    }
+#     USER_STATE[user_id]["cv_path"] = str(cv_path)
+#     return {
+#         "message": "CV uploaded successfully",
+#         "cv_path": str(cv_path)
+#     }

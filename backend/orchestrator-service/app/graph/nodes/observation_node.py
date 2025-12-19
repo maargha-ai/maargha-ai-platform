@@ -93,6 +93,52 @@ async def observation_node(state: AgentState):
         }]
         updates["agent_waiting_for_user"] = True
         
+
+    elif tool_result["type"] == "quiz_questions":
+        questions = tool_result["questions"]
+
+        updates["quiz_questions"] = questions
+        updates["quiz_question_idx"] = 1
+        updates["quiz_answers"] = {}
+        updates["quiz_mode"] = True
+
+        updates["messages"] = state["messages"] + [{
+            "role": "assistant",
+            "content": f" Quiz started for **{state['selected_career']}**\n\n"
+                    f"Question 1:\n{questions[0]['question']}"
+        }]
+        updates["agent_waiting_for_user"] = True
+
+    if state.get("quiz_mode") and state.get("agent_action") is None:
+        idx = state["quiz_question_idx"]
+        questions = state["quiz_questions"]
+
+        if idx < len(questions):
+            updates["quiz_question_idx"] = idx + 1
+            updates["quiz_answers"] = {
+                **state["quiz_answers"],
+                questions[idx]["question"]: state["messages"][-1]["content"]
+            }
+
+            if idx + 1 < len(questions):
+                updates["messages"] = state["messages"] + [{
+                    "role": "assistant",
+                    "content": f"Question {idx+2}:\n{questions[idx+1]['question']}"
+                }]
+                updates["agent_waiting_for_user"] = True
+            else:
+                updates["agent_action"] = "QuizEvaluator"
+
+    elif tool_result["type"] == "quiz_evaluation":
+        updates["messages"] = state["messages"] + [{
+            "role": "assistant",
+            "content": f" **Quiz Evaluation Result**\n\n{tool_result['result']}"
+        }]
+
+        updates["quiz_mode"] = False
+        updates["quiz_completed"] = True
+        updates["agent_done"] = True
+
     # Cleanup
     updates["tool_result"] = None
     updates["agent_action"] = None

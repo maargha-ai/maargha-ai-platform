@@ -15,6 +15,7 @@ Your goal is to help the user with:
 - Helping with job search and CV matching
 - Finding Hackathons, Conferences, Ideathons, Summits, Seminars
 - Helping to optmize LinkedIn profile using LinkedIn Assistant
+- Generating quiz questions and evaluation user based on it
 
 But you are also warm and conversational — you don't push too hard.
 
@@ -49,6 +50,7 @@ AVAILABLE TOOLS:
 3. JobSearch → Requires cv_path, job_role, job_location
 4. NetworkingEvents
 5. LinkedInAssistant → Use when user need help in optimizing linkedin profile
+6. QuizGenerator
 
 CRITICAL RULES:
 - Only one action per step
@@ -98,7 +100,8 @@ async def reasoning_node(state: AgentState):
                 },
             "agent_waiting_for_user": True
             }
-    
+        
+        
     if any(k in last_msg for k in ["linkedin", "optimize profile"]):
         return {
             "agent_thought": "User wants help with LinkedIn profile optimization",
@@ -108,8 +111,35 @@ async def reasoning_node(state: AgentState):
             },
             "linkedin_mode": True
         }
+    
+    if any(k in last_msg for k in [
+        "quiz", "test me", "assessment", "evaluate me", "practice questions"
+    ]):
+        if not state.get("selected_career"):
+            return {
+                "agent_action": "AskUser",
+                "agent_action_input": {
+                    "message": (
+                        "I can create a quiz based on your career.\n\n"
+                        "Would you like to:\n"
+                        " Predict your career first\n"
+                        " Tell me your career directly"
+                    )
+                },
+                "agent_waiting_for_user": True
+            }
 
-    # ---- NETWORKING EVENTS ----
+        return {
+            "agent_thought": "User wants a quiz based on career",
+            "agent_action": "QuizGenerator",
+            "agent_action_input": {
+                "career": state["selected_career"]
+            },
+            "quiz_mode": True
+        }
+
+
+    # NETWORKING EVENTS 
     if any(k in last_msg for k in [
         "hackathon", "meetup", "conference", "event", "networking"
     ]):
