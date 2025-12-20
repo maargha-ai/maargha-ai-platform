@@ -1,0 +1,87 @@
+/* Full page */
+.register-wrapper {
+  height: 100vh;
+  width: 100vw;
+  background: black;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Stars container */
+.stars-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Individual stars */
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: floatStar linear infinite;
+  top: calc(100% * var(--y));
+  left: calc(100% * var(--x));
+}
+
+/* Random placement */
+.star:nth-child(n) {
+  --x: calc(random() * 1);
+  --y: calc(random() * 1);
+  animation-duration: calc(8s + random() * 12s);
+}
+
+/* Floating motion */
+@keyframes floatStar {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-120vh);
+  }
+}
+
+/* White card */
+.register-card {
+  z-index: 2;
+  background: white;
+  padding: 48px;
+  border-radius: 20px;
+  width: 380px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+.register-card h2 {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.register-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.register-card input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.register-card button {
+  margin-top: 12px;
+  padding: 12px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
