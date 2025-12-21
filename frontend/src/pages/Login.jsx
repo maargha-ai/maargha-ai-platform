@@ -28,7 +28,7 @@ export default function Login() {
       localStorage.setItem("access_token", tokens.access);
       localStorage.setItem("refresh_token", tokens.refresh);
 
-      navigate("/"); // later → dashboard
+      navigate("/dashboard"); 
     } catch (err) {
       setError(err.message);
     }
