@@ -1,9 +1,9 @@
 import "../styles/register.css";
 import { useNavigate } from "react-router-dom";
 
-export default function Register() {
-  const stars = Array.from({ length: 920 });
+export default function Login() {
   const navigate = useNavigate();
+  const stars = Array.from({ length: 920 });
 
   return (
     <div className="register-wrapper">
@@ -26,7 +26,7 @@ export default function Register() {
         })}
       </div>
 
-      {/* FORM CARD */}
+      {/* LOGIN CARD */}
       <div className="register-card">
         <button
           className="home-float-btn"
@@ -35,18 +35,18 @@ export default function Register() {
         >
           ⌂
         </button>
-        <h2>Create Account</h2>
+        <h2>Welcome Back</h2>
 
         <form>
-          <input type="text" placeholder="Full Name" />
           <input type="email" placeholder="Email" />
           <input type="password" placeholder="Password" />
 
-          <button type="submit">Register</button>
+          <button type="submit">Login</button>
         </form>
 
         <p className="login-link">
-        Already have an account? <span onClick={() => navigate("/login")}>Login</span>
+          Don’t have an account?{" "}
+          <span onClick={() => navigate("/register")}>Register</span>
         </p>
       </div>
     </div>
