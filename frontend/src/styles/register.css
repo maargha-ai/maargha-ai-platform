@@ -90,7 +90,7 @@
   width: 520px;
   padding: 64px 56px;
 
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0);
   backdrop-filter: blur(0.1px);
 
   border-radius: 28px;
