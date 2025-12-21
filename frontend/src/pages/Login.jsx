@@ -1,9 +1,38 @@
 import "../styles/register.css";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { loginUser } from "../services/authService";
 
 export default function Login() {
   const navigate = useNavigate();
   const stars = Array.from({ length: 920 });
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const tokens = await loginUser(form);
+
+      localStorage.setItem("access_token", tokens.access);
+      localStorage.setItem("refresh_token", tokens.refresh);
+
+      navigate("/"); // later → dashboard
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
     <div className="register-wrapper">
@@ -37,12 +66,26 @@ export default function Login() {
         </button>
         <h2>Welcome Back</h2>
 
-        <form>
-          <input type="email" placeholder="Email" />
-          <input type="password" placeholder="Password" />
+        <form onSubmit={handleSubmit}>
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+            required
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            onChange={handleChange}
+            required
+          />
 
           <button type="submit">Login</button>
         </form>
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
         <p className="login-link">
           Don’t have an account?{" "}
