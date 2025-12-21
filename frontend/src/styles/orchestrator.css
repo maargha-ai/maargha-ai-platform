@@ -1,0 +1,63 @@
+.orchestrator-wrapper {
+  height: 100vh;
+  background: #0b0b0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-card {
+  width: 720px;
+  height: 80vh;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.chat-bubble {
+  max-width: 70%;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+}
+
+.chat-bubble.ai {
+  background: rgba(255,255,255,0.12);
+  align-self: flex-start;
+}
+
+.chat-bubble.user {
+  background: white;
+  color: black;
+  align-self: flex-end;
+}
+
+.chat-input {
+  display: flex;
+  padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+}
+
+.chat-input button {
+  margin-left: 12px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+}

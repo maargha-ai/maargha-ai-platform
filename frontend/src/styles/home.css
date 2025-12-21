@@ -1,0 +1,155 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Page */
+.home-wrapper {
+  background: white;
+}
+
+/* OUTER spacing like BeachHack */
+.hero-outer {
+  width: 100vw;              /* IMPORTANT */
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+/* HERO CONTAINER (rounded + clipped) */
+.hero-inner {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  border-radius: 32px;
+  overflow: hidden; /* IMPORTANT */
+  background: #f5f5f5;
+}
+
+/* GRID MUST FILL ENTIRE HERO */
+.hero-inner .hover-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
+  z-index: 1;
+}
+
+/* FLOATING CARD */
+.hero-card {
+  position: absolute;
+  z-index: 2;
+  max-width: 520px;
+  padding: 48px;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+/* Text */
+.hero-subtitle {
+   font-size: 20px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.highlight {
+  background: #d7ff3f;
+  padding: 4px 8px;
+  font-weight: 600;
+}
+
+/* Buttons */
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.primary-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  background: transparent;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+/* BELOW CONTENT */
+.below-section {
+  padding: 120px 80px;
+}
+
+.hero-marquee {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: black;
+  border-radius: 0 0 28px 28px;
+  overflow: hidden;
+  padding: 14px 0;
+  z-index: 5;
+}
+
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  animation: marquee 20s linear infinite;
+}
+
+.marquee-track span {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  color: #d7ff3f;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+
+/* STAR STYLE (THIS IS THE KEY FIX) */
+.marquee-track span::before,
+.marquee-track span::after {
+  content: "★";
+  color: white;
+  font-size: 10px;
+}
+
+/* Scroll animation */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.content-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+}
+
+

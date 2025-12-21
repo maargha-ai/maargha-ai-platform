@@ -1,0 +1,10 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  /* Assuming your background tiles/grid is already in your main App.css or elsewhere */
+  background: url('your-grid-background.png') repeat; /* Replace with your existing grid/tiles background */
+}
