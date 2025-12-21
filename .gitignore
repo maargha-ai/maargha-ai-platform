@@ -1,0 +1,8 @@
+.env
+
+#venv
+*env/
+maarghaenv*
+*.mp4
+*.pdf
+node_modules
