@@ -1,24 +1,48 @@
 import "../styles/orchestrator.css";
-import { useState } from "react";
+import { useState,useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Orchestrator() {
   const navigate = useNavigate();
   const stars = Array.from({ length: 900 });
+  const wsRef = useRef(null);
 
   const [messages, setMessages] = useState([
     { from: "ai", text: "Hi 👋 How can I help you today?" }
   ]);
   const [input, setInput] = useState("");
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
+    useEffect(() => {
+      const token = localStorage.getItem("access_token");
 
-    setMessages([...messages, { from: "user", text: input }]);
-    setInput("");
+      wsRef.current = new WebSocket(
+        `ws://localhost:8000/ws/chat?token=${token}`
+      );
 
-    // later → connect orchestrator-service
-  };
+      wsRef.current.onmessage = (event) => {
+        setMessages((prev) => [
+          ...prev,
+          { from: "ai", text: event.data },
+        ]);
+      };
+
+      wsRef.current.onerror = () => {
+        console.error("WebSocket error");
+      };
+
+      return () => {
+        wsRef.current?.close();
+      };
+    }, []);
+
+    const sendMessage = () => {
+      if (!input.trim()) return;
+
+      setMessages((prev) => [...prev, { from: "user", text: input }]);
+
+      wsRef.current.send(input);
+      setInput("");
+    };
 
   return (
     <div className="orchestrator-wrapper">

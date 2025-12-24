@@ -51,3 +51,6 @@ class AgentState(TypedDict):
     quiz_question_idx: int = 0
     quiz_completed: bool = False
     quiz_evaluation: Optional[dict] = None
+
+    # News
+    tech_news_completed: bool

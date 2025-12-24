@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     USER_SERVICE_API_KEY: Optional[str] = None
 
     DATABASE_URL: str = Field(env="DATABASE_URL")
-    GROQ_API_KEY: str
 
     # LLM / AI provider
     LLM_PROVIDER: str = Field(env="LLM_PROVIDER")

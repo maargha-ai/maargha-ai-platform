@@ -10,6 +10,6 @@ async def register_user(data: dict):
 
 async def login_user(data: dict):
     return await post(
-        f"{settings.USER_SERVICE_URL}/auth/login",
+        f"{settings.USER_SERVICE_URL}/auth/login/",
         json=data
     )

@@ -12,6 +12,9 @@ IntentType = Literal[
     "networking_events",
     "linkedin_assistant",
     "quiz_section",
+    "tech_news",
+    "latest_tech_news",
+    "ai_news",
     "emotional_support",
     "general_chat",
     "unknown"
@@ -37,6 +40,9 @@ Categories:
 - linkedin optimization
 - grow linkedin
 - quiz_section
+- tech_news
+- ai_news
+- latest tech updates
 - emotional_support
 - general_chat
 - unknown

@@ -1,8 +1,8 @@
-const USER_SERVICE_BASE = "http://localhost:8000/auth";
+const GATEWAY_API_URL  = "http://localhost:8000/auth";
 
 /* REGISTER */
 export async function registerUser(data) {
-  const response = await fetch(`${USER_SERVICE_BASE}/register/`, {
+  const response = await fetch(`${GATEWAY_API_URL }/register/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -25,7 +25,7 @@ export async function registerUser(data) {
 
 /* LOGIN */
 export async function loginUser(data) {
-  const response = await fetch(`${USER_SERVICE_BASE}/login/`, {
+  const response = await fetch(`${GATEWAY_API_URL}/login/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

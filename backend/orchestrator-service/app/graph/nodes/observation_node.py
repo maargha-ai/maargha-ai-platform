@@ -67,7 +67,8 @@ async def observation_node(state: AgentState):
         updates["messages"] = state["messages"] + [{
             "role": "assistant", "content": message
             }]
-    
+        updates["agent_waiting_for_user"] = True
+        
     elif tool_result.get("type") == "networking_events":
         events = tool_result["events"]
 
@@ -137,6 +138,20 @@ async def observation_node(state: AgentState):
 
         updates["quiz_mode"] = False
         updates["quiz_completed"] = True
+        updates["agent_done"] = True
+
+    elif tool_result["type"] == "tech_news":
+        news = tool_result["news"]
+
+        message = "**Latest Tech News**\n\n"
+        for i, n in enumerate(news, 1):
+            message += f"{i}. {n['title']}\n"
+
+        updates["messages"] = state["messages"] + [{
+                "role": "assistant",
+                "content": message
+            }]
+        updates["tech_news_completed"] = True
         updates["agent_done"] = True
 
     # Cleanup
