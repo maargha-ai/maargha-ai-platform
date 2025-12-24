@@ -1,6 +1,6 @@
 # app/graph/nodes/action_node.py
 from app.core.state import AgentState
-from app.graph.nodes import career_tool, jobs_tool, roadmap_tool, select_career_tool, networking_events_tool, linkedin_tool, quiz_evaluator_tool, quiz_generator_tool
+from app.graph.nodes import career_tool, jobs_tool, roadmap_tool, select_career_tool, networking_events_tool, linkedin_tool, quiz_evaluator_tool, quiz_generator_tool, tech_news_tool
 
 async def action_node(state: AgentState):
     print(f"\n[DEBUG action_node] Entering action_node with action[agent_action]: {state['agent_action']}, input [agent_action_input]: {state.get('agent_action_input')}")
@@ -35,12 +35,19 @@ async def action_node(state: AgentState):
     elif action == "QuizEvaluator":
         return await quiz_evaluator_tool.quiz_evaluator_tool(state)
 
+    if action == "TechNews":
+        return await tech_news_tool.tech_news_tool(state)
+
     if action == "AskUser":
         # Safe extraction with fallback
         question = "Hello! How can I help you with your career today?"
         
         if isinstance(action_input, dict):
-            question = action_input.get("message", question)
+            question = (
+            action_input.get("message")
+            or action_input.get("question")
+            or question
+        )
         
         return {
             "messages": state["messages"] + [{

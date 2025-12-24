@@ -1,5 +1,5 @@
 import "../styles/dashboard.css";
-import "../styles/register.css"; // 🔥 reuse star + glass styles
+import "../styles/register.css"; 
 import { useNavigate } from "react-router-dom";
 
 const features = [
@@ -7,6 +7,7 @@ const features = [
   { title: "AI Roadmap Generator", desc: "Personalized learning paths for your goals." },
   { title: "AI Tutor", desc: "Ask doubts and learn interactively." },
   { title: "Quiz Generator", desc: "Test yourself with smart quizzes." },
+  { title: "Quiz Evaluation", desc: "Evaluate your answers." },
   { title: "Job Search", desc: "AI-powered job discovery." },
   { title: "CV Generation", desc: "AI-powered CV generator." },
   { title: "LinkedIn Assistant", desc: "Optimize your profile and posts." },
@@ -14,7 +15,7 @@ const features = [
   { title: "Emotional Support", desc: "Talk when you need motivation." },
   { title: "Music Recommendation", desc: "Mood-based playlists." },
   { title: "News Digest", desc: "Curated AI & tech updates." },
-  { title: "Personal Analytics", desc: "Track your growth journey." },
+  // { title: "Personal Analytics", desc: "Track your growth journey." },
 ];
 
 export default function Dashboard() {
