@@ -48,7 +48,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row items-center gap-4 mt-4">
               <button 
                 onClick={() => navigate("/register")}
-                className="group relative px-8 py-4 bg-primary text-primary-foreground text-lg font-bold rounded-full overflow-hidden shadow-xl shadow-primary/20 hover:scale-105 transition-all duration-300"
+                className="group relative px-8 py-4 bg-primary text-primary-foreground text-lg font-bold rounded-full overflow-hidden  hover:scale-105 transition-all duration-300"
               >
                 <div className="absolute inset-0 bg-white/10 group-hover:translate-x-full transition-transform duration-500 ease-out skew-x-12" />
                 <span className="relative flex items-center gap-2">
