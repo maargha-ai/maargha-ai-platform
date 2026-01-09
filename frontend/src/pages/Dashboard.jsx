@@ -20,12 +20,11 @@ const features = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const username = "User"; // later from backend/JWT
+  const username = "User"; 
   const stars = Array.from({ length: 900 });
 
   return (
     <div className="register-wrapper dashboard-wrapper">
-      {/* ⭐ STAR BACKGROUND */}
       <div className="stars-layer">
         {stars.map((_, i) => {
           const movement = Math.random() < 0.33 ? 4 : Math.random() < 0.66 ? 8 : 14;
@@ -43,7 +42,6 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* 🌌 CONTENT */}
       <div className="dashboard-content">
         <h1 className="dashboard-title float-text">
           Welcome, {username}

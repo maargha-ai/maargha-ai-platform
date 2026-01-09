@@ -7,7 +7,6 @@ export default function RotatingBadge() {
         className="badge-svg"
         viewBox="0 0 120 120"
       >
-        {/* Circular path */}
         <defs>
           <path
             id="text-circle"
@@ -15,7 +14,6 @@ export default function RotatingBadge() {
           />
         </defs>
 
-        {/* Rotating text */}
         <text className="badge-text">
           <textPath href="#text-circle">
             PERSONAL • GROWTH • PLATFORM •
@@ -23,7 +21,6 @@ export default function RotatingBadge() {
         </text>
       </svg>
 
-      {/* Center circle */}
       <div className="badge-center">
         <span>#10</span>
       </div>

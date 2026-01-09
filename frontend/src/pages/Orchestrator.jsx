@@ -47,7 +47,6 @@ export default function Orchestrator() {
   return (
     <div className="orchestrator-wrapper">
 
-      {/* STAR BACKGROUND */}
       <div className="stars-layer">
         {stars.map((_, i) => {
           const movement =
@@ -70,10 +69,8 @@ export default function Orchestrator() {
         })}
       </div>
 
-      {/* CHAT CARD */}
       <div className="chat-card floating-chat">
 
-        {/* HOME BUTTON */}
         <button
           className="home-float-btn"
           onClick={() => navigate("/dashboard")}
