@@ -3,7 +3,7 @@ import "../styles/hoverGrid.css";
 
 const ROWS = 9;
 const COLS = 19;
-const COLORS = ["#C7FF3D", "#4C6FFF", "#000000"];
+const COLORS = ["#235CD9","#142A5B", "#0F172A","#F6EEFE", "#b28ade"];
 
 export default function HoverGrid() {
   const [tiles, setTiles] = useState(

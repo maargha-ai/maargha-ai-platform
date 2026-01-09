@@ -15,7 +15,7 @@
 .badge-text {
   font-weight: 700;
   text-transform: uppercase;
-  fill: #000;
+  fill: var(--foreground);
   font-size: 11px;
   letter-spacing: 2.7px;
   transform-origin: 50% 50%;
@@ -27,14 +27,14 @@
   animation: rotateFast 1s linear infinite;
 }
 
-/* Center black circle */
+/* Center circle */
 .badge-center {
   position: absolute;
   top: 50%;
   left: 50%;
   width: 63px;
   height: 63px;
-  background: black;
+  background: var(--foreground);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   display: flex;
@@ -43,7 +43,7 @@
 }
 
 .badge-center span {
-  color: #ffffff;
+  color: var(--background);
   font-size: 16px;
   font-weight: 800;
 }
@@ -53,6 +53,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -62,6 +63,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
