@@ -1,11 +1,19 @@
 import "../styles/register.css";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { registerUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const stars = Array.from({ length: 920 });
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const [form, setForm] = useState({
     full_name: "",

@@ -9,12 +9,19 @@ import AuthModal from "../components/AuthModal";
 import { ArrowRight, Sparkles } from "lucide-react";
 import "../styles/home.css";
 
+import { useAuth } from "../context/AuthContext";
+
 export default function Home() {
   const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authDefaultTab, setAuthDefaultTab] = useState("login");
+  const { isAuthenticated } = useAuth();
 
   const openAuthModal = (tab = "login") => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+      return;
+    }
     setAuthDefaultTab(tab);
     setIsAuthModalOpen(true);
   };
@@ -80,7 +87,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* MARQUEE */}
           <div className="hero-marquee">
             <div className="marquee-track">
               <span>AI CAREER</span>

@@ -5,7 +5,7 @@ import Lenis from "@studio-freight/lenis";
 import "./index.css";
 
 const lenis = new Lenis({
-  duration: 0.9,       // 👈 controls scroll speed
+  duration: 0.9,      
   easing: (t) => 1 - Math.pow(1 - t, 3),
   smoothWheel: true,
   smoothTouch: false,
@@ -19,11 +19,14 @@ function raf(time) {
 requestAnimationFrame(raf);
 
 import { ThemeProvider } from "./components/ThemeProvider";
+import { AuthProvider } from "./context/AuthContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

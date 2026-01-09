@@ -7,9 +7,7 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    /* Pure White */
     --foreground: 222.2 47.4% 11.2%;
-    /* Deep Slate */
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 47.4% 11.2%;
@@ -18,11 +16,9 @@
     --popover-foreground: 222.2 47.4% 11.2%;
 
     --primary: 222.2 47.4% 11.2%;
-    /* Deep Navy/Slate */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
-    /* Soft Grey */
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
@@ -43,7 +39,6 @@
 
   .dark {
     --background: 240 10% 3.9%;
-    /* Zinc 950 - Deep Neural Black */
     --foreground: 0 0% 98%;
 
     --card: 240 10% 3.9%;
@@ -56,7 +51,6 @@
     --primary-foreground: 240 5.9% 10%;
 
     --secondary: 240 3.7% 15.9%;
-    /* Zinc 800 - Neutral Dark Grey */
     --secondary-foreground: 0 0% 98%;
 
     --muted: 240 3.7% 15.9%;
@@ -95,7 +89,6 @@
   }
 }
 
-/* Custom Animations */
 @keyframes float-slow {
   0% {
     transform: translateY(0px);
