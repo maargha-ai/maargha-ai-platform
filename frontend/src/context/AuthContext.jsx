@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check local storage for token
     const token = localStorage.getItem('access_token');
     if (token) {
       setIsAuthenticated(true);

@@ -60,7 +60,6 @@ export default function Login() {
         })}
       </div>
 
-      {/* LOGIN CARD */}
       <div className="register-card">
         <button
           className="home-float-btn"

@@ -28,7 +28,6 @@ export default function HoverGrid() {
     );
   };
 
-  // DECAY LOOP — this was missing / incorrect earlier
   useEffect(() => {
     const interval = setInterval(() => {
       setTiles((prev) =>
@@ -38,7 +37,6 @@ export default function HoverGrid() {
           const elapsed = Date.now() - tile.activeAt;
 
           if (elapsed > 500) {
-            // RESET TO DEFAULT
             return { color: null, activeAt: null };
           }
 

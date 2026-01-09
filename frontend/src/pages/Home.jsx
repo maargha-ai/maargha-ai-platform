@@ -36,22 +36,17 @@ export default function Home() {
         defaultTab={authDefaultTab}
       />
 
-      {/* HERO SECTION */}
       <section className="hero-outer pt-20 md:pt-24">
         <div className="hero-inner relative flex flex-col items-center justify-center">
-          {/* BACKGROUND ANIMATION */}
           <HoverGrid />
 
-          {/* ROTATING BADGE (Top Right or Center) */}
           <div className="absolute top-8 right-8 z-20 hidden md:block">
             <RotatingBadge />
           </div>
 
-          {/* HERO CONTENT */}
           <div className="content-center z-20 px-4 w-full max-w-4xl mx-auto flex flex-col items-center gap-6">
             
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/50 backdrop-blur-md border border-border shadow-sm animate-fade-in-up">
-              <Sparkles size={16} className="text-amber-500" />
               <span className="text-sm font-medium tracking-wide uppercase">AI-Powered Career Architect</span>
             </div>
 
@@ -105,12 +100,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* NEW SECTIONS */}
       <ThinkingProcess />
       
       <FeaturesGrid />
 
-      {/* FOOTER */}
       <footer className="py-12 border-t border-border mt-20">
         <div className="max-w-7xl mx-auto px-6 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2 font-bold text-xl">

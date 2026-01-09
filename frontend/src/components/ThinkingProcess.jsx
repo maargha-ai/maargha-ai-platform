@@ -43,7 +43,6 @@ export default function ThinkingProcess() {
         </div>
 
         <div className="relative grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Connecting Line (Desktop) */}
           <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-border to-transparent -z-10" />
 
           {steps.map((step, index) => (
@@ -57,7 +56,6 @@ export default function ThinkingProcess() {
               <h3 className="text-xl font-bold mb-2">{step.title}</h3>
               <p className="text-muted-foreground">{step.desc}</p>
               
-              {/* Arrow for mobile */}
               {index < steps.length - 1 && (
                 <ArrowRight className="md:hidden absolute -bottom-6 left-1/2 -translate-x-1/2 text-muted-foreground/30" />
               )}
