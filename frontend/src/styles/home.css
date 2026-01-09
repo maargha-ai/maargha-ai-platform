@@ -31,7 +31,8 @@ body {
   height: 95vh;
   border-radius: 32px;
   overflow: hidden;
-  background: var(--secondary);
+  background: var(--background);
+  /* Use main bg instead of secondary */
   border: 1px solid var(--border);
 }
 

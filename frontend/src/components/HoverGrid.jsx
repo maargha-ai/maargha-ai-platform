@@ -56,7 +56,7 @@ export default function HoverGrid() {
         <div
           key={i}
           className="grid-tile"
-          style={tile.color ? { backgroundColor: tile.color } : {}}
+         style={{ backgroundColor: tile.color || "transparent" }}
           onMouseEnter={() => activateTile(i)}
         />
       ))}
