@@ -4,7 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { ThemeToggle } from './ThemeToggle';
 
-export default function PremiumNavbar() {
+export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
   const { theme, setTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -27,12 +27,12 @@ export default function PremiumNavbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-background/80 backdrop-blur-md border-b border-white/10 shadow-sm'
+          ? 'bg-background/80 backdrop-blur-md border-b border-border shadow-sm'
           : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2 font-bold text-xl tracking-tighter">
+        <div className="flex items-center gap-2 font-bold text-xl tracking-tighter cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
             M
           </div>
@@ -53,10 +53,16 @@ export default function PremiumNavbar() {
 
         <div className="hidden md:flex items-center gap-4">
           <ThemeToggle theme={theme} setTheme={setTheme} />
+          <button 
+             onClick={onOpenAuth}
+             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+             Login
+          </button>
           <Button 
             variant="default" 
             className="rounded-full px-6 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
-            onClick={() => window.location.href = '/register'}
+            onClick={onGetStarted}
           >
             Get Started
           </Button>
@@ -71,7 +77,7 @@ export default function PremiumNavbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b border-border p-6 flex flex-col gap-4 animate-in slide-in-from-top-4">
+        <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b border-border p-6 flex flex-col gap-4 animate-in slide-in-from-top-4 shadow-xl">
           {navLinks.map((link) => (
             <a
               key={link.name}
@@ -86,7 +92,10 @@ export default function PremiumNavbar() {
             <span className="text-muted-foreground">Theme</span>
             <ThemeToggle theme={theme} setTheme={setTheme} />
           </div>
-          <Button className="w-full mt-4 rounded-full" onClick={() => window.location.href = '/register'}>Get Started</Button>
+          <div className="flex gap-4 mt-4">
+             <Button variant="outline" className="flex-1 rounded-full" onClick={() => { setMobileMenuOpen(false); onOpenAuth(); }}>Login</Button>
+             <Button className="flex-1 rounded-full" onClick={() => { setMobileMenuOpen(false); onGetStarted(); }}>Get Started</Button>
+          </div>
         </div>
       )}
     </nav>

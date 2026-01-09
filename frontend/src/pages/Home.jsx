@@ -1,18 +1,33 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HoverGrid from "../components/HoverGrid";
 import RotatingBadge from "../components/RotatingBadge";
 import PremiumNavbar from "../components/PremiumNavbar";
 import ThinkingProcess from "../components/ThinkingProcess";
 import FeaturesGrid from "../components/FeaturesGrid";
+import AuthModal from "../components/AuthModal";
 import { ArrowRight, Sparkles } from "lucide-react";
 import "../styles/home.css";
 
 export default function Home() {
   const navigate = useNavigate();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authDefaultTab, setAuthDefaultTab] = useState("login");
+
+  const openAuthModal = (tab = "login") => {
+    setAuthDefaultTab(tab);
+    setIsAuthModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary selection:text-primary-foreground">
-      <PremiumNavbar />
+      <PremiumNavbar onOpenAuth={() => openAuthModal("login")} onGetStarted={() => openAuthModal("register")} />
+      
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        defaultTab={authDefaultTab}
+      />
 
       {/* HERO SECTION */}
       <section className="hero-outer pt-20 md:pt-24">
@@ -47,8 +62,8 @@ export default function Home() {
 
             <div className="flex flex-col md:flex-row items-center gap-4 mt-4">
               <button 
-                onClick={() => navigate("/register")}
-                className="group relative px-8 py-4 bg-primary text-primary-foreground text-lg font-bold rounded-full overflow-hidden  hover:scale-105 transition-all duration-300"
+                onClick={() => openAuthModal("register")}
+                className="group relative px-8 py-4 bg-primary text-primary-foreground text-lg font-bold rounded-full overflow-hidden shadow-xl shadow-primary/20 hover:scale-105 transition-all duration-300"
               >
                 <div className="absolute inset-0 bg-white/10 group-hover:translate-x-full transition-transform duration-500 ease-out skew-x-12" />
                 <span className="relative flex items-center gap-2">
@@ -57,7 +72,7 @@ export default function Home() {
               </button>
               
               <button 
-                onClick={() => navigate("/login")}
+                onClick={() => openAuthModal("login")}
                 className="px-8 py-4 bg-transparent border border-foreground/10 hover:bg-foreground/5 text-foreground text-lg font-medium rounded-full transition-all"
               >
                 Login
