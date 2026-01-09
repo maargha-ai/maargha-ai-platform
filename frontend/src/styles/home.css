@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -6,24 +7,32 @@ html, body {
 
 /* Page */
 .home-wrapper {
-  background: white;
+  background: var(--background);
+  color: var(--foreground);
 }
 
-/* OUTER spacing like BeachHack */
+/* OUTER spacing */
 .hero-outer {
-  width: 100vw;              /* IMPORTANT */
-  padding: 40px;
+  width: 100vw;
+  padding: 2px;
   box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .hero-outer {
+    padding: 24px;
+  }
 }
 
 /* HERO CONTAINER (rounded + clipped) */
 .hero-inner {
   position: relative;
   width: 100%;
-  height: 90vh;
+  height: 95vh;
   border-radius: 32px;
-  overflow: hidden; /* IMPORTANT */
-  background: #f5f5f5;
+  overflow: hidden;
+  background: var(--secondary);
+  border: 1px solid var(--border);
 }
 
 /* GRID MUST FILL ENTIRE HERO */
@@ -35,71 +44,32 @@ html, body {
   display: grid;
   place-content: center;
   z-index: 1;
+  opacity: 0.6;
+  /* Slight fade for subtlety */
 }
 
-/* FLOATING CARD */
-.hero-card {
+/* Center Content */
+.content-center {
   position: absolute;
-  z-index: 2;
-  max-width: 520px;
-  padding: 48px;
-  background: white;
-  border-radius: 24px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-}
-
-/* Text */
-.hero-subtitle {
-   font-size: 20px;
-  line-height: 1.6;
-  text-align: center;
-}
-
-.highlight {
-  background: #d7ff3f;
-  padding: 4px 8px;
-  font-weight: 600;
-}
-
-/* Buttons */
-.hero-actions {
+  z-index: 10;
+  width: 100%;
   display: flex;
-  justify-content: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.primary-btn {
-  padding: 12px 24px;
-  font-size: 16px;
-  background: black;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.secondary-btn {
-  padding: 12px 24px;
-  font-size: 16px;
-  background: transparent;
-  border: 1px solid black;
-  cursor: pointer;
-}
-
-/* BELOW CONTENT */
-.below-section {
-  padding: 120px 80px;
-}
-
+/* MARQUEE */
 .hero-marquee {
   position: absolute;
   bottom: 0;
   width: 100%;
-  background: black;
+  background: var(--foreground);
+  color: var(--background);
   border-radius: 0 0 28px 28px;
   overflow: hidden;
   padding: 14px 0;
@@ -110,46 +80,42 @@ html, body {
   display: flex;
   align-items: center;
   gap: 48px;
-  animation: marquee 20s linear infinite;
+  animation: marquee 30s linear infinite;
 }
 
 .marquee-track span {
   display: flex;
   align-items: center;
   gap: 14px;
-
-  color: #d7ff3f;
+  color: var(--background);
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.8px;
+  letter-spacing: 2px;
   white-space: nowrap;
+  opacity: 0.9;
 }
 
-/* STAR STYLE (THIS IS THE KEY FIX) */
 .marquee-track span::before,
 .marquee-track span::after {
   content: "★";
-  color: white;
+  color: var(--primary);
+  /* subtle accent */
   font-size: 10px;
 }
 
-/* Scroll animation */
 @keyframes marquee {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(-50%);
   }
 }
 
-.content-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 10;
+/* Below sections */
+.below-section {
+  padding: 120px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
-
-
