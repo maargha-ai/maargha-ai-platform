@@ -4,10 +4,13 @@ import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { ThemeToggle } from './ThemeToggle';
 
+import { useAuth } from '../context/AuthContext';
+
 export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
   const { theme, setTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,7 +60,7 @@ export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
              onClick={onOpenAuth}
              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-             Login
+             {isAuthenticated ? "Dashboard" : "Login"}
           </button>
           <Button 
             variant="default" 
@@ -93,7 +96,9 @@ export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
             <ThemeToggle theme={theme} setTheme={setTheme} />
           </div>
           <div className="flex gap-4 mt-4">
-             <Button variant="outline" className="flex-1 rounded-full" onClick={() => { setMobileMenuOpen(false); onOpenAuth(); }}>Login</Button>
+             <Button variant="outline" className="flex-1 rounded-full" onClick={() => { setMobileMenuOpen(false); onOpenAuth(); }}>
+               {isAuthenticated ? "Dashboard" : "Login"}
+             </Button>
              <Button className="flex-1 rounded-full" onClick={() => { setMobileMenuOpen(false); onGetStarted(); }}>Get Started</Button>
           </div>
         </div>

@@ -13,11 +13,14 @@ import { loginUser, registerUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
 
+import { useAuth } from "../context/AuthContext";
+
 export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   useEffect(() => {
     if (isOpen) {
@@ -49,8 +52,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
           email: form.email,
           password: form.password,
         });
-        localStorage.setItem("access_token", tokens.access);
-        localStorage.setItem("refresh_token", tokens.refresh);
+        login(tokens);
         onClose();
         navigate("/dashboard");
       } else {
@@ -220,12 +222,6 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
           </div>
         </div>
 
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-secondary"
-        >
-          <X size={20} />
-        </button>
 
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
         <div className="absolute -top-[100px] -right-[100px] w-[200px] h-[200px] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
