@@ -6,6 +6,8 @@ import Dashboard from "./pages/Dashboard";
 import Orchestrator from "./pages/Orchestrator";
 import "./styles/stars.css";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   return (
     <BrowserRouter>
@@ -13,11 +15,18 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        {/* After login */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
 
-        {/* Main AI interaction */}
-        <Route path="/orchestrator" element={<Orchestrator />} />
+        <Route path="/orchestrator" element={
+          <ProtectedRoute>
+            <Orchestrator />
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );

@@ -3,7 +3,7 @@ import "../styles/hoverGrid.css";
 
 const ROWS = 9;
 const COLS = 19;
-const COLORS = ["#C7FF3D", "#4C6FFF", "#000000"];
+const COLORS = ["#235CD9","#142A5B", "#0F172A","#F6EEFE", "#b28ade"];
 
 export default function HoverGrid() {
   const [tiles, setTiles] = useState(
@@ -28,7 +28,6 @@ export default function HoverGrid() {
     );
   };
 
-  // DECAY LOOP — this was missing / incorrect earlier
   useEffect(() => {
     const interval = setInterval(() => {
       setTiles((prev) =>
@@ -38,7 +37,6 @@ export default function HoverGrid() {
           const elapsed = Date.now() - tile.activeAt;
 
           if (elapsed > 500) {
-            // RESET TO DEFAULT
             return { color: null, activeAt: null };
           }
 
@@ -56,7 +54,7 @@ export default function HoverGrid() {
         <div
           key={i}
           className="grid-tile"
-          style={tile.color ? { backgroundColor: tile.color } : {}}
+         style={{ backgroundColor: tile.color || "transparent" }}
           onMouseEnter={() => activateTile(i)}
         />
       ))}

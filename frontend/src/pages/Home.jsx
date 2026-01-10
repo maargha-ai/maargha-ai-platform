@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import HoverGrid from "../components/HoverGrid";
 import RotatingBadge from "../components/RotatingBadge";
 import Pill from "../components/Pill";
@@ -5,6 +7,8 @@ import Title from "../components/Title";
 import Description from "../components/Description";
 import OrchestratorButton from "../components/GetStartedButton";
 import "../styles/home.css";
+
+import { useAuth } from "../context/AuthContext";
 
 export default function Home() {
   const stars = Array.from({ length: 900 });
@@ -51,15 +55,16 @@ export default function Home() {
           <div className="hero-marquee">
             <div className="marquee-track">
               <span>AI CAREER</span>
-              <span>AI ROADMAP</span>
-              <span>AI TUTOR</span>
-              <span>QUIZ GENERATION</span>
-              <span>AI JOBSEARCH</span>
-              <span>LINKEDIN ASSISTANT</span>
-              <span>NETWORKING EVENTS</span>
-              <span>EMOTIONAL SUPPORT</span>
-              <span>MUSIC RECOMMENDATION</span>
-              <span>DAILY NEWS</span>
+              <span>PATH FINDER</span>
+              <span>SKILL ANALYSIS</span>
+              <span>REAL-TIME MARKET DATA</span>
+              <span>LINKEDIN OPTIMIZER</span>
+              <span>MENTORSHIP</span>
+              <span>RESUME BUILDER</span>
+              <span>INTERVIEW PREP</span>
+              <span>AI CAREER</span>
+              <span>PATH FINDER</span>
+              <span>SKILL ANALYSIS</span>
             </div>
           </div>
 

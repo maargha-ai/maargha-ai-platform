@@ -1,11 +1,19 @@
 import "../styles/register.css";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { loginUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
   const stars = Array.from({ length: 920 });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const [form, setForm] = useState({
     email: "",
@@ -24,10 +32,7 @@ export default function Login() {
 
     try {
       const tokens = await loginUser(form);
-
-      localStorage.setItem("access_token", tokens.access);
-      localStorage.setItem("refresh_token", tokens.refresh);
-
+      login(tokens);
       navigate("/dashboard"); 
     } catch (err) {
       setError(err.message);
@@ -55,7 +60,6 @@ export default function Login() {
         })}
       </div>
 
-      {/* LOGIN CARD */}
       <div className="register-card">
         <button
           className="home-float-btn"

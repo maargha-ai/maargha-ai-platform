@@ -1,4 +1,4 @@
-import '../styles/pill.css'; // Assuming styles are in styles/Pill.css
+import '../styles/pill.css'; 
 
 const Pill = () => {
   return (

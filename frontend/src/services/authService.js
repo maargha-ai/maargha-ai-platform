@@ -1,6 +1,5 @@
 const GATEWAY_API_URL  = "http://localhost:8000/auth";
 
-/* REGISTER */
 export async function registerUser(data) {
   const response = await fetch(`${GATEWAY_API_URL }/register/`, {
     method: "POST",
@@ -23,7 +22,6 @@ export async function registerUser(data) {
   return response.json();
 }
 
-/* LOGIN */
 export async function loginUser(data) {
   const response = await fetch(`${GATEWAY_API_URL}/login/`, {
     method: "POST",
@@ -37,5 +35,5 @@ export async function loginUser(data) {
     throw new Error("Invalid email or password");
   }
 
-  return response.json(); // { access, refresh }
+  return response.json();
 }

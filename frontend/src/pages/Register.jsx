@@ -1,11 +1,19 @@
 import "../styles/register.css";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { registerUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const stars = Array.from({ length: 920 });
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const [form, setForm] = useState({
     full_name: "",
@@ -27,7 +35,7 @@ export default function Register() {
 
     try {
       await registerUser(form);
-      navigate("/login"); // after successful registration
+      navigate("/login"); 
     } catch (err) {
       setError(err.message);
     } finally {
@@ -37,7 +45,6 @@ export default function Register() {
 
   return (
     <div className="register-wrapper">
-      {/* STAR BACKGROUND */}
       <div className="stars-layer">
         {stars.map((_, i) => {
           const movement = Math.random() < 0.33 ? 4 : Math.random() < 0.66 ? 8 : 14;
@@ -56,7 +63,6 @@ export default function Register() {
         })}
       </div>
 
-      {/* FORM CARD */}
       <div className="register-card">
         <button
           className="home-float-btn"
