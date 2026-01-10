@@ -64,6 +64,7 @@ async def orchestrator_ws(
                 print("[Gateway] Orch → Frontend:", msg)
                 await websocket.send_text(msg)
 
+        # Parallel run (Full-duplex)
         await asyncio.gather(
             frontend_to_orchestrator(),
             orchestrator_to_frontend(),
