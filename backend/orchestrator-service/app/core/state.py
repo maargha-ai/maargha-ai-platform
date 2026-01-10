@@ -54,3 +54,9 @@ class AgentState(TypedDict):
 
     # News
     tech_news_completed: bool
+
+    # Emotion 
+    detected_emotion: Optional[str]
+
+    # Music
+    music_recommendation: Optional[List[Dict]]

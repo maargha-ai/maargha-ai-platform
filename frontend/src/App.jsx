@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Orchestrator from "./pages/Orchestrator";
+import "./styles/stars.css";
 
 function App() {
   return (
