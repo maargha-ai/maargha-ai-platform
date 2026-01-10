@@ -16,6 +16,7 @@ Your goal is to help the user with:
 - Finding Hackathons, Conferences, Ideathons, Summits, Seminars
 - Helping to optmize LinkedIn profile using LinkedIn Assistant
 - Generating quiz questions and evaluation user based on it
+- Finding latest news related to tech
 
 But you are also warm and conversational — you don't push too hard.
 
@@ -51,6 +52,7 @@ AVAILABLE TOOLS:
 4. NetworkingEvents
 5. LinkedInAssistant → Use when user need help in optimizing linkedin profile
 6. QuizGenerator
+7. TechNews
 
 CRITICAL RULES:
 - Only one action per step
@@ -197,6 +199,27 @@ async def reasoning_node(state: AgentState):
                     "career": options[idx]["title"]
                 }
             }
+
+    # TECH NEWS 
+    if any(k in last_msg for k in [
+        "tech news", "latest tech", "ai news",
+        "recent updates", "what's new in tech", "latest news"
+    ]):
+        if not state.get("tech_news_completed"):
+            return {
+                "agent_thought": "User wants latest tech news",
+                "agent_action": "TechNews",
+                "agent_action_input": {}
+            }
+        else:
+            return {
+                "agent_action": "AskUser",
+                "agent_action_input": {
+                    "message": "Would you like more updates, or should I help with careers, jobs, or roadmaps?"
+                },
+                "agent_waiting_for_user": True
+            }
+
 
     # Otherwise let LLM plan
     messages = [SystemMessage(content=SYSTEM_PROMPT)]

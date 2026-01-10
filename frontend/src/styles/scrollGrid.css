@@ -1,0 +1,14 @@
+.grid-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 40px);
+  grid-template-rows: repeat(4, 40px);
+  gap: 12px;
+  margin-top: 80px;
+}
+
+.grid-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  transition: background-color 0.4s ease;
+}

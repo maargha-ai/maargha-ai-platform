@@ -66,6 +66,9 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
         "cv_path": USER_STATE[user_id].get("cv_path"),
         "job_role": None,
         "job_location": None,
+
+        # News
+        "tech_news_completed": False,
     }
 
     try:
