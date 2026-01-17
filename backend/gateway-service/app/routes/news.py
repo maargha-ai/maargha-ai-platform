@@ -1,11 +1,13 @@
 from fastapi import APIRouter
-from app.utils.http import post
+import httpx
 from app.config import settings
 
 router = APIRouter(prefix="/news", tags=["News"])
 
-@router.post("/latest")
+@router.get("/latest")
 async def proxy_news():
-    return await post(
-        url=f"{settings.ORCHESTRATOR_SERVICE_WS_URL}/news/latest"
-    )
+    async with httpx.AsyncClient(timeout=30) as client:
+        resp = await client.get(
+            f"{settings.ORCHESTRATOR_SERVICE_URL}/news/latest"
+        )
+    return resp.json()

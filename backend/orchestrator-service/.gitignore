@@ -7,3 +7,7 @@ orchesenv/
 # Secrets
 secrets/
 *.json
+
+# SentenceTransformer / HF models
+orchestrator-service/models/
+models/
