@@ -43,14 +43,22 @@ class AgentState(TypedDict):
     # LinkedIn
     linkedin_mode: bool = False
 
-    # Quiz 
-    quiz_mode: bool = False
-    quiz_career: Optional[str] = None
-    quiz_questions: list = []
-    quiz_answers: dict = {}
-    quiz_question_idx: int = 0
-    quiz_completed: bool = False
-    quiz_evaluation: Optional[dict] = None
+    # Quiz config
+    quiz_topic: str | None
+    quiz_level: str | None
+    quiz_active: bool
+
+    # Quiz runtime
+    current_question: dict
+    quiz_answers: dict
+    quiz_question_idx: int
+
+    # FER / attention tracking
+    quiz_emotions: list        # [{emotion, confidence, timestamp}]
+    quiz_focus_score: float | None
+
+    # Final evaluation
+    quiz_evaluation: dict | None
 
     # News
     tech_news_completed: bool
@@ -60,3 +68,4 @@ class AgentState(TypedDict):
 
     # Music
     music_recommendation: Optional[List[Dict]]
+

@@ -13,3 +13,14 @@ async def login_user(data: dict):
         f"{settings.USER_SERVICE_URL}/auth/login/",
         json=data
     )
+
+async def logout_user(data: dict, auth_header: str):
+    return await post(
+        f"{settings.USER_SERVICE_URL}/auth/logout/",
+        headers={
+            "Authorization": auth_header,
+        },
+        json={
+            "refresh": data.get("refresh")
+        }
+    )

@@ -4,14 +4,13 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from app.config import settings
 
-
 security = HTTPBearer()
 
 def get_current_user(
         creds: HTTPAuthorizationCredentials = Depends(security)
 ):
     token = creds.credentials
-
+    print("AUTH HEADER:", creds.credentials[:20])
     try:
         payload = jwt.decode(
             token, 

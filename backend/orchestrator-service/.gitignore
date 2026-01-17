@@ -1,2 +1,9 @@
-.env
+
 orchesenv/
+
+# Environment files
+.env
+
+# Secrets
+secrets/
+*.json

@@ -1,0 +1,14 @@
+artifact_uri: file:F:/BROTOTYPE WEEK TASKS/WEEK 49/FER-using-YOLOv11/runs/mlflow/261949541427563613/8fdbb3403de64a25b87bcc39eace648e/artifacts
+end_time: 1761830908873
+entry_point_name: ''
+experiment_id: '261949541427563613'
+lifecycle_stage: active
+run_id: 8fdbb3403de64a25b87bcc39eace648e
+run_name: facial_emotion_fer2013_v12
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761826022131
+status: 3
+tags: []
+user_id: ACER

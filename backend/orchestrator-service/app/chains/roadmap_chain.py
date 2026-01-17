@@ -7,6 +7,10 @@ from langchain_core.messages import HumanMessage
 from gtts import gTTS
 from PIL import Image, ImageDraw, ImageFont
 from moviepy import ImageClip, AudioFileClip, concatenate_videoclips
+import uuid
+import os
+from app.utils.gcs import upload_to_gcs
+from app.core.config import settings
 
 async def generate_roadmap_script(career: str):
     prompt = f"""
@@ -110,4 +114,21 @@ async def generate_roadmap_video(career: str) -> str:
 
     final.close()
 
-    return temp_video_path
+    # Upload to GCS
+    safe_name = career.lower().replace(" ", "_")
+    filename = f"{safe_name}_{uuid.uuid4().hex[:6]}.mp4"
+    gcs_path = f"roadmaps/{filename}"
+
+    public_url = upload_to_gcs(
+        local_path=temp_video_path,
+        bucket_name=settings.GCP_ROADMAP_BUCKET,
+        destination_blob=gcs_path
+    )
+
+    # cleanup local temp file
+    try:
+        os.unlink(temp_video_path)
+    except:
+        pass
+
+    return public_url

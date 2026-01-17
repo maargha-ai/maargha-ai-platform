@@ -6,13 +6,28 @@ emotion_pipeline = pipeline(
     device=-1
 )
 
-def detect_text_emotion(text: str):
+FAST_EMOTION_MAP = {
+    "sadness": ["Sadness", "Anxiety", "Stress", "Longing", "Nostalgia"],
+    "joy": ["Joy", "Excitement", "Hope", "Motivation"],
+    "anger": ["Anger", "Stress", "Tension"],
+    "fear": ["Anxiety", "Nervousness", "Stress"],
+    "surprise": ["Excitement", "Curiosity"],
+    "love": ["Love", "Calm", "Caring", "Comfort", "Hope"],
+}
+
+def detect_text_emotion(text: str, threshold: float = 0.6) -> list[str]:
     try:
-        result = emotion_pipeline(text)
-        label = result[0]["label"].lower()
-        score = result[0]["score"]
-        return label if score > 0.6 else "neutral"
+        result = emotion_pipeline(text)[0]
+        label = result["label"].lower()
+        score = result["score"]
+
+        print(f"[Emotion Detector] Detected emotion: {result}")
+        if score < threshold:
+            return ["Calm"]
+
+        return FAST_EMOTION_MAP.get(label, ["Calm"])
+
     except Exception:
-        return "neutral"
+        return ["Calm"]
     
     

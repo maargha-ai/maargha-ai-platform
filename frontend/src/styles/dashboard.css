@@ -57,7 +57,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
 
   text-align: center;
-  transition: transform 0.35s ease, background 0.35s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .feature-card h3 {
@@ -108,4 +108,50 @@
   100% {
     transform: translateY(0px);
   }
+}
+
+.logout-btn {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  background: transparent;
+  border: 1px solid #ff4d4f;
+  color: #ff4d4f;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+.powerbi-container {
+  width: 100%;
+  height: calc(100vh - 120px);
+  margin-top: 24px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.powerbi-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.feature-card.clickable {
+  cursor: pointer;
+}
+
+.feature-card.clickable:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.feature-card.clickable:active {
+  transform: scale(0.98);
 }

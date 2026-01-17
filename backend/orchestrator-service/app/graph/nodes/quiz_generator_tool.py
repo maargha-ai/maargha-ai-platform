@@ -1,12 +1,16 @@
-# app/graph/nodes/quiz_generator_tool.py
-from app.chains.quiz_generation_chain import generate_quiz
+from app.chains.quiz_generation_chain import generate_quiz_question
 
 async def quiz_generator_tool(state):
-    quiz = await generate_quiz(state["selected_career"])
+    question = await generate_quiz_question(
+        topic=state["quiz_topic"],
+        level=state["quiz_level"]
+    )
+
+    state["quiz_questions"].append(question["question"])
 
     return {
         "tool_result": {
-            "type": "quiz_questions",
-            "questions": quiz
+            "type": "quiz_question",
+            "question": question["question"]
         }
     }

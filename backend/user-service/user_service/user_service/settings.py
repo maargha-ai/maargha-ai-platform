@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts",
     "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 MIDDLEWARE = [
@@ -122,7 +123,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=9180),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 

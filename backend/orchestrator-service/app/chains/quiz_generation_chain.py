@@ -1,49 +1,38 @@
 # app/chains/quiz_generation_chain.py
 from langchain_core.messages import HumanMessage
 from app.core.llm_client import llm
+import json
 
 QUIZ_PROMPT_TEMPLATE = """
-You are an expert technical interviewer.
+You are an expert interviewer.
 
-Generate a short quiz to assess a candidate's knowledge for the career:
-"{career}"
+Generate ONE question for the topic:
+"{topic}"
+
+Difficulty level: {level}
 
 Rules:
-- Generate exactly 5 questions
-- Questions should be open-ended (not MCQ)
-- Questions should progressively increase in difficulty
-- Keep questions concise and practical
-- Do NOT include answers
+- Open-ended question
+- No multiple choice
+- No answer
+- Practical if possible
+- Difficulty must match the level
 
-Return the output strictly as JSON in this format:
-
-[
-  {{
-  "question": "...",
-  "options": []
+Return JSON only:
+{{
+  "question": "..."
 }}
-]
 """
 
-async def generate_quiz(career: str):
-    prompt = QUIZ_PROMPT_TEMPLATE.format(career=career)
-
-    response = await llm.ainvoke([
-        HumanMessage(content=prompt)
-    ])
-
+async def generate_quiz_question(topic: str, level: str):
+    prompt = QUIZ_PROMPT_TEMPLATE.format(
+        topic=topic,
+        level=level
+    )
+    response = await llm.ainvoke([HumanMessage(content=prompt)])
     raw = response.content.strip()
 
     try:
-        import json
-        quiz = json.loads(raw)
-        return quiz
+        return json.loads(raw)
     except Exception:
-        # Fallback safety
-        return [
-            {"question": "Explain the core responsibilities of a " + career},
-            {"question": "What tools are commonly used in this role?"},
-            {"question": "Explain a common real-world problem faced in this role."},
-            {"question": "How would you troubleshoot an issue in this domain?"},
-            {"question": "How do you keep your skills updated in this field?"}
-        ]
+        return {"question": f"Explain {topic} concepts ({level} level)."}

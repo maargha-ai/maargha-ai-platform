@@ -3,37 +3,39 @@ from langchain_core.messages import HumanMessage
 from app.core.llm_client import llm
 
 EVAL_PROMPT_TEMPLATE = """
-You are a senior interviewer evaluating a quiz attempt.
+You are a senior interviewer.
 
-Career: {career}
+Career/Topic: {career}
 
-Below are the questions and the user's answers.
+Evaluate the candidate using:
+1. Answer quality
+2. Emotional confidence
+3. Focus consistency
 
-Evaluate based on:
-- Conceptual understanding
-- Practical thinking
-- Clarity of explanation
-
-Provide:
-1. Overall assessment
-2. Strengths
-3. Weak areas
-4. Suggestions to improve
+Emotion summary:
+- Dominant emotion: {emotion_summary[dominant_emotion]}
+- Focus score: {emotion_summary[focus_score]}
 
 Questions & Answers:
 {qa_block}
 
-Respond in clear professional language.
+Provide:
+- Knowledge score
+- Confidence assessment
+- Attention insights
+- Suggestions
 """
 
-async def evaluate_quiz(career: str, quiz_answers: dict):
+
+async def evaluate_quiz(career: str, quiz_answers: dict, emotion_summary: dict):
     qa_lines = []
     for q, a in quiz_answers.items():
         qa_lines.append(f"Q: {q}\nA: {a}")
 
     prompt = EVAL_PROMPT_TEMPLATE.format(
         career=career,
-        qa_block="\n\n".join(qa_lines)
+        qa_block="\n\n".join(qa_lines),
+        emotion_summary=emotion_summary
     )
 
     response = await llm.ainvoke([

@@ -1,5 +1,9 @@
 from fastapi import FastAPI
-from app.routes import auth, orchestrator_ws
+from app.routes import (
+    auth, orchestrator_ws, quiz_ws, 
+    emotional_support_ws, song_recommend, career_ws,
+    roadmap, jobs, news, linkedin
+    )
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="MAARGHA Gateway")
@@ -14,3 +18,11 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(orchestrator_ws.router)
+app.include_router(quiz_ws.router)
+app.include_router(emotional_support_ws.router)
+app.include_router(song_recommend.router)
+app.include_router(career_ws.router)
+app.include_router(roadmap.router)
+app.include_router(jobs.router)
+app.include_router(news.router)
+app.include_router(linkedin.router)
