@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "../styles/roadmap-dashboard.css";
 
 export default function Roadmap() {
   const [career, setCareer] = useState("");
@@ -40,12 +41,14 @@ export default function Roadmap() {
       </button>
 
       {videoUrl && (
-        <video
-          src={videoUrl}
-          controls
-          autoPlay
-          style={{ width: "100%", marginTop: "20px" }}
-        />
+        <div className="roadmap-video-container">
+          <video
+            src={videoUrl}
+            controls
+            autoPlay
+            style={{ width: "100%", display: "block" }}
+          />
+        </div>
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "./MockBridge"; // <--- DELETE THIS LINE TO USE REAL BACKEND
 import App from "./App";
 import Lenis from "@studio-freight/lenis";
 import "./index.css";
