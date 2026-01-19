@@ -1,29 +1,64 @@
-import "../styles/dashboard.css";
+import { useNavigate } from "react-router-dom";
+import { 
+  ArrowLeft, 
+  Calendar, 
+  Users, 
+  ExternalLink,
+  Globe,
+  MapPin
+} from "lucide-react";
+import { useTheme } from "../components/ThemeProvider";
+import { Button } from "../components/ui/button";
+import "../styles/networking.css";
 
 export default function NetworkingEvents() {
-  return (
-    <div className="dashboard-wrapper">
-      <h1 className="dashboard-title">
-        Networking & Hackathon Insights
-      </h1>
+  const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
-      {/* Power BI Embed */}
-      <div className="powerbi-container">
-        <iframe
-          title="Networking Events Dashboard"
-          src="https://app.powerbi.com/view?r=eyJrIjoiOGU2MGZhMzgtYWRhNy00ZDc5LTg5NDctZTk3ZGZlMTIzMjNjIiwidCI6IjM5ZmU4ZmY2LTUwNjMtNGI0NS1hZDI1LWVkNjBlMjAyNjlhNSJ9"
-          frameBorder="0"
-          allowFullScreen
-        />
-      </div>
+  return (
+    <div className={`networking-layout ${theme}`}>
+      <header className="net-header">
+        <div className="flex items-center gap-4">
+           <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")} className="rounded-full">
+              <ArrowLeft size={24} />
+           </Button>
+           <div>
+              <h1 className="text-xl font-bold font-display">Global Tech Events</h1>
+              <p className="text-xs text-muted-foreground">Real-time networking & hackathon data</p>
+           </div>
+        </div>
+      </header>
+
+      <main className="net-main">
+        {/* Quick Stats Overlay - Simulated for UI feel */}
+        <div className="net-stats-row">
+           <div className="net-stat-card">
+              <div className="stat-icon"><Calendar size={20} /></div>
+              <div className="stat-value">142</div>
+              <div className="stat-label">Upcoming Hackathons</div>
+           </div>
+           
+           <div className="net-stat-card">
+              <div className="stat-icon"><Globe size={20} /></div>
+              <div className="stat-value">28</div>
+              <div className="stat-label">Virtual Summits</div>
+           </div>
+
+           <div className="net-stat-card">
+              <div className="stat-icon"><MapPin size={20} /></div>
+              <div className="stat-value">Bangalore</div>
+              <div className="stat-label">Top Tech Hub</div>
+           </div>
+        </div>
+
+        <div className="iframe-wrapper">
+          <iframe
+            title="Networking Events Dashboard"
+            src="https://app.powerbi.com/view?r=eyJrIjoiOGU2MGZhMzgtYWRhNy00ZDc5LTg5NDctZTk3ZGZlMTIzMjNjIiwidCI6IjM5ZmU4ZmY2LTUwNjMtNGI0NS1hZDI1LWVkNjBlMjAyNjlhNSJ9"
+            allowFullScreen
+          />
+        </div>
+      </main>
     </div>
   );
 }
-
-<button
-  className="orchestrator-btn"
-  onClick={() => window.history.back()}
->
-  ← Back to Dashboard
-</button>
-

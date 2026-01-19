@@ -1,0 +1,227 @@
+/* Career Finder Premium UI */
+.career-layout {
+    min-height: 100vh;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Outfit', sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+.career-container {
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.career-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.career-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.career-subtitle {
+    color: hsl(var(--muted-foreground));
+    font-size: 1.1rem;
+}
+
+.status-badge {
+    background: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 1rem;
+    display: inline-block;
+}
+
+/* Question Card */
+.question-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border) / 50%);
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fade-in-up 0.4s ease-out;
+}
+
+.question-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 3rem;
+    line-height: 1.4;
+}
+
+.answer-options {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.answer-btn {
+    padding: 1rem 3rem;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.answer-btn.yes {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+.answer-btn.yes:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px hsl(var(--primary) / 30%);
+}
+
+.answer-btn.no {
+    background: transparent;
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+}
+
+.answer-btn.no:hover {
+    background: hsl(var(--secondary));
+    border-color: transparent;
+}
+
+.progress-indicator {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: hsl(var(--muted-foreground));
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Results Grid */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    animation: fade-in-up 0.6s ease-out;
+}
+
+.result-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.result-card:hover {
+    transform: translateY(-5px);
+    border-color: hsl(var(--primary) / 50%);
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+}
+
+.result-card h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.result-reason {
+    font-size: 0.9rem;
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.skill-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.skill-pill {
+    background: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.select-career-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 12px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.select-career-btn:hover {
+    opacity: 0.9;
+}
+
+/* Success View */
+.success-view {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: hsl(var(--card));
+    border-radius: 24px;
+    border: 1px solid hsl(var(--border));
+    animation: scale-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scale-up {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

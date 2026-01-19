@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { 
+  ArrowLeft, 
+  CheckCircle2, 
+  BrainCircuit, 
+  Sparkles,
+  Target
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import "../styles/career-finder.css";
 
 export default function CareerFinder() {
   const navigate = useNavigate();
@@ -83,70 +92,99 @@ export default function CareerFinder() {
   };
 
   return (
-    <div className="career-page">
-      <h2>Career Finder</h2>
+    <div className="career-layout">
+      <div className="p-6">
+         <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")} className="rounded-full">
+            <ArrowLeft size={24} />
+         </Button>
+      </div>
 
-      {!connected && <p>Connecting...</p>}
-
-      {/* QUESTION VIEW */}
-      {question && !careers && (
-        <div className="career-question-card">
-          <p className="question-text">{question}</p>
-
-          <div className="answer-buttons">
-            <button onClick={() => sendAnswer("yes")}>Yes</button>
-            <button onClick={() => sendAnswer("no")}>No</button>
+      <div className="career-container">
+        {!saved && (
+          <div className="career-header">
+            <h1 className="career-title">Career Discovery Engine</h1>
+            <p className="career-subtitle">Let AI analyze your aptitudes and map out your perfect path.</p>
+            {connected ? (
+               <span className="status-badge flex items-center gap-2 w-fit mx-auto">
+                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                 Neural Link Active
+               </span>
+            ) : (
+               <span className="status-badge text-muted-foreground">Connecting to Neural Net...</span>
+            )}
           </div>
+        )}
 
-          <p className="question-progress">
-            Question {questionId + 1}
-          </p>
-        </div>
-      )}
+        {/* QUESTION VIEW */}
+        {question && !careers && (
+          <div className="question-card">
+            <BrainCircuit size={48} className="mx-auto mb-6 text-primary" />
+            <p className="question-text">{question}</p>
 
-      {/* RESULT VIEW */}
-      {careers && !saved && (
-        <div className="career-result">
-          <h3>Recommended Careers</h3>
-          <p>Select the career that fits you best:</p>
-
-          {careers.map((career, idx) => (
-            <div key={idx} className="career-card">
-              <h4>{career.title}</h4>
-              <p>{career.reason}</p>
-
-              <div className="skill-tags">
-                {career.skills.map((skill, i) => (
-                  <span key={i} className="skill-tag">
-                    {skill}
-                  </span>
-                ))}
-              </div>
-
-              {/* ✅ EXPLICIT BUTTON */}
-              <button
-                className="select-btn"
-                onClick={() => selectCareer(career.title)}
-              >
-                Select this career
+            <div className="answer-options">
+              <button className="answer-btn yes" onClick={() => sendAnswer("yes")}>
+                Absolutely
+              </button>
+              <button className="answer-btn no" onClick={() => sendAnswer("no")}>
+                Not really
               </button>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* CONFIRMATION VIEW */}
-      {saved && (
-        <div className="career-confirmation">
-          <h3>Career Selected 🎉</h3>
-          <p>You have chosen:</p>
-          <h2>{selectedCareer}</h2>
+            <p className="progress-indicator">
+              Analysis Step {questionId + 1}
+            </p>
+          </div>
+        )}
 
-          <button onClick={() => navigate("/dashboard")}>
-            Back to Dashboard
-          </button>
-        </div>
-      )}
+        {/* RESULT VIEW */}
+        {careers && !saved && (
+          <div className="results-section">
+             <h2 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2">
+               <Sparkles className="text-primary" /> Analysis Complete: Top Matches
+             </h2>
+             
+             <div className="results-grid">
+              {careers.map((career, idx) => (
+                <div key={idx} className="result-card">
+                  <h4>{career.title}</h4>
+                  <p className="result-reason">{career.reason}</p>
+
+                  <div className="skill-pills">
+                    {career.skills.map((skill, i) => (
+                      <span key={i} className="skill-pill">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+
+                  <button
+                    className="select-career-btn"
+                    onClick={() => selectCareer(career.title)}
+                  >
+                    Select Path <Target size={16} className="inline ml-1" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* CONFIRMATION VIEW */}
+        {saved && (
+          <div className="success-view">
+            <div className="success-icon">
+               <CheckCircle2 size={40} />
+            </div>
+            <h3 className="text-xl font-bold mb-2">Trajectory Locked</h3>
+            <p className="text-muted-foreground mb-6">Your professional path has been optimized for:</p>
+            <h2 className="text-4xl font-bold text-primary mb-8">{selectedCareer}</h2>
+
+            <Button onClick={() => navigate("/dashboard")} className="rounded-full px-8">
+              Return to Dashboard
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
