@@ -12,62 +12,23 @@ async def observation_node(state: AgentState):
 
     # Career Question
     if tool_result["type"] == "career_question":
-        updates["messages"] = state["messages"] + [{
-            "role": "assistant",
-            "content": tool_result["question"]
-        }]
-        updates["career_question_idx"] = tool_result["next_idx"]
-        updates["agent_waiting_for_user"] = True
+        updates["ws_event"] = {
+        "type": "NAVIGATE",
+        "target": "career"
+    }
 
-    # Career Result
-    elif tool_result["type"] == "career_result":
-        careers = tool_result["careers"]
-        msg = "Here are your recommended careers:\n\n"
-        for i, c in enumerate(careers, 1):
-            msg += f"{i}. **{c['title']}**\n"
-            msg += f"   {c['reason']}\n"
-            msg += f"   Skills: {', '.join(c['skills'])}\n\n"
-        msg += "Reply with a number (1–4) to choose."
-
-        updates["messages"] = state["messages"] + [{
-            "role": "assistant",
-            "content": msg
-        }]
-        updates["career_options"] = careers
-        updates["agent_waiting_for_user"] = True
-
-        # ROADMAP RESULT 
+    # ROADMAP RESULT 
     elif tool_result["type"] == "roadmap_result":
-        updates["messages"] = state["messages"] + [{
-            "role": "assistant",
-            "content": (
-                f"**Roadmap Generated for {tool_result['career']}**\n\n"
-                f"Video: {tool_result['video_url']}\n\n"
-                "What would you like to do next?\n"
-                "• Find jobs\n"
-                "• Upload CV\n"
-                "• Change career"
-            )
-        }]
-        updates["roadmap_generated"] = True
-        updates["agent_waiting_for_user"] = True
+        updates["ws_event"] = {
+        "type": "NAVIGATE",
+        "target": "roadmap"
+    }
 
     elif tool_result.get("type") == "job_results":
-        jobs = tool_result["jobs"]
-
-        lines = ["Here are the top job matches for you:\n"]
-        for score, job in jobs[:10]:
-            lines.append(
-                f"• **{job['title']}** at {job['company']}\n"
-                f"  Source: {job['source']}\n"
-                f"  Link: {job['link']}\n"
-            )
-            message = "\n".join(lines)
-
-        updates["messages"] = state["messages"] + [{
-            "role": "assistant", "content": message
-            }]
-        updates["agent_waiting_for_user"] = True
+        updates["ws_event"] = {
+        "type": "NAVIGATE",
+        "target": "jobs"
+    }
         
     elif tool_result.get("type") == "networking_events":
         events = tool_result["events"]
@@ -88,11 +49,10 @@ async def observation_node(state: AgentState):
         updates["agent_waiting_for_user"] = True
     
     elif tool_result["type"] == "linkedin_response":
-        updates["messages"] = state["messages"] + [{
-            "role": "assistant",
-            "content": tool_result["content"]
-        }]
-        updates["agent_waiting_for_user"] = True
+        updates["ws_event"] = {
+        "type": "NAVIGATE",
+        "target": "linkedin"
+    }
         
 
     elif tool_result["type"] == "quiz_questions":
@@ -141,18 +101,10 @@ async def observation_node(state: AgentState):
         updates["agent_done"] = True
 
     elif tool_result["type"] == "tech_news":
-        news = tool_result["news"]
-
-        message = "**Latest Tech News**\n\n"
-        for i, n in enumerate(news, 1):
-            message += f"{i}. {n['title']}\n"
-
-        updates["messages"] = state["messages"] + [{
-                "role": "assistant",
-                "content": message
-            }]
-        updates["tech_news_completed"] = True
-        updates["agent_done"] = True
+        updates["ws_event"] = {
+        "type": "NAVIGATE",
+        "target": "news"
+    }
 
     # Cleanup
     updates["tool_result"] = None

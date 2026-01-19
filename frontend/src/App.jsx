@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import Orchestrator from "./pages/Orchestrator";
+import OrchestratorChat from "./pages/OrchestratorChat";
 import NetworkingEvents from "./pages/NetworkingEvents";
 import QuizPage from "./pages/quiz/QuizPage";
 import QuizEvaluationPage from "./pages/quiz/QuizEvaluationPage";
@@ -14,6 +14,8 @@ import Roadmap from "./pages/Roadmap";
 import JobSearch from "./pages/JobSearch";
 import LinkedInAssistant from "./pages/LinkedInAssistant";
 import NewsDigest from "./pages/NewsDigest";
+import Tutor from "./pages/Tutor";
+
 import "./styles/stars.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
@@ -33,6 +35,8 @@ function App() {
         <Route path="/jobs" element={<JobSearch />} />
         <Route path="/linkedin" element={<LinkedInAssistant />} />
         <Route path="/news" element={<NewsDigest />} />
+        <Route path="/tutor" element={<Tutor />} />
+
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
@@ -40,7 +44,7 @@ function App() {
         } />
         <Route path="/orchestrator" element={
           <ProtectedRoute>
-            <Orchestrator />
+            <OrchestratorChat />
           </ProtectedRoute>
         } />
       </Routes>

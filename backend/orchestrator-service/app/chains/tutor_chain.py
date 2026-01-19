@@ -1,84 +1,80 @@
-import os
-from langchain_groq import ChatGroq
+# app/chains/tutor_chain.py
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain_classic.chains import create_retrieval_chain  
-from langchain_classic.chains.combine_documents import create_stuff_documents_chain  
+from langchain_classic.chains import create_retrieval_chain
+from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import PromptTemplate
-from dotenv import load_dotenv
 
-load_dotenv()
+from app.core.llm_client import llm
+from app.core.langchain_embeddings import LangchainSentenceEmbeddings
 
-# Load Qwen Model 
-def load_llm():
-    llm = ChatGroq(
-        groq_api_key=os.getenv("career-growth"),
-        model="qwen2.5-72b-instruct",
-        temperature=0.2
-    )
-    return llm
-
-# Load textbook and create Vector DB
-def build_vector_db(pdf_path="./books/Hands-On-Machine-Learning.pdf"):
-    print("Loading textbook...")
-    loader = PyPDFLoader(pdf_path)
-    docs = loader.load()
-
-    print("Splitting into chunks...")
-    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
-    chunks = splitter.split_documents(docs)
-
-    print("Creating embeddings...")
-    embedding = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-
-    print("Building FAISS vector database....")
-    vectordb = FAISS.from_documents(chunks, embedding)
-    return vectordb.as_retriever(search_type="similarity", k=4)
+_retriever = None
+_tutor_chain = None
 
 
-# Build RAG Tutor Chain
-def build_tutor_chain(llm, retriever):
+def build_vector_db(pdf_path="app/static/books/Hands-On-Machine-Learning.pdf"):
+    print("[Tutor] Loading textbook...")
+
+    try:
+        loader = PyPDFLoader(pdf_path)
+        docs = loader.load()
+
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=800,
+            chunk_overlap=100
+        )
+        chunks = splitter.split_documents(docs)
+
+        embeddings = LangchainSentenceEmbeddings()
+
+        vectordb = FAISS.from_documents(chunks, embeddings)
+
+        return vectordb.as_retriever(
+            search_type="similarity",
+            k=4
+        )
+    except Exception as e:
+        print(f"[Tutor] Failed with exception {e}")
+
+
+def build_tutor_chain(retriever):
     prompt = PromptTemplate.from_template(
-    """
-    You are an AI Tutor teaching IT concepts clearly and simply.
-    Use ONLY the provided context from the textbook.
-                                          
-    Question: {input}
-    
-    CONTEXT:
-    {context}
+        """
+        You are an AI Tutor teaching IT concepts clearly and simply.
+        Use ONLY the provided context from the textbook.
 
-    Your response must include:
-    - Beginner-level explanation
-    - Real-world analogy or example
-    - 3-step learning plan
-    - A short quiz with answers
-    """
+        Question: {input}
+
+        CONTEXT:
+        {context}
+
+        Your response must include:
+        - Beginner-level explanation
+        - Real-world analogy
+        - 3-step learning plan
+        - A short quiz with answers
+        """
     )
 
-    document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)
-    retrieval_chain = create_retrieval_chain(retriever, document_chain)
-    return retrieval_chain
+    document_chain = create_stuff_documents_chain(llm, prompt)
+    return create_retrieval_chain(retriever, document_chain)
 
 
-# Tutor Ask Function
-def ask_tutor(chain, question):
+def get_tutor_chain():
+    global _retriever, _tutor_chain
 
-    print("\nStudent Question: {question}")
+    if _tutor_chain is None:
+        print("[Tutor] Initializing RAG tutor (one-time)")
+        _retriever = build_vector_db()
+        print("[Tutor] Sucessfully retrieved vectorDB")
+        _tutor_chain = build_tutor_chain(_retriever)
+        print("[Tutor] Sucessfully build Tutor Chain")
+
+    return _tutor_chain
+
+
+def ask_tutor(question: str) -> str:
+    chain = get_tutor_chain()
     response = chain.invoke({"input": question})
-    print("\n Tutor Response: \n")
-    print(response["answer"])
     return response["answer"]
-
-
-if __name__ == "__main__":
-    llm = load_llm()
-    retriever = build_vector_db()
-    tutor_chain = build_tutor_chain(llm, retriever)
-
-    rslt = ask_tutor(
-        tutor_chain,
-        "Explain about cybersecurity."
-    )

@@ -21,6 +21,26 @@ import { useTheme } from '../components/ThemeProvider';
 import { ThemeToggle } from '../components/ThemeToggle';
 import '../styles/landscape-dashboard.css';
 const Dashboard = () => {
+import "../styles/dashboard.css";
+import "../styles/register.css"; 
+import { useNavigate } from "react-router-dom";
+
+const features = [
+  { title: "Career Finder", desc: "Discover careers that match your interests and skills.", route: "/career" },
+  { title: "AI Roadmap Generator", desc: "Personalized learning paths for your goals.", route: "/roadmap" },
+  { title: "AI Tutor", desc: "Ask doubts and learn interactively.", route: "/tutor" },
+  { title: "Quiz Generator", desc: "Test yourself with smart quizzes.", route: "/quiz" },
+  // { title: "Quiz Evaluation", desc: "Evaluate your answers.", route: "/quiz/evaluation" },
+  { title: "Job Search", desc: "AI-powered job discovery.", route: "/jobs" },
+  { title: "CV Generation", desc: "AI-powered CV generator.", route: "/cv" },
+  { title: "LinkedIn Assistant", desc: "Optimize your profile and posts.", route: "/linkedin" },
+  { title: "Networking Events", desc: "Find relevant hackathons & events.", route: "/networking-events" },
+  { title: "Emotional Support", desc: "Talk when you need motivation.", route: "/emotional-support" },
+  { title: "Music Recommendation", desc: "Mood-based playlists.", route: "/music" },
+  { title: "News Digest", desc: "Curated AI & tech updates.", route: "/news" },
+];
+
+export default function Dashboard() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
