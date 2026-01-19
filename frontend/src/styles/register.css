@@ -8,13 +8,11 @@
   align-items: center;
   justify-content: center;
 }
-
 .stars-layer {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
-
 .star {
   position: absolute;
   width: 0.1px;
@@ -25,26 +23,22 @@
   will-change: transform, opacity;
   opacity: 0.8;
 }
-
 .star:nth-child(3n) {
   width: 0.1px;
   height: 0.1px;
   opacity: 0.35;
   filter: blur(0.4px);
 }
-
 .star:nth-child(5n) {
   width: 0.1px;
   height: 0.1px;
   opacity: 0.65;
   filter: blur(0.2px);
 }
-
 @keyframes starDrift {
   0% {
     transform: translate(0, 0) scale(1);
   }
-
   25% {
     transform:
       translate(
@@ -53,7 +47,6 @@
       )
       scale(1.3);
   }
-
   50% {
     transform:
       translate(
@@ -62,7 +55,6 @@
       )
       scale(0.9);
   }
-
   75% {
     transform:
       translate(
@@ -71,45 +63,35 @@
       )
       scale(1.1);
   }
-
   100% {
     transform: translate(0, 0) scale(1);
   }
 }
-
-
-
 .register-card {
   position: relative;
   z-index: 2;
   animation: cardFloat 8s ease-in-out infinite;
   width: 520px;
   padding: 64px 56px;
-
   background: rgba(255, 255, 255, 0);
   backdrop-filter: blur(0.1px);
-
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.25);
-
   box-shadow:
     0 40px 80px rgba(0, 0, 0, 0.6),
     inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
-
 .register-card h2 {
   margin-bottom: 28px;
   text-align: center;
   color: #ffffff;
   font-size: 26px;
 }
-
 .register-card form {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
-
 .register-card input {
   padding: 14px 16px;
   border-radius: 10px;
@@ -117,7 +99,6 @@
   font-size: 15px;
   background: rgba(255, 255, 255, 0.06);
 }
-
 .register-card button {
   margin-top: 14px;
   padding: 12px;
@@ -129,51 +110,40 @@
   font-size: 15px;
   cursor: pointer;
 }
-
 .login-link {
   margin-top: 18px;
   text-align: center;
   font-size: 14px;
   color: rgba(255, 255, 255, 0.8);
 }
-
 .login-link span {
   color: white;
   cursor: pointer;
   text-decoration: underline;
 }
-
 .home-float-btn {
   position: absolute;
   top: 18px;
   right: 18px;
-
   width: 38px;
   height: 38px;
   border-radius: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-
   border: 1px solid rgba(255, 255, 255, 0.25);
   color: white;
-
   font-size: 16px;
   cursor: pointer;
-
   transition: transform 0.2s ease, background 0.2s ease;
 }
-
 .home-float-btn:hover {
   transform: scale(1.08);
   background: rgba(255, 255, 255, 0.14);
 }
-
 @keyframes cardFloat {
   0% {
     transform: translateY(0px);
@@ -185,3 +155,5 @@
     transform: translateY(0px);
   }
 }
+
+

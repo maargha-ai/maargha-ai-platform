@@ -1,0 +1,109 @@
+.news-layout {
+    min-height: 100vh;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+}
+.news-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid hsl(var(--border));
+}
+.news-title h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+    font-family: 'Space Grotesk', sans-serif;
+}
+.news-title span {
+    color: hsl(var(--primary));
+}
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+.news-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border) / 50%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.news-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+    border-color: hsl(var(--border));
+}
+.news-source {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: hsl(var(--primary));
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.news-source::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.news-card h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    flex: 1;
+}
+.news-footer {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px dashed hsl(var(--border));
+    display: flex;
+    justify-content: flex-end;
+}
+.read-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    text-decoration: none;
+    transition: gap 0.2s;
+}
+.read-btn:hover {
+    gap: 0.75rem;
+    color: hsl(var(--primary));
+}
+.loading-skeleton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 1rem;
+    color: hsl(var(--muted-foreground));
+}
+
+

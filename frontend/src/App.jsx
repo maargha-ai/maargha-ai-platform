@@ -17,9 +17,7 @@ import NewsDigest from "./pages/NewsDigest";
 import Tutor from "./pages/Tutor";
 
 import "./styles/stars.css";
-
 import ProtectedRoute from "./components/ProtectedRoute";
-
 function App() {
   return (
     <BrowserRouter>
@@ -44,7 +42,6 @@ function App() {
             <Dashboard />
           </ProtectedRoute>
         } />
-
         <Route path="/orchestrator" element={
           <ProtectedRoute>
             <OrchestratorChat />
@@ -54,5 +51,6 @@ function App() {
     </BrowserRouter>
   );
 }
-
 export default App;
+
+

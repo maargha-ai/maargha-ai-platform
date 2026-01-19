@@ -3,36 +3,29 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { registerUser } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
-
 export default function Register() {
   const stars = Array.from({ length: 920 });
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
-
   const [form, setForm] = useState({
     full_name: "",
     email: "",
     password: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await registerUser(form);
       navigate("/login"); 
@@ -42,27 +35,22 @@ export default function Register() {
       setLoading(false);
     }
   };
-
   return (
     <div className="register-wrapper">
       <div className="stars-layer">
         {stars.map((_, i) => {
           const movement = Math.random() < 0.33 ? 4 : Math.random() < 0.66 ? 8 : 14;
-
           const style = {
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
             animationDuration: `${12 + Math.random() * 18}s`,
-            animationDelay: `${Math.random() * -10}s`, // 👈 KEY LINE
+            animationDelay: `${Math.random() * -10}s`,
             opacity: Math.random(),
             "--drift": `${movement}px`,
           };
-
-
           return <span key={i} className="star" style={style} />;
         })}
       </div>
-
       <div className="register-card">
         <button
           className="home-float-btn"
@@ -72,7 +60,6 @@ export default function Register() {
           ⌂
         </button>
         <h2>Create Account</h2>
-
         <form onSubmit={handleSubmit}>
           <input
             name="full_name"
@@ -94,14 +81,11 @@ export default function Register() {
             onChange={handleChange}
             required
           />
-
           <button type="submit" disabled={loading}>
             {loading ? "Creating..." : "Register"}
           </button>
         </form>
-
          {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
-         
         <p className="login-link">
         Already have an account? <span onClick={() => navigate("/login")}>Login</span>
         </p>
@@ -109,3 +93,5 @@ export default function Register() {
     </div>
   );
 }
+
+

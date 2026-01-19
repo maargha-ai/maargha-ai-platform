@@ -4,7 +4,6 @@
   z-index: 0;
   pointer-events: none;
 }
-
 .star {
   position: absolute;
   width: 0.1px;
@@ -15,17 +14,14 @@
   will-change: transform, opacity;
   opacity: 0.8;
 }
-
 .star:nth-child(3n) {
   opacity: 0.35;
   filter: blur(0.4px);
 }
-
 .star:nth-child(5n) {
   opacity: 0.65;
   filter: blur(0.2px);
 }
-
 @keyframes starDrift {
   0% { transform: translate(0, 0) scale(1); }
   25% {
@@ -45,3 +41,5 @@
   }
   100% { transform: translate(0, 0) scale(1); }
 }
+
+

@@ -4,6 +4,29 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  width: 8px;
+
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(var(--foreground) / 20%);
+
+  border-radius: 99px;
+  border: 2px solid transparent;
+
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsla(var(--foreground) / 40%);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -122,3 +145,4 @@
 .animate-pulse-soft {
   animation: pulse-soft 4s ease-in-out infinite;
 }
+

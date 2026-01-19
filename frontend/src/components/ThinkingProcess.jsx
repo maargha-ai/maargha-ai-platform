@@ -1,5 +1,4 @@
 import { Brain, Target, Zap, CheckCircle2, ArrowRight } from 'lucide-react';
-
 export default function ThinkingProcess() {
   const steps = [
     {
@@ -31,7 +30,6 @@ export default function ThinkingProcess() {
       bg: "bg-emerald-500/10"
     }
   ];
-
   return (
     <section className="py-24 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
@@ -41,10 +39,8 @@ export default function ThinkingProcess() {
             Our AI engine breaks down complex career ambitions into actionable, logical steps.
           </p>
         </div>
-
         <div className="relative grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-border to-transparent -z-10" />
-
           {steps.map((step, index) => (
             <div 
               key={index} 
@@ -55,7 +51,6 @@ export default function ThinkingProcess() {
               </div>
               <h3 className="text-xl font-bold mb-2">{step.title}</h3>
               <p className="text-muted-foreground">{step.desc}</p>
-              
               {index < steps.length - 1 && (
                 <ArrowRight className="md:hidden absolute -bottom-6 left-1/2 -translate-x-1/2 text-muted-foreground/30" />
               )}
@@ -66,3 +61,5 @@ export default function ThinkingProcess() {
     </section>
   );
 }
+
+
