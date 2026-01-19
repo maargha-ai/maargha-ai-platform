@@ -11,3 +11,5 @@ secrets/
 # SentenceTransformer / HF models
 orchestrator-service/models/
 models/
+
+runs/

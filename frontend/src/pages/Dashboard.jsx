@@ -7,7 +7,7 @@ const features = [
   { title: "AI Roadmap Generator", desc: "Personalized learning paths for your goals.", route: "/roadmap" },
   { title: "AI Tutor", desc: "Ask doubts and learn interactively.", route: "/tutor" },
   { title: "Quiz Generator", desc: "Test yourself with smart quizzes.", route: "/quiz" },
-  { title: "Quiz Evaluation", desc: "Evaluate your answers.", route: "/quiz/evaluation" },
+  // { title: "Quiz Evaluation", desc: "Evaluate your answers.", route: "/quiz/evaluation" },
   { title: "Job Search", desc: "AI-powered job discovery.", route: "/jobs" },
   { title: "CV Generation", desc: "AI-powered CV generator.", route: "/cv" },
   { title: "LinkedIn Assistant", desc: "Optimize your profile and posts.", route: "/linkedin" },

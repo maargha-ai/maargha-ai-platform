@@ -14,7 +14,8 @@ class AgentState(TypedDict):
     agent_observation: Optional[str]
     agent_done: bool
     agent_waiting_for_user: bool
-
+    agent_response: Optional[str]
+    
     # Career flow
     selected_career: Optional[str]
     career_answers: Optional[Dict[str, str]] = None

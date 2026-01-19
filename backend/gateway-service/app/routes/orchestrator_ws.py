@@ -37,7 +37,7 @@ async def orchestrator_ws(
         return
 
     # Build orchestrator WS URL
-    orchestrator_ws_url = f"{settings.ORCHESTRATOR_SERVICE_WS_URL}/ws/{user_id}"
+    orchestrator_ws_url = f"{settings.ORCHESTRATOR_SERVICE_WS_URL}/ws/chat"
     print("[Gateway] Connecting to orchestrator:", orchestrator_ws_url)
 
     # Try connecting to orchestrator
