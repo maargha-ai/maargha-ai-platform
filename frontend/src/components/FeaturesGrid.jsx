@@ -1,5 +1,4 @@
 import { Share2, BookOpen, UserCheck, BarChart3, Radio, Github, Code2 } from 'lucide-react';
-
 export default function FeaturesGrid() {
   return (
     <section id="features" className="py-24 bg-secondary/30">
@@ -8,9 +7,7 @@ export default function FeaturesGrid() {
           <span className="text-primary font-semibold tracking-wider text-sm uppercase">Features</span>
           <h2 className="text-3xl md:text-5xl font-bold mt-2">Everything you need to grow</h2>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 h-auto md:h-[600px]">
-          
           <div className="md:col-span-2 md:row-span-2 bg-card rounded-3xl p-8 border border-border shadow-sm hover:shadow-xl transition-all relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
               <Code2 size={200} />
@@ -38,8 +35,7 @@ export default function FeaturesGrid() {
               </div>
             </div>
           </div>
-
-          {/* Small Card 2 */}
+          {}
           <div className="md:col-span-1 bg-card rounded-3xl p-8 border border-border shadow-sm hover:shadow-xl transition-all group">
             <div className="w-12 h-12 bg-purple-500/10 text-purple-600 rounded-xl flex items-center justify-center mb-4">
               <UserCheck />
@@ -49,7 +45,6 @@ export default function FeaturesGrid() {
               Optimize your profile with AI suggestions to rank higher in recruiter searches.
             </p>
           </div>
-
           <div className="md:col-span-1 bg-card rounded-3xl p-8 border border-border shadow-sm hover:shadow-xl transition-all group">
             <div className="w-12 h-12 bg-amber-500/10 text-amber-600 rounded-xl flex items-center justify-center mb-4">
               <BarChart3 />
@@ -59,9 +54,7 @@ export default function FeaturesGrid() {
               Identify missing skills and get recommended courses instantly.
             </p>
           </div>
-
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
            <FeatureCards 
              icon={<Share2 />} 
@@ -91,7 +84,6 @@ export default function FeaturesGrid() {
     </section>
   );
 }
-
 function FeatureCards({ icon, title, desc, className = "bg-card", iconClassName = "text-primary", descClassName = "text-muted-foreground" }) {
   return (
     <div className={`p-6 rounded-2xl border border-border shadow-sm flex flex-col justify-center gap-2 hover:-translate-y-1 transition-transform cursor-default ${className}`}>
@@ -101,3 +93,5 @@ function FeatureCards({ icon, title, desc, className = "bg-card", iconClassName 
     </div>
   )
 }
+
+

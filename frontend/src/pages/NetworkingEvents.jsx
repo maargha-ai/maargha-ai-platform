@@ -10,11 +10,9 @@ import {
 import { useTheme } from "../components/ThemeProvider";
 import { Button } from "../components/ui/button";
 import "../styles/networking.css";
-
 export default function NetworkingEvents() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-
   return (
     <div className={`networking-layout ${theme}`}>
       <header className="net-header">
@@ -28,29 +26,25 @@ export default function NetworkingEvents() {
            </div>
         </div>
       </header>
-
       <main className="net-main">
-        {/* Quick Stats Overlay - Simulated for UI feel */}
+        {}
         <div className="net-stats-row">
            <div className="net-stat-card">
               <div className="stat-icon"><Calendar size={20} /></div>
               <div className="stat-value">142</div>
               <div className="stat-label">Upcoming Hackathons</div>
            </div>
-           
            <div className="net-stat-card">
               <div className="stat-icon"><Globe size={20} /></div>
               <div className="stat-value">28</div>
               <div className="stat-label">Virtual Summits</div>
            </div>
-
            <div className="net-stat-card">
               <div className="stat-icon"><MapPin size={20} /></div>
               <div className="stat-value">Bangalore</div>
               <div className="stat-label">Top Tech Hub</div>
            </div>
         </div>
-
         <div className="iframe-wrapper">
           <iframe
             title="Networking Events Dashboard"
@@ -62,3 +56,5 @@ export default function NetworkingEvents() {
     </div>
   );
 }
+
+

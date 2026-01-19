@@ -4,10 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Scrollbar - Minimal but functional */
 ::-webkit-scrollbar {
   width: 8px;
-  /* Slightly wider for better usability */
+
   height: 8px;
 }
 
@@ -17,17 +16,16 @@
 
 ::-webkit-scrollbar-thumb {
   background: hsla(var(--foreground) / 20%);
-  /* Visible by default */
+
   border-radius: 99px;
   border: 2px solid transparent;
-  /* padding around thumb */
+
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: hsla(var(--foreground) / 40%);
 }
-
 
 @layer base {
   :root {
@@ -147,3 +145,4 @@
 .animate-pulse-soft {
   animation: pulse-soft 4s ease-in-out infinite;
 }
+

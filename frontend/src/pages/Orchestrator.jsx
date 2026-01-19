@@ -12,13 +12,11 @@ import {
 import { useTheme } from "../components/ThemeProvider";
 import { Button } from "../components/ui/button";
 import "../styles/orchestrator.css";
-
 export default function Orchestrator() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const scrollRef = useRef(null);
   const wsRef = useRef(null);
-
   const [messages, setMessages] = useState([
     { 
       from: "ai", 
@@ -28,20 +26,17 @@ export default function Orchestrator() {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-
   const suggestions = [
     "Analyze my resume quality",
     "Generate a 6-month study plan",
     "Mock interview: React Senior Dev",
     "Find high-paying remote roles"
   ];
-
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     wsRef.current = new WebSocket(
       `ws://localhost:8000/ws/chat?token=${token}`
     );
-
     wsRef.current.onmessage = (event) => {
       setIsTyping(false);
       setMessages((prev) => [
@@ -53,36 +48,29 @@ export default function Orchestrator() {
         },
       ]);
     };
-
     wsRef.current.onerror = () => {
       console.error("WebSocket error");
       setIsTyping(false);
     };
-
     return () => {
       wsRef.current?.close();
     };
   }, []);
-
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
-
   const sendMessage = () => {
     if (!input.trim()) return;
-
     const userMessage = { 
       from: "user", 
       text: input,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
-
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsTyping(true);
-
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(input);
     } else {
@@ -96,14 +84,12 @@ export default function Orchestrator() {
       }, 1500);
     }
   };
-
   return (
     <div className={`orchestrator-layout ${theme}`}>
       <div className="orch-bg-overlay">
         <div className="orch-gradient-sphere pulse-1"></div>
         <div className="orch-gradient-sphere pulse-2"></div>
       </div>
-
       <main className="orch-main w-full h-full flex flex-col">
         <header className="orch-header border-b border-border/40 backdrop-blur-md bg-background/50">
           <div className="flex items-center justify-between w-full px-6">
@@ -115,7 +101,6 @@ export default function Orchestrator() {
             >
               <ArrowLeft size={20} />
             </Button>
-            
             <div className="flex flex-col items-center flex-1">
               <h1 className="text-xl font-bold leading-none tracking-tight">Maargha Orchestrator</h1>
               <span className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1.5">
@@ -123,11 +108,9 @@ export default function Orchestrator() {
                 Online
               </span>
             </div>
-            
             <div className="w-10" />
           </div>
         </header>
-
         <div className="messages-viewport" ref={scrollRef}>
           <div className="messages-inner">
             {messages.map((m, i) => (
@@ -143,7 +126,6 @@ export default function Orchestrator() {
                 </div>
               </div>
             ))}
-            
             {messages.length === 1 && (
               <div className="suggestions-grid">
                 {suggestions.map((s, i) => (
@@ -154,7 +136,6 @@ export default function Orchestrator() {
                 ))}
               </div>
             )}
-
             {isTyping && (
               <div className="msg-wrapper ai">
                 <div className="msg-avatar">
@@ -171,7 +152,6 @@ export default function Orchestrator() {
             )}
           </div>
         </div>
-
         <footer className="orch-footer">
           <div className="input-container glass-morphism">
             <textarea
@@ -204,3 +184,5 @@ export default function Orchestrator() {
     </div>
   );
 }
+
+

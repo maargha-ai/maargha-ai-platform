@@ -1,4 +1,3 @@
-/* Skill Matrix Premium UI */
 .quiz-layout {
     min-height: 100vh;
     background-color: hsl(var(--background));
@@ -9,7 +8,6 @@
     position: relative;
     overflow: hidden;
 }
-
 .quiz-bg {
     position: absolute;
     inset: 0;
@@ -18,7 +16,6 @@
         radial-gradient(circle at 100% 100%, hsla(var(--secondary) / 20%) 0%, transparent 40%);
     z-index: 0;
 }
-
 .quiz-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -31,8 +28,6 @@
     position: relative;
     z-index: 10;
 }
-
-/* Setup Phase */
 .setup-card {
     background: hsl(var(--card));
     border: 1px solid hsl(var(--border) / 50%);
@@ -44,19 +39,16 @@
     text-align: center;
     animation: fade-in-up 0.5s ease-out;
 }
-
 .setup-title {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     font-family: 'Space Grotesk', sans-serif;
 }
-
 .setup-subtitle {
     color: hsl(var(--muted-foreground));
     margin-bottom: 2rem;
 }
-
 .input-field {
     width: 100%;
     padding: 1rem 1.25rem;
@@ -69,13 +61,11 @@
     transition: all 0.2s;
     margin-bottom: 1rem;
 }
-
 .input-field:focus {
     border-color: hsl(var(--primary));
     background: hsl(var(--background));
     box-shadow: 0 0 0 2px hsl(var(--primary) / 10%);
 }
-
 .level-selector {
     display: flex;
     gap: 0.5rem;
@@ -84,7 +74,6 @@
     background: hsl(var(--secondary) / 50%);
     border-radius: 14px;
 }
-
 .level-btn {
     flex: 1;
     padding: 0.75rem;
@@ -97,13 +86,11 @@
     color: hsl(var(--muted-foreground));
     transition: all 0.2s;
 }
-
 .level-btn.active {
     background: hsl(var(--background));
     color: hsl(var(--foreground));
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
-
 .start-btn {
     width: 100%;
     padding: 1rem;
@@ -119,20 +106,16 @@
     justify-content: center;
     gap: 0.5rem;
 }
-
 .start-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px -5px hsl(var(--primary) / 30%);
 }
-
-/* Session Phase */
 .session-layout {
     display: grid;
     grid-template-columns: 1fr 340px;
     gap: 2rem;
     height: 600px;
 }
-
 .question-panel {
     background: hsl(var(--card));
     border: 1px solid hsl(var(--border) / 50%);
@@ -142,14 +125,12 @@
     flex-direction: column;
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
 }
-
 .question-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
 }
-
 .q-badge {
     background: hsl(var(--secondary));
     padding: 4px 12px;
@@ -158,13 +139,11 @@
     font-weight: 600;
     text-transform: uppercase;
 }
-
 .timer {
     font-family: 'Space Grotesk', monospace;
     font-weight: 700;
     color: hsl(var(--primary));
 }
-
 .live-question {
     font-size: 1.5rem;
     font-weight: 600;
@@ -172,7 +151,6 @@
     margin-bottom: 2rem;
     flex: 1;
 }
-
 .answer-area textarea {
     width: 100%;
     min-height: 150px;
@@ -185,17 +163,14 @@
     margin-bottom: 1rem;
     font-size: 1rem;
 }
-
 .answer-area textarea:focus {
     border-color: hsl(var(--primary));
     background: hsl(var(--background));
 }
-
 .session-actions {
     display: flex;
     justify-content: space-between;
 }
-
 .next-btn {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
@@ -205,7 +180,6 @@
     border: none;
     cursor: pointer;
 }
-
 .stop-btn {
     background: transparent;
     color: hsl(var(--destructive));
@@ -215,14 +189,11 @@
     font-weight: 600;
     cursor: pointer;
 }
-
-/* Side Panel */
 .side-panel {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
-
 .camera-card {
     height: 240px;
     background: black;
@@ -231,15 +202,12 @@
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
-
 .camera-preview {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transform: scaleX(-1);
-    /* Mirror effect */
 }
-
 .camera-overlay {
     position: absolute;
     bottom: 1rem;
@@ -253,7 +221,6 @@
     align-items: center;
     gap: 6px;
 }
-
 .rec-dot {
     width: 8px;
     height: 8px;
@@ -261,22 +228,21 @@
     border-radius: 50%;
     animation: pulse 2s infinite;
 }
-
 @keyframes fade-in-up {
     from {
         opacity: 0;
         transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
-
 @media (max-width: 900px) {
     .session-layout {
         grid-template-columns: 1fr;
         height: auto;
     }
 }
+
+

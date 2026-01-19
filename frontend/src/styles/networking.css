@@ -1,4 +1,3 @@
-/* Networking Page Layout */
 .networking-layout {
     min-height: 100vh;
     background-color: hsl(var(--background));
@@ -7,7 +6,6 @@
     display: flex;
     flex-direction: column;
 }
-
 .net-header {
     height: 80px;
     padding: 0 2rem;
@@ -21,7 +19,6 @@
     top: 0;
     z-index: 50;
 }
-
 .net-main {
     flex: 1;
     padding: 2rem;
@@ -32,13 +29,11 @@
     flex-direction: column;
     gap: 2rem;
 }
-
 .net-stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
 }
-
 .net-stat-card {
     background: hsl(var(--card));
     border: 1px solid hsl(var(--border));
@@ -49,12 +44,10 @@
     gap: 0.5rem;
     transition: all 0.2s;
 }
-
 .net-stat-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
-
 .stat-icon {
     width: 40px;
     height: 40px;
@@ -66,18 +59,15 @@
     justify-content: center;
     margin-bottom: 0.5rem;
 }
-
 .stat-value {
     font-size: 1.75rem;
     font-weight: 700;
     font-family: 'Space Grotesk', sans-serif;
 }
-
 .stat-label {
     color: hsl(var(--muted-foreground));
     font-size: 0.9rem;
 }
-
 .iframe-wrapper {
     flex: 1;
     background: hsl(var(--card));
@@ -88,9 +78,10 @@
     min-height: 600px;
     position: relative;
 }
-
 .iframe-wrapper iframe {
     width: 100%;
     height: 100%;
     border: none;
 }
+
+

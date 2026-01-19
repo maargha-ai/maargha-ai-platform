@@ -1,4 +1,3 @@
-/* Roadmap Generator Layout */
 .roadmap-layout {
     min-height: 100vh;
     background-color: hsl(var(--background));
@@ -11,7 +10,6 @@
     position: relative;
     overflow: hidden;
 }
-
 .roadmap-bg {
     position: absolute;
     inset: 0;
@@ -20,7 +18,6 @@
         linear-gradient(to bottom, transparent, hsla(var(--background)) 90%);
     z-index: 0;
 }
-
 .roadmap-content {
     position: relative;
     z-index: 10;
@@ -29,7 +26,6 @@
     padding: 2rem;
     text-align: center;
 }
-
 .roadmap-title {
     font-size: 3.5rem;
     font-weight: 800;
@@ -40,7 +36,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
 .roadmap-subtitle {
     font-size: 1.25rem;
     color: hsl(var(--muted-foreground));
@@ -49,8 +44,6 @@
     margin-left: auto;
     margin-right: auto;
 }
-
-/* Input Area */
 .roadmap-input-wrapper {
     background: hsla(var(--card) / 50%);
     backdrop-filter: blur(16px);
@@ -64,13 +57,11 @@
     transition: all 0.3s;
     margin-bottom: 3rem;
 }
-
 .roadmap-input-wrapper:focus-within {
     transform: translateY(-5px);
     box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2);
     border-color: hsl(var(--primary));
 }
-
 .roadmap-input-wrapper input {
     flex: 1;
     background: transparent;
@@ -80,7 +71,6 @@
     outline: none;
     font-weight: 500;
 }
-
 .generate-btn {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
@@ -95,18 +85,14 @@
     gap: 0.75rem;
     transition: all 0.2s;
 }
-
 .generate-btn:hover {
     opacity: 0.9;
     transform: scale(1.02);
 }
-
 .generate-btn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
 }
-
-/* Video Area */
 .video-card {
     border-radius: 24px;
     overflow: hidden;
@@ -115,22 +101,21 @@
     background: black;
     animation: scale-up 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .back-btn {
     position: absolute;
     top: 2rem;
     left: 2rem;
     z-index: 20;
 }
-
 @keyframes scale-up {
     from {
         opacity: 0;
         transform: scale(0.9);
     }
-
     to {
         opacity: 1;
         transform: scale(1);
     }
 }
+
+

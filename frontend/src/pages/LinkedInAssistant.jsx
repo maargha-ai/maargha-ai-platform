@@ -16,24 +16,20 @@ import { useTheme } from "../components/ThemeProvider";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { Button } from "../components/ui/button";
 import "../styles/linkedin.css";
-
 export default function LinkedInAssistant() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const wsRef = useRef(null);
   const scrollRef = useRef(null);
-  
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
-
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const ws = new WebSocket(
       `ws://localhost:8000/ws/linkedin?token=${token}`
     );
     wsRef.current = ws;
-
     ws.onmessage = (e) => {
       const msg = JSON.parse(e.data);
       if (msg.type === "linkedin_reply") {
@@ -41,47 +37,36 @@ export default function LinkedInAssistant() {
         setMessages(prev => [...prev, { role: "assistant", text: msg.message }]);
       }
     };
-
     ws.onerror = () => setIsTyping(false);
-
     return () => ws.close();
   }, []);
-
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
-
   const send = () => {
     if (!input.trim()) return;
-
     setMessages(prev => [...prev, { role: "user", text: input }]);
     setIsTyping(true);
-
-    // Safe send check
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: "linkedin_message",
         message: input
       }));
     } else {
-        // Fallback for demo if backend not running perfectly or WS fails
         setTimeout(() => {
             setIsTyping(false);
             setMessages(prev => [...prev, { role: "assistant", text: "I'm simulating a response as the connection seems unstable. In a real scenario, I'd analyze your profile or generate a post now." }]);
         }, 1500);
     }
-
     setInput("");
   };
-
   return (
     <div className={`linkedin-layout ${theme}`}>
       <div className="linkedin-bg"></div>
-
       <main className="li-main">
-        {/* Header */}
+        {}
         <header className="li-header">
           <div className="flex items-center gap-3">
              <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")} className="rounded-full">
@@ -95,11 +80,9 @@ export default function LinkedInAssistant() {
                </div>
              </div>
           </div>
-          
           <ThemeToggle theme={theme} setTheme={setTheme} />
         </header>
-
-        {/* Chat Area */}
+        {}
         <div className="li-chat-viewport" ref={scrollRef}>
           {messages.length === 0 && (
             <div className="li-welcome">
@@ -110,7 +93,6 @@ export default function LinkedInAssistant() {
                <p className="max-w-md mx-auto">
                  I can help you audit your profile, write viral posts, or draft connection requests.
                </p>
-               
                <div className="flex flex-wrap justify-center gap-2 mt-6">
                  {["Review my headline", "Draft a post about AI", "Connection request for clear", "Analyze recent trends"].map(s => (
                    <button 
@@ -124,7 +106,6 @@ export default function LinkedInAssistant() {
                </div>
             </div>
           )}
-
           {messages.map((m, i) => (
             <div key={i} className={`li-message ${m.role}`}>
               <div className="li-avatar">
@@ -135,7 +116,6 @@ export default function LinkedInAssistant() {
               </div>
             </div>
           ))}
-          
           {isTyping && (
              <div className="li-message assistant">
                <div className="li-avatar">
@@ -148,8 +128,7 @@ export default function LinkedInAssistant() {
              </div>
           )}
         </div>
-
-        {/* Footer */}
+        {}
         <footer className="li-footer">
           <div className="li-input-box">
             <textarea
@@ -166,12 +145,9 @@ export default function LinkedInAssistant() {
             />
             <div className="li-input-actions">
               <div className="li-tools">
-                 <button className="tool-btn" title="Add Image"><Image size={18} /></button>
-                 <button className="tool-btn" title="Attach File"><Paperclip size={18} /></button>
-                 <button className="tool-btn" title="Generate Post"><Sparkles size={18} /></button>
               </div>
               <button className="li-send-btn" onClick={send} disabled={!input.trim()}>
-                Send <Send size={16} />
+                Send 
               </button>
             </div>
           </div>
@@ -180,3 +156,5 @@ export default function LinkedInAssistant() {
     </div>
   );
 }
+
+

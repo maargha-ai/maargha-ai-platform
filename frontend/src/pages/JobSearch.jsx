@@ -14,28 +14,22 @@ import {
 import { useTheme } from "../components/ThemeProvider";
 import { Button } from "../components/ui/button";
 import "../styles/jobsearch.css";
-
 export default function JobSearch() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-  
   const [role, setRole] = useState("");
   const [location, setLocation] = useState("");
   const [cv, setCv] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const submit = async () => {
     if (!role || !location || !cv) return;
-
     setLoading(true);
     setJobs([]);
-
     const formData = new FormData();
     formData.append("role", role);
     formData.append("location", location);
     formData.append("cv", cv);
-
     try {
       const res = await fetch("http://localhost:8000/jobs/match", {
         method: "POST",
@@ -44,7 +38,6 @@ export default function JobSearch() {
         },
         body: formData,
       });
-
       const data = await res.json();
       setJobs(data.jobs || []);
     } catch (error) {
@@ -53,17 +46,15 @@ export default function JobSearch() {
       setLoading(false);
     }
   };
-
   return (
     <div className={`job-search-page ${theme}`}>
-      {/* Background Effects */}
+      {}
       <div className="job-search-bg">
         <div className="bg-gradient-spot spot-1"></div>
         <div className="bg-gradient-spot spot-2"></div>
       </div>
-
       <div className="job-content">
-        {/* Header */}
+        {}
         <header className="job-header">
            <div className="flex items-center gap-4">
              <div className="job-title-section">
@@ -71,12 +62,10 @@ export default function JobSearch() {
                 <p>Upload your CV and let our AI match you with your dream role.</p>
              </div>
            </div>
-           
            <div className="flex items-center gap-2">
            </div>
         </header>
-
-        {/* Search Section */}
+        {}
         <div className="search-card">
           <div className="input-group">
             <div className="input-field-wrapper">
@@ -87,7 +76,6 @@ export default function JobSearch() {
                 onChange={(e) => setRole(e.target.value)}
               />
             </div>
-
             <div className="input-field-wrapper">
               <MapPin size={20} />
               <input
@@ -96,7 +84,6 @@ export default function JobSearch() {
                 onChange={(e) => setLocation(e.target.value)}
               />
             </div>
-
             <label className="file-upload-btn">
               <Upload size={20} />
               <span>{cv ? cv.name : "Upload Resume (PDF)"}</span>
@@ -106,7 +93,6 @@ export default function JobSearch() {
                 onChange={(e) => setCv(e.target.files[0])}
               />
             </label>
-
             <button 
               className="search-btn" 
               onClick={submit} 
@@ -114,7 +100,6 @@ export default function JobSearch() {
             >
               {loading ? (
                 <>
-                  <Sparkles size={20} className="animate-spin" />
                   Analyzing...
                 </>
               ) : (
@@ -126,8 +111,7 @@ export default function JobSearch() {
             </button>
           </div>
         </div>
-
-        {/* Results Section */}
+        {}
         {jobs.length > 0 ? (
           <div className="results-container">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -140,7 +124,6 @@ export default function JobSearch() {
                   <div className="match-badge">
                     {(job.score * 100).toFixed(0)}% Match
                   </div>
-                  
                   <div className="job-card-header">
                     <h3>{job.title}</h3>
                     <div className="company-name">
@@ -148,14 +131,11 @@ export default function JobSearch() {
                       {job.company}
                     </div>
                   </div>
-
                   <div className="job-details">
                      <span>• {job.source}</span>
                      <span>• Full Time</span>
                   </div>
-
                   <p className="job-desc">{job.desc}</p>
-
                   <div className="job-card-footer">
                     <a href={job.link} target="_blank" rel="noreferrer" className="view-job-btn">
                       View Application <ExternalLink size={16} />
@@ -175,3 +155,5 @@ export default function JobSearch() {
     </div>
   );
 }
+
+

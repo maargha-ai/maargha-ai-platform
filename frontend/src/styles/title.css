@@ -5,20 +5,19 @@
   text-transform: uppercase;
   margin: 0;
 }
-
 .title-indigo {
   color: #4f22b1; 
   font-family: "Raks", serif;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
-
 @font-face {
   font-family: "Raks";
   src: url("../assets/fonts/Raks-Regular.otf") format("opentype");
 }
-
 .title-black {
   color: black;
   display: block;
 }
+
+

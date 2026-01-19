@@ -14,11 +14,8 @@ import Roadmap from "./pages/Roadmap";
 import JobSearch from "./pages/JobSearch";
 import LinkedInAssistant from "./pages/LinkedInAssistant";
 import NewsDigest from "./pages/NewsDigest";
-
 import "./styles/stars.css";
-
 import ProtectedRoute from "./components/ProtectedRoute";
-
 function App() {
   return (
     <BrowserRouter>
@@ -36,13 +33,11 @@ function App() {
         <Route path="/jobs" element={<JobSearch />} />
         <Route path="/linkedin" element={<LinkedInAssistant />} />
         <Route path="/news" element={<NewsDigest />} />
-
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
         } />
-
         <Route path="/orchestrator" element={
           <ProtectedRoute>
             <Orchestrator />
@@ -52,5 +47,6 @@ function App() {
     </BrowserRouter>
   );
 }
-
 export default App;
+
+

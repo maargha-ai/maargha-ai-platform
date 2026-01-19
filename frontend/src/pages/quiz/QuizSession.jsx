@@ -7,16 +7,12 @@ import {
   Send
 } from "lucide-react";
 import "../../styles/quiz.css";
-
 export default function QuizSession({ socket, question, onStop }) {
   const [answer, setAnswer] = useState("");
   const videoRef = useRef(null);
   const streamRef = useRef(null);
-
-  // 🎥 Start camera
   useEffect(() => {
     let active = true;
-
     navigator.mediaDevices
       .getUserMedia({ video: true })
       .then((stream) => {
@@ -29,7 +25,6 @@ export default function QuizSession({ socket, question, onStop }) {
       .catch((err) => {
         console.error("Camera access denied:", err);
       });
-
     return () => {
       active = false;
       if (streamRef.current) {
@@ -37,10 +32,8 @@ export default function QuizSession({ socket, question, onStop }) {
       }
     };
   }, []);
-
   const submitAnswer = () => {
     if (!answer.trim()) return;
-
     socket.send(
       JSON.stringify({
         type: "quiz_answer",
@@ -49,18 +42,16 @@ export default function QuizSession({ socket, question, onStop }) {
     );
     setAnswer("");
   };
-
   const stopQuiz = () => {
     socket.send(JSON.stringify({ type: "stop_quiz" }));
     if (onStop) onStop();
   };
-
   return (
     <div className="quiz-layout">
        <div className="quiz-bg"></div>
        <div className="quiz-container">
          <div className="session-layout">
-           {/* Left: Question & Answer */}
+           {}
            <div className="question-panel">
              <div className="question-header">
                <span className="q-badge">Active Assessment</span>
@@ -69,9 +60,7 @@ export default function QuizSession({ socket, question, onStop }) {
                   <span>00:45</span>
                </div>
              </div>
-
              <h3 className="live-question">{question}</h3>
-
              <div className="answer-area">
                <textarea
                  placeholder="Type your technical response here..."
@@ -80,18 +69,16 @@ export default function QuizSession({ socket, question, onStop }) {
                  autoFocus
                />
              </div>
-
              <div className="session-actions">
                <button onClick={stopQuiz} className="stop-btn flex items-center gap-2">
                  <StopCircle size={18} /> Terminate
                </button>
                <button onClick={submitAnswer} disabled={!answer.trim()} className="next-btn flex items-center gap-2">
-                 Submit Response <Send size={18} />
+                 Submit Response 
                </button>
              </div>
            </div>
-
-           {/* Right: Monitoring Panel */}
+           {}
            <div className="side-panel">
              <div className="camera-card">
                <video
@@ -106,7 +93,6 @@ export default function QuizSession({ socket, question, onStop }) {
                  LIVE PROCTORING
                </div>
              </div>
-             
              <div className="bg-card/50 backdrop-blur p-4 rounded-xl border border-border/50">
                 <div className="flex items-center gap-3 mb-2">
                    <div className="p-2 bg-green-500/10 text-green-500 rounded-lg">
@@ -127,3 +113,5 @@ export default function QuizSession({ socket, question, onStop }) {
     </div>
   );
 }
+
+

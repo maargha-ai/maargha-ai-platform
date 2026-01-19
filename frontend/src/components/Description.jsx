@@ -1,5 +1,4 @@
 import '../styles/description.css'; 
-
 const Description = () => {
   return (
     <p className="description">
@@ -7,5 +6,6 @@ const Description = () => {
     </p>
   );
 };
-
 export default Description;
+
+

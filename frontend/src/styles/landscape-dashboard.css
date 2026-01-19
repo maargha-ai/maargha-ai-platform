@@ -1,4 +1,3 @@
-/* Professional Trajectory Map */
 .professional-dashboard {
     min-height: 100vh;
     width: 100%;
@@ -7,10 +6,7 @@
     font-family: 'Space Grotesk', sans-serif;
     position: relative;
     transition: background-color 0.4s ease;
-    /* Removed overflow: hidden to allow body scroll */
 }
-
-/* Base Mesh / Grid Background */
 .professional-dashboard::before {
     content: '';
     position: absolute;
@@ -22,8 +18,6 @@
     pointer-events: none;
     z-index: 0;
 }
-
-/* Floating HUD (Control Bar) */
 .dashboard-hud {
     position: fixed;
     bottom: 24px;
@@ -42,13 +36,11 @@
     z-index: 1000;
     transition: all 0.3s ease;
 }
-
 .dashboard-hud:hover {
     background: hsla(var(--card) / 90%);
     transform: translateX(-50%) translateY(-2px);
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
 }
-
 .hud-item {
     color: hsl(var(--foreground));
     opacity: 0.6;
@@ -57,19 +49,16 @@
     padding: 8px;
     border-radius: 50%;
 }
-
 .hud-item:hover {
     opacity: 1;
     background: hsla(var(--foreground) / 5%);
     color: hsl(var(--primary));
 }
-
 .hud-divider {
     width: 1px;
     height: 24px;
     background: hsl(var(--border));
 }
-
 .hud-profile {
     display: flex;
     align-items: center;
@@ -79,12 +68,10 @@
     border-radius: 20px;
     border: 1px solid transparent;
 }
-
 .hud-profile:hover {
     border-color: hsl(var(--border));
     background: hsla(var(--secondary) / 50%);
 }
-
 .profile-avatar {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
@@ -97,7 +84,6 @@
     font-size: 12px;
     font-weight: 700;
 }
-
 .profile-name {
     font-size: 14px;
     font-weight: 600;
@@ -106,27 +92,19 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-/* Main Map Area */
 .map-canvas {
     position: relative;
     width: 100%;
-    /* Removed fixed height and internal scroll */
     perspective: 1000px;
-    /* Force high z-index to be clickable/scrollable above any backgrounds */
     z-index: 10;
 }
-
 .map-content-wrapper {
     position: relative;
-    /* Significant height to ensure scrolling is obvious */
     min-height: 250vh;
     width: 100%;
     display: flex;
     justify-content: center;
 }
-
-/* The Connection Spine */
 .connection-spine-svg {
     position: absolute;
     top: 0;
@@ -136,7 +114,6 @@
     pointer-events: none;
     z-index: 10;
 }
-
 .spine-path-bg {
     stroke: hsl(var(--border));
     stroke-width: 2px;
@@ -144,7 +121,6 @@
     opacity: 0.3;
     stroke-linecap: round;
 }
-
 .spine-path-active {
     stroke: hsl(var(--primary));
     stroke-width: 2px;
@@ -152,15 +128,12 @@
     stroke-dasharray: 10 10;
     stroke-linecap: round;
 }
-
-/* Professional Nodes */
 .map-node {
     position: absolute;
     transform: translate(-50%, -50%);
     z-index: 20;
     cursor: pointer;
 }
-
 .node-card {
     width: 280px;
     background: hsla(var(--card) / 60%);
@@ -175,14 +148,12 @@
     gap: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
-
 .map-node:hover .node-card {
     transform: translateY(-8px) scale(1.02);
     background: hsla(var(--card) / 90%);
     border-color: hsl(var(--primary) / 50%);
     box-shadow: 0 20px 40px -10px hsla(var(--primary) / 10%);
 }
-
 .node-icon-box {
     background: hsl(var(--secondary));
     color: hsl(var(--primary));
@@ -195,17 +166,14 @@
     flex-shrink: 0;
     transition: all 0.3s;
 }
-
 .map-node:hover .node-icon-box {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
     transform: rotate(-5deg);
 }
-
 .node-meta {
     flex: 1;
 }
-
 .node-title {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 1.1rem;
@@ -213,15 +181,12 @@
     margin-bottom: 4px;
     letter-spacing: -0.01em;
 }
-
 .node-desc {
     font-family: 'Outfit', sans-serif;
     font-size: 0.85rem;
     color: hsl(var(--muted-foreground));
     line-height: 1.4;
 }
-
-/* Pulse Marker for active position */
 .location-marker {
     width: 16px;
     height: 16px;
@@ -234,7 +199,6 @@
     z-index: 30;
     box-shadow: 0 0 0 4px hsla(var(--primary) / 30%);
 }
-
 .header-brand {
     position: fixed;
     top: 24px;
@@ -249,20 +213,18 @@
     gap: 10px;
     opacity: 0.8;
 }
-
 .brand-dot {
     width: 8px;
     height: 8px;
     background: hsl(var(--primary));
     border-radius: 50%;
 }
-
-/* 3D Character Marker */
 .location-marker-3d {
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
     transition: transform 0.3s ease-out;
 }
-
 .location-marker-3d canvas {
     display: block;
 }
+
+

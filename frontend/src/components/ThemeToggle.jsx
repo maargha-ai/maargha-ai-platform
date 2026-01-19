@@ -1,5 +1,4 @@
 import { Moon, Sun } from 'lucide-react';
-
 export function ThemeToggle({ theme, setTheme }) {
   const toggleTheme = () => {
     if (theme === 'dark') {
@@ -8,7 +7,6 @@ export function ThemeToggle({ theme, setTheme }) {
       setTheme('dark');
     }
   };
-
   return (
     <button
       onClick={toggleTheme}
@@ -36,3 +34,5 @@ export function ThemeToggle({ theme, setTheme }) {
     </button>
   );
 }
+
+

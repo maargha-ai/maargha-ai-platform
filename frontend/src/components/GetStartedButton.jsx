@@ -1,9 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "../styles/button.css";
-
 const Button = () => {
   const navigate = useNavigate();
-
   return (
     <button
       className="button"
@@ -13,5 +11,6 @@ const Button = () => {
     </button>
   );
 };
-
 export default Button;
+
+
