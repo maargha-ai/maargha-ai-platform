@@ -10,28 +10,6 @@ import "../../styles/quiz.css";
 export default function QuizSession({ socket, question, onStop }) {
   const [answer, setAnswer] = useState("");
   const videoRef = useRef(null);
-  const streamRef = useRef(null);
-  useEffect(() => {
-    let active = true;
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then((stream) => {
-        if (!active) return;
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      })
-      .catch((err) => {
-        console.error("Camera access denied:", err);
-      });
-    return () => {
-      active = false;
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-      }
-    };
-  }, []);
   const submitAnswer = () => {
     if (!answer.trim()) return;
     socket.send(
@@ -81,13 +59,9 @@ export default function QuizSession({ socket, question, onStop }) {
            {}
            <div className="side-panel">
              <div className="camera-card">
-               <video
-                 ref={videoRef}
-                 autoPlay
-                 muted
-                 playsInline
-                 className="camera-preview"
-               />
+              <div className="camera-placeholder">
+                Camera preview disabled (backend proctoring active)
+              </div>
                <div className="camera-overlay">
                  <div className="rec-dot"></div>
                  LIVE PROCTORING

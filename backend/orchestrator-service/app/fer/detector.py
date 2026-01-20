@@ -20,12 +20,17 @@ emotion_classes = emotion_model.names
 
 
 def start_camera_loop(stop_event):
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FPS, 30)
 
     if not cap.isOpened():
         print("[FER] Webcam not accessible")
         return
 
+    time.sleep(1.0)
     print("[FER] Camera started")
 
     try:
@@ -33,6 +38,8 @@ def start_camera_loop(stop_event):
             print("[FER] Loop tick")
             ret, frame = cap.read()
             if not ret:
+                print("[FER] Frame grab failed")
+                time.sleep(0.05)   # IMPORTANT: avoid hammering camera
                 continue
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -41,6 +48,9 @@ def start_camera_loop(stop_event):
             )
             print("[FER] Faces detected:", len(faces))
 
+            if len(faces) == 0:
+                time.sleep(0.1)
+
             user_id = get_active_user()
             if not user_id:
                 time.sleep(0.2)
@@ -48,6 +58,10 @@ def start_camera_loop(stop_event):
 
             for (x, y, w, h) in faces:
                 face_roi = gray[y:y + h, x:x + w]
+
+                if face_roi.size == 0:
+                    continue
+
                 resized = cv2.resize(face_roi, (48, 48))
                 input_face = cv2.cvtColor(resized, cv2.COLOR_GRAY2BGR)
 

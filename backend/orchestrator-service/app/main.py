@@ -6,11 +6,14 @@ from app.core.state import AgentState
 from app.db.database import engine, Base
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
-from app.ws import quiz, emotional_support, career, linkedin, tutor
+from app.ws import quiz, emotional_support, career, linkedin, tutor, live_chat
 from app.router import music, roadmap, jobs, news
+from fastapi import WebSocket
+from app.agents.emotional_support_agent import transcribe_audio 
 import json
-from langchain_core.messages import HumanMessage
-from app.core.llm_client import llm
+import numpy as np
+import io
+import soundfile as sf
 from dotenv import load_dotenv
 import os
 
@@ -64,74 +67,45 @@ async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-async def general_chat_reply(state: AgentState, message: str) -> str:
-    state["messages"].append({"role": "user", "content": message})
-
-    response = await llm.ainvoke([
-        HumanMessage(content=m["content"])
-        for m in state["messages"]
-        if m["role"] == "user"
-    ])
-
-    reply = response.content.strip()
-
-    state["messages"].append({
-        "role": "assistant",
-        "content": reply
-    })
-
-    return reply
+@app.websocket("/ws/chat/live")
+async def chat_live(websocket: WebSocket):
+    await live_chat.chat_live_ws(websocket)
 
 @app.websocket("/ws/chat")
-async def websocket_endpoint(websocket: WebSocket):
+async def chat_ws(websocket: WebSocket):
     await websocket.accept()
+    print("[CHAT] Connected")
 
-    user_id = id(websocket)
     state: AgentState = {
-        "user_id": user_id,
+        "user_id": id(websocket),
         "messages": [],
         "agent_done": False,
     }
 
     try:
         while True:
-            data = await websocket.receive_text()
+            text = await websocket.receive_text()
+            print("[CHAT] User:", text)
 
-            state["messages"].append({
-                "role": "user",
-                "content": data
-            })
+            state["messages"].append({"role": "user", "content": text})
 
             output = await graph_app.ainvoke(state)
-
-            agent_action = output.get("agent_action")
-            agent_response = output.get("agent_response")
-            navigate = output.get("navigate")
-
             state.update(output)
 
-            print(
-                f"[Main] Action: {state.get('agent_action')} | "
-                f"Agent Response: {state.get('agent_response')}"
-            )
-
-            # CHAT
-            if agent_action == "CHAT" and agent_response:
+            if state.get("agent_response"):
                 await websocket.send_text(json.dumps({
                     "type": "CHAT",
-                    "content": agent_response
+                    "content": state["agent_response"]
                 }))
 
-            # NAVIGATION
-            if navigate:
+            if state.get("navigate"):
                 await websocket.send_text(json.dumps({
-                    "navigate": navigate
+                    "navigate": state["navigate"]
                 }))
 
-            # cleanup
-            state["agent_action"] = None
-            state["agent_response"] = None
+            state.pop("agent_response", None)
             state.pop("navigate", None)
 
     except WebSocketDisconnect:
-        print(f"User disconnected: {user_id}")
+        print("[CHAT] Disconnected")
+

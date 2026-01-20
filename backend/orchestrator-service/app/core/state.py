@@ -16,6 +16,8 @@ class AgentState(TypedDict):
     agent_waiting_for_user: bool
     agent_response: Optional[str]
     
+    navigate: Optional[Dict[str, dict]] 
+    
     # Career flow
     selected_career: Optional[str]
     career_answers: Optional[Dict[str, str]] = None

@@ -19,11 +19,10 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../components/ThemeProvider';
 import { ThemeToggle } from '../components/ThemeToggle';
+
 import '../styles/landscape-dashboard.css';
-const Dashboard = () => {
 import "../styles/dashboard.css";
 import "../styles/register.css"; 
-import { useNavigate } from "react-router-dom";
 
 const features = [
   { title: "Career Finder", desc: "Discover careers that match your interests and skills.", route: "/career" },
@@ -243,6 +242,5 @@ export default function Dashboard() {
     </div>
   );
 };
-export default Dashboard;
 
 

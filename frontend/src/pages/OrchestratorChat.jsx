@@ -1,152 +1,151 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  startMicStream,
+  stopMicStream,
+  muteMic,
+  unmuteMic
+} from "../pages/emotional-support/useAudioStream";
 
-/**
- * OrchestratorChat
- * ----------------
- * - Opens WebSocket to gateway (/ws/chat?token=...)
- * - Handles general chat + navigation instructions
- */
+/* ---------------------------
+   INLINE TTS
+--------------------------- */
+function speakText(text, onEnd) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
+  utterance.rate = 1;
+  utterance.pitch = 1;
+
+  utterance.onend = onEnd;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+
 export default function OrchestratorChat({ onClose }) {
   const navigate = useNavigate();
-  const wsRef = useRef(null);
+
+  const chatWsRef = useRef(null);   // TEXT WS
+  const liveWsRef = useRef(null);   // AUDIO WS
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [connected, setConnected] = useState(false);
+  const [liveMode, setLiveMode] = useState(false);
+  const [status, setStatus] = useState(""); // "Listening...", "Thinking...", etc.
 
-  /* -------------------------------
-     WebSocket connection
-  -------------------------------- */
+  /* TEXT CHAT WS */
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-
-    if (!token) {
-      console.error("No access token found");
-      return;
-    }
-
-    const ws = new WebSocket(
-      `ws://localhost:8000/ws/chat?token=${token}`
-    );
-
-    wsRef.current = ws;
+    const ws = new WebSocket(`ws://localhost:8000/ws/chat?token=${token}`);
+    chatWsRef.current = ws;
 
     ws.onopen = () => {
-      console.log("[WS] Orchestrator connected");
+      console.log("[CHAT WS] Connected");
       setConnected(true);
     };
 
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-
-        // 🔁 Navigation instruction
-        if (data.navigate) {
-          handleNavigation(data.navigate);
-          return;
-        }
-
-        // 💬 Normal chat message
-        if (data.type === "CHAT") {
-          setMessages((prev) => [
-            ...prev,
-            { role: "assistant", content: data.content }
-          ]);
-        }
-      } catch {
-        // Fallback: plain string
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: event.data }
-        ]);
+    ws.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      if (data.navigate) {
+        handleNavigation(data.navigate);
+        return;
+      }
+      if (data.type === "CHAT") {
+        setMessages(p => [...p, { role: "assistant", content: data.content }]);
       }
     };
 
-    ws.onclose = () => {
-      console.log("[WS] Orchestrator disconnected");
-      setConnected(false);
-    };
+    ws.onclose = () => setConnected(false);
 
-    ws.onerror = (err) => {
-      console.error("[WS] Error", err);
-    };
-
-    return () => {
-      ws.close();
-    };
+    return () => ws.close();
   }, []);
 
-  /* -------------------------------
-     Send message
-  -------------------------------- */
+  /* TOGGLE LIVE MODE */
+  const toggleLiveMode = () => {
+    const token = localStorage.getItem("access_token");
+
+    if (!liveMode) {
+      console.log("[LIVE MODE] START");
+      setStatus("Connecting...");
+
+      const ws = new WebSocket(`ws://localhost:8000/ws/chat/live?token=${token}`);
+
+      ws.onopen = () => {
+        console.log("[LIVE WS] Connected");
+        startMicStream(ws);
+        setStatus("Listening...");
+      };
+
+      ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+
+        if (data.type === "USER_TRANSCRIPT") {
+          setMessages(p => [...p, { role: "user", content: data.content }]);
+          setStatus("Thinking...");
+        }
+
+        if (data.type === "CHAT") {
+          setMessages(p => [...p, { role: "assistant", content: data.content }]);
+          muteMic();
+          setStatus("Speaking...");
+          speakText(data.content, () => {
+            unmuteMic();
+            setStatus("Listening...");
+            console.log("[TTS] Finished – mic unmuted, listening resumed");
+          });
+        }
+      };
+
+      ws.onclose = () => {
+        console.log("[LIVE WS] Closed");
+        setStatus("");
+        setLiveMode(false);
+      };
+
+      liveWsRef.current = ws;
+      setLiveMode(true);
+
+    } else {
+      console.log("[LIVE MODE] STOP");
+      setStatus("Stopping...");
+
+      if (liveWsRef.current?.readyState === WebSocket.OPEN) {
+        liveWsRef.current.send("STOP");
+      }
+
+      // Give a moment for STOP to be processed
+      setTimeout(() => {
+        stopMicStream();
+        liveWsRef.current?.close();
+        liveWsRef.current = null;
+        setLiveMode(false);
+        setStatus("");
+      }, 400);
+    }
+  };
+
+  /* SEND TEXT MESSAGE */
   const sendMessage = () => {
-    if (!input.trim() || !wsRef.current) return;
-
-    wsRef.current.send(input);
-
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", content: input }
-    ]);
-
+    if (!input.trim()) return;
+    chatWsRef.current.send(input);
+    setMessages(p => [...p, { role: "user", content: input }]);
     setInput("");
   };
 
-  /* -------------------------------
-     Handle ENTER key
-  -------------------------------- */
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      sendMessage();
-    }
-  };
-
-  /* -------------------------------
-     Navigation handler
-  -------------------------------- */
   const handleNavigation = ({ tool, payload }) => {
-    console.log("[NAVIGATE]", tool, payload);
-
-    if (onClose) onClose();
-
-    switch (tool) {
-      case "CareerPredictor":
-        navigate("/career");
-        break;
-
-      case "RoadmapGenerator":
-        navigate("/roadmap", { state: payload });
-        break;
-
-      case "JobSearch":
-        navigate("/jobs");
-        break;
-
-      case "LinkedInAssistant":
-        navigate("/linkedin");
-        break;
-
-      case "QuizGenerator":
-        navigate("/quiz");
-        break;
-
-      case "TechNews":
-        navigate("/news");
-        break;
-
-      case "EmotionalSupport":
-        navigate("/emotional-support");
-        break;
-
-      default:
-        console.warn("Unknown tool:", tool);
-    }
+    const routes = {
+      CareerPredictor: "/career",
+      RoadmapGenerator: "/roadmap",
+      JobSearch: "/jobs",
+      LinkedInAssistant: "/linkedin",
+      QuizGenerator: "/quiz",
+      TechNews: "/news",
+      EmotionalSupport: "/emotional-support"
+    };
+    if (routes[tool]) navigate(routes[tool], payload ? { state: payload } : {});
   };
 
-  /* -------------------------------
-     UI
-  -------------------------------- */
+  /* UI */
   return (
     <div className="orchestrator-chat">
       <div className="header">
@@ -154,26 +153,37 @@ export default function OrchestratorChat({ onClose }) {
         <button onClick={onClose}>✕</button>
       </div>
 
+      <button
+        className={`live-btn ${liveMode ? "active" : ""}`}
+        onClick={toggleLiveMode}
+      >
+        🎤 {liveMode ? "Live Mode ON" : "Live Mode"}
+      </button>
+
+      {liveMode && status && (
+        <div className="status-bar" style={{ textAlign: "center", padding: "8px", color: "#666" }}>
+          {status}
+        </div>
+      )}
+
       <div className="messages">
         {messages.map((m, i) => (
           <div key={i} className={`msg ${m.role}`}>
             {m.content}
           </div>
         ))}
-
-        {!connected && (
-          <div className="msg system">Connecting...</div>
-        )}
+        {!connected && <div className="msg system">Connecting…</div>}
       </div>
 
       <div className="input-bar">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           placeholder="Talk to the orchestrator..."
+          disabled={liveMode} // optional: disable text input during voice mode
         />
-        <button onClick={sendMessage}>Send</button>
+        <button onClick={sendMessage} disabled={liveMode}>Send</button>
       </div>
     </div>
   );
