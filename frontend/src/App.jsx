@@ -15,6 +15,7 @@ import JobSearch from "./pages/JobSearch";
 import LinkedInAssistant from "./pages/LinkedInAssistant";
 import NewsDigest from "./pages/NewsDigest";
 import Tutor from "./pages/Tutor";
+import CVGeneration from "./pages/CVGeneration";
 
 import "./styles/stars.css";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -36,6 +37,7 @@ function App() {
         <Route path="/linkedin" element={<LinkedInAssistant />} />
         <Route path="/news" element={<NewsDigest />} />
         <Route path="/tutor" element={<Tutor />} />
+        <Route path="/cv" element={<CVGeneration />} />
 
         <Route path="/dashboard" element={
           <ProtectedRoute>
