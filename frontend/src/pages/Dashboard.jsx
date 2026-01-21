@@ -118,6 +118,15 @@ export default function Dashboard() {
       left: '65%'
     },
     {
+      id: 'ai-tutor',
+      title: 'AI Tutor',
+      description: 'Personalized AI-driven guidance to clarify concepts and accelerate learning.',
+      icon: BrainCircuit,
+      path: '/tutor',
+      top: '18%',
+      left: '55%'
+    },
+    {
       id: 'linkedin',
       title: 'LinkedIn Growth AI',
       description: 'Maximize your profile impact and build high-value connections.',
