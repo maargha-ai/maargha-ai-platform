@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from app.routes import (
     auth, orchestrator_ws, quiz_ws, 
     emotional_support_ws, song_recommend, career_ws,
-    roadmap, jobs, news, linkedin, tutor_ws
+    roadmap, jobs, news, linkedin, tutor_ws, cv
     )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,3 +27,4 @@ app.include_router(jobs.router)
 app.include_router(news.router)
 app.include_router(linkedin.router)
 app.include_router(tutor_ws.router)
+app.include_router(cv.router)

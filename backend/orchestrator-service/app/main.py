@@ -7,7 +7,7 @@ from app.db.database import engine, Base
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from app.ws import quiz, emotional_support, career, linkedin, tutor, live_chat
-from app.router import music, roadmap, jobs, news
+from app.router import music, roadmap, jobs, news, cv
 from fastapi import WebSocket
 from app.agents.emotional_support_agent import transcribe_audio 
 import json
@@ -41,6 +41,7 @@ app.include_router(music.router)
 app.include_router(roadmap.router)
 app.include_router(jobs.router)
 app.include_router(news.router)
+app.include_router(cv.router)
 
 @app.websocket("/ws/career/{user_id}")
 async def career_ws(websocket: WebSocket, user_id: str):

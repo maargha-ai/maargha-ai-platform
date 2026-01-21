@@ -48,7 +48,7 @@ export default function NetworkingEvents() {
         <div className="iframe-wrapper">
           <iframe
             title="Networking Events Dashboard"
-            src="https://app.powerbi.com/view?r=eyJrIjoiOGU2MGZhMzgtYWRhNy00ZDc5LTg5NDctZTk3ZGZlMTIzMjNjIiwidCI6IjM5ZmU4ZmY2LTUwNjMtNGI0NS1hZDI1LWVkNjBlMjAyNjlhNSJ9"
+            src="https://app.powerbi.com/reportEmbed?reportId=e053da7c-aacf-47a9-8d6a-e51472f94956&autoAuth=true&ctid=39fe8ff6-5063-4b45-ad25-ed60e20269a5"
             allowFullScreen
           />
         </div>
