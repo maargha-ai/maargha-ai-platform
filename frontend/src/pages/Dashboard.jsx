@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { BrainCircuit } from "lucide-react";
 import {
   Newspaper,
   Briefcase,
@@ -119,12 +120,12 @@ export default function Dashboard() {
     },
     {
       id: 'ai-tutor',
-      title: 'AI Tutor',
-      description: 'Personalized AI-driven guidance to clarify concepts and accelerate learning.',
+      title: 'Knowledge Mastery Engine',
+      description: 'Structured AI tutoring for true concept mastery.',
       icon: BrainCircuit,
       path: '/tutor',
-      top: '18%',
-      left: '55%'
+      top: '63%',
+      left: '52%'
     },
     {
       id: 'linkedin',
