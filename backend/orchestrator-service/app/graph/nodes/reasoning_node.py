@@ -16,7 +16,10 @@ You must decide ONE action:
 - LinkedInAssistant
 - TechNews
 - QuizGenerator
+- MusicRecommender
+- NetworkingEvents
 - EmotionalSupport
+- CVGeneration
 - DONE
 
 Rules:

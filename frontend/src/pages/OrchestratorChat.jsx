@@ -140,6 +140,9 @@ export default function OrchestratorChat({ onClose }) {
       LinkedInAssistant: "/linkedin",
       QuizGenerator: "/quiz",
       TechNews: "/news",
+      MusicRecommender: "/news",
+      NetworkingEvents: "/news",
+      CVGeneration: "/news",
       EmotionalSupport: "/emotional-support"
     };
     if (routes[tool]) navigate(routes[tool], payload ? { state: payload } : {});

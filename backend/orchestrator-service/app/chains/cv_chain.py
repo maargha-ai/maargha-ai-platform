@@ -2,45 +2,45 @@ from app.schemas.cv import CVInput
 from langchain_core.messages import HumanMessage
 from app.core.llm_client import llm
 
-# Prompt Builder
 def build_cv_prompt(data: CVInput) -> str:
     skills_text = "\n".join(f"- {s}" for s in data.skills)
     projects_text = "\n".join(f"- {p}" for p in data.projects)
 
     return f"""
-You are a senior resume writer and ATS optimization expert.
+You are a resume content generator.
 
-Your task is to generate a HIGHLY ATS-FRIENDLY resume.
+IMPORTANT:
+- You generate CONTENT ONLY.
+- You must NOT invent experience.
+- You must NOT change section titles.
+- You must NOT add new sections.
+- You must NOT remove sections.
+- Do NOT add any decorative characters, lines, or symbols.
+- Plain text only.
 
-STRICT RULES:
-- Plain text only
-- No tables, no columns, no icons, no emojis
-- Use standard section headings exactly as written
-- Bullet points must start with strong action verbs
-- Optimize for ATS parsing (simple structure, keywords naturally placed)
-- Do NOT invent fake experience
-- Keep it professional and concise
+STRICT TEMPLATE (DO NOT MODIFY):
 
-Use the following format EXACTLY:
-
-==============================
+NAME:
 {data.name}
-Target Role: {data.target_role}
 
-PROFESSIONAL SUMMARY
+TARGET ROLE:
+{data.target_role}
+
+SECTION: PROFESSIONAL SUMMARY
 {data.self_intro}
 
-SKILLS
+SECTION: SKILLS
 {skills_text}
 
-PROJECTS
+SECTION: PROJECTS
 {projects_text}
 
-EDUCATION
+SECTION: EDUCATION
 {data.education}
-==============================
 
-Generate the resume now.
+END OF TEMPLATE.
+
+Generate the resume content exactly inside this structure.
 """
 
 

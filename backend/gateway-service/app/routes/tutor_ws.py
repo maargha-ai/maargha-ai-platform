@@ -9,7 +9,7 @@ router = APIRouter()
 @router.websocket("/ws/tutor")
 async def tutor_ws(websocket: WebSocket, token: str = Query(...)):
     await websocket.accept()
-
+    print("\n[Gateway] tutor connection")
     payload = jwt.decode(
         token,
         settings.JWT_SECRET,

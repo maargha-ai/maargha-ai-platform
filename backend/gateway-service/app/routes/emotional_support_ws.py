@@ -9,7 +9,7 @@ router = APIRouter()
 @router.websocket("/ws/emotional-support")
 async def emotional_support_ws(websocket: WebSocket, token: str = Query(...)):
     await websocket.accept()
-
+    print("\n[Gateway] emotional support connection")
     # ✅ JWT validation (same as quiz)
     payload = jwt.decode(
         token,

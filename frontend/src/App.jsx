@@ -16,6 +16,7 @@ import LinkedInAssistant from "./pages/LinkedInAssistant";
 import NewsDigest from "./pages/NewsDigest";
 import Tutor from "./pages/Tutor";
 import CVGeneration from "./pages/CVGeneration";
+import ResumeParser from "./pages/ResumeParser";
 
 import "./styles/stars.css";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -38,6 +39,7 @@ function App() {
         <Route path="/news" element={<NewsDigest />} />
         <Route path="/tutor" element={<Tutor />} />
         <Route path="/cv" element={<CVGeneration />} />
+        <Route path="/resume-parser" element={<ResumeParser />} />
 
         <Route path="/dashboard" element={
           <ProtectedRoute>

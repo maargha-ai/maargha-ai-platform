@@ -7,7 +7,7 @@ router = APIRouter(prefix="/jobs", tags=["Jobs"])
 @router.post("/match")
 async def proxy_job_match(req: Request):
     body = await req.body()
-
+    print("\n[Gateway] jobs connection")
     headers = {
         "Authorization": req.headers.get("authorization"),
         "Content-Type": req.headers.get("content-type"),

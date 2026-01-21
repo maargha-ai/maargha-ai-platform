@@ -25,6 +25,7 @@ export default function CVGeneration() {
 
   const [formData, setFormData] = useState({
     fullName: "",
+    targetRole: "",
     selfIntro: "",
     skills: [],
     education: [{ school: "", degree: "", year: "" }],
@@ -72,13 +73,118 @@ export default function CVGeneration() {
     setFormData({ ...formData, projects: formData.projects.filter((_, i) => i !== index) });
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setLoading(true);
-    setTimeout(() => {
+
+    // ---- transform education ----
+    const educationText = formData.education
+      .map(
+        edu =>
+          `${edu.degree} - ${edu.school} (${edu.year || "Year not specified"})`
+      )
+      .join("\n");
+
+    // ---- transform projects ----
+    const projectsText = formData.projects.map(proj => {
+      return `${proj.name} | ${proj.tech}
+  - ${proj.desc}
+  ${proj.github ? "GitHub: " + proj.github : ""}
+  ${proj.live ? "Live: " + proj.live : ""}`;
+    });
+
+    const payload = {
+      name: formData.fullName,
+      target_role: formData.targetRole,
+      self_intro: formData.selfIntro,
+      skills: formData.skills,
+      education: educationText,
+      projects: projectsText
+    };
+
+    try {
+      const res = await fetch("http://localhost:8000/cv/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        alert("CV generated successfully");
+        console.log(data.cv); // later show in UI
+      } else {
+        alert("CV generation failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error connecting to CV service");
+    } finally {
       setLoading(false);
-      alert("Professional CV generation initiated.");
-    }, 2000);
+    }
   };
+
+  const generateCVPdf = async (download = false) => {
+    setLoading(true);
+
+    // ---- same payload as text CV ----
+    const educationText = formData.education
+      .map(
+        edu =>
+          `${edu.degree} - ${edu.school} (${edu.year || "Year not specified"})`
+      )
+      .join("\n");
+
+    const projectsText = formData.projects.map(proj => {
+      return `${proj.name} | ${proj.tech}
+  - ${proj.desc}
+  ${proj.github ? "GitHub: " + proj.github : ""}
+  ${proj.live ? "Live: " + proj.live : ""}`;
+    });
+
+    const payload = {
+      name: formData.fullName,
+      target_role: formData.targetRole,
+      self_intro: formData.selfIntro,
+      skills: formData.skills,
+      education: educationText,
+      projects: projectsText
+    };
+
+    try {
+      const endpoint = download
+        ? "/cv/generate/pdf/download"
+        : "/cv/generate/pdf";
+
+      const res = await fetch(`http://localhost:8000${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      if (download) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "generated_cv.pdf";
+        a.click();
+      } else {
+        window.open(url, "_blank");
+      }
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to generate PDF");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <div className={`cv-layout ${theme}`}>
@@ -116,6 +222,18 @@ export default function CVGeneration() {
                   placeholder="e.g. Alexander Pierce"
                   value={formData.fullName}
                   onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                />
+              </div>
+              <div className="form-group">
+                <label className="label-box">Target Role</label>
+                <input 
+                  type="text"
+                  className="cv-input"
+                  placeholder="e.g. Machine Learning Engineer, Backend Developer"
+                  value={formData.targetRole}
+                  onChange={(e) =>
+                    setFormData({ ...formData, targetRole: e.target.value })
+                  }
                 />
               </div>
               <div className="form-group">
@@ -281,7 +399,7 @@ export default function CVGeneration() {
             <div className="preview-card">
               <div className="preview-avatar-circle"></div>
               <h3 className="preview-name">{formData.fullName || "Your Identity"}</h3>
-              <p className="preview-role">Architect of Value</p>
+              <p className="preview-role">{formData.targetRole || "Target Role"}</p>
               
               <div className="completion-stats">
                 <div className="flex justify-between text-xs font-bold mb-3 uppercase tracking-wider">
@@ -297,13 +415,31 @@ export default function CVGeneration() {
                 <p className="text-xs text-muted-foreground leading-relaxed mb-6">
                   Finalize your data entries to enable AI-powered professional asset formatting.
                 </p>
-                <button 
-                  className="generate-btn" 
-                  onClick={handleGenerate}
-                  disabled={loading}
-                >
-                  {loading ? "PROCESSING..." : "GENERATE ASSET"}
-                </button>
+                <div className="flex flex-col gap-3">
+                  <button
+                    className="generate-btn"
+                    onClick={handleGenerate}
+                    disabled={loading}
+                  >
+                    {loading ? "PROCESSING..." : "GENERATE TEXT CV"}
+                  </button>
+
+                  <button
+                    className="generate-btn"
+                    onClick={() => generateCVPdf(false)}
+                    disabled={loading}
+                  >
+                    VIEW PDF
+                  </button>
+
+                  <button
+                    className="generate-btn"
+                    onClick={() => generateCVPdf(true)}
+                    disabled={loading}
+                  >
+                    DOWNLOAD PDF
+                  </button>
+                </div>
               </div>
             </div>
           </aside>

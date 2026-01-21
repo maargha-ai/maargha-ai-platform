@@ -9,7 +9,7 @@ router = APIRouter()
 @router.websocket("/ws/linkedin")
 async def linkedin_ws(websocket: WebSocket, token: str = Query(...)):
     await websocket.accept()
-
+    print("\n[Gateway] linkedin connection")
     payload = jwt.decode(
         token,
         settings.JWT_SECRET,

@@ -16,7 +16,8 @@ import {
   Music,
   Settings,
   FileUser,
-  Layout
+  Layout,
+  FileSearch
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../components/ThemeProvider';
@@ -31,7 +32,7 @@ const features = [
   { title: "AI Roadmap Generator", desc: "Personalized learning paths for your goals.", route: "/roadmap" },
   { title: "AI Tutor", desc: "Ask doubts and learn interactively.", route: "/tutor" },
   { title: "Quiz Generator", desc: "Test yourself with smart quizzes.", route: "/quiz" },
-
+  { title: "Resume Parser", desc: "AI-powered resume analysis and skill extraction.", route: "/resume-parser"},
   { title: "Job Search", desc: "AI-powered job discovery.", route: "/jobs" },
   { title: "CV Generation", desc: "AI-powered CV generator.", route: "/cv" },
   { title: "LinkedIn Assistant", desc: "Optimize your profile and posts.", route: "/linkedin" },
@@ -70,6 +71,15 @@ export default function Dashboard() {
       path: '/orchestrator',
       top: '8%',
       left: '50%'
+    },
+    {
+      id: 'resume-parser',
+      title: 'Resume Intelligence Engine',
+      description: 'Deep resume analysis to extract skills, roles, and career signals using AI.',
+      icon: FileSearch,
+      path: '/resume-parser',
+      top: '51%',
+      left: '35%'
     },
     {
       id: 'news',

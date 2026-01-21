@@ -9,7 +9,7 @@ router = APIRouter()
 @router.websocket("/ws/career")
 async def career_ws(websocket: WebSocket, token: str = Query(...)):
     await websocket.accept()
-
+    print("\n[Gateway] career connection")
     payload = jwt.decode(
         token,
         settings.JWT_SECRET,
