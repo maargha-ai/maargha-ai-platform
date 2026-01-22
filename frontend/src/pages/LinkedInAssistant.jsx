@@ -13,7 +13,6 @@ import {
   Share2
 } from "lucide-react";
 import { useTheme } from "../components/ThemeProvider";
-import { ThemeToggle } from "../components/ThemeToggle";
 import { Button } from "../components/ui/button";
 import "../styles/linkedin.css";
 export default function LinkedInAssistant() {
@@ -80,7 +79,6 @@ export default function LinkedInAssistant() {
                </div>
              </div>
           </div>
-          <ThemeToggle theme={theme} setTheme={setTheme} />
         </header>
         {}
         <div className="li-chat-viewport" ref={scrollRef}>
