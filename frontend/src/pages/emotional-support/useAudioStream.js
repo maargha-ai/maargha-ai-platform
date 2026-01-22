@@ -12,10 +12,10 @@ export function muteMic() {
 export function unmuteMic() {
   micEnabled = true;
 }
-export function startMicStream(ws) {
+export function startMicStream(ws, onVolume) {
   navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
     streamRef = stream;
-    audioContext = new AudioContext({ sampleRate: 16000 });
+    audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
     source = audioContext.createMediaStreamSource(stream);
     processor = audioContext.createScriptProcessor(4096, 1, 1);
     source.connect(processor);
@@ -27,6 +27,9 @@ export function startMicStream(ws) {
       ws.send(input.buffer);
       const volume =
         input.reduce((s, v) => s + Math.abs(v), 0) / input.length;
+
+      if (onVolume) onVolume(volume);
+
       if (volume > SILENCE_THRESHOLD) {
         if (silenceTimer) {
           clearTimeout(silenceTimer);
