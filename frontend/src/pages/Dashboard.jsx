@@ -33,7 +33,7 @@ const features = [
   { title: "AI Roadmap Generator", desc: "Personalized learning paths for your goals.", route: "/roadmap" },
   { title: "AI Tutor", desc: "Ask doubts and learn interactively.", route: "/tutor" },
   { title: "Quiz Generator", desc: "Test yourself with smart quizzes.", route: "/quiz" },
-  { title: "Resume Parser", desc: "AI-powered resume analysis and skill extraction.", route: "/resume-parser"},
+  { title: "Resume Parser", desc: "AI-powered resume analysis and skill extraction.", route: "/resume-parser" },
   { title: "Job Search", desc: "AI-powered job discovery.", route: "/jobs" },
   { title: "CV Generation", desc: "AI-powered CV generator.", route: "/cv" },
   { title: "LinkedIn Assistant", desc: "Optimize your profile and posts.", route: "/linkedin" },
@@ -49,7 +49,7 @@ export default function Dashboard() {
   const { theme, setTheme } = useTheme();
   const containerRef = useRef(null);
   const pathRef = useRef(null);
-  const [markerPos, setMarkerPos] = useState({ x: 50, y: 5 });
+  const [markerPos, setMarkerPos] = useState({ x: 50, y: 10 });
   const { scrollYProgress } = useScroll({
     offset: ["start start", "end end"]
   });
@@ -70,17 +70,8 @@ export default function Dashboard() {
       description: 'Your AI career architect for strategic planning and analysis.',
       icon: Cpu,
       path: '/orchestrator',
-      top: '8%',
+      top: '5%',
       left: '50%'
-    },
-    {
-      id: 'resume-parser',
-      title: 'Resume Intelligence Engine',
-      description: 'Deep resume analysis to extract skills, roles, and career signals using AI.',
-      icon: FileSearch,
-      path: '/resume-parser',
-      top: '51%',
-      left: '35%'
     },
     {
       id: 'news',
@@ -88,7 +79,7 @@ export default function Dashboard() {
       description: 'Real-time industry shifts and curated tech insights.',
       icon: Newspaper,
       path: '/news',
-      top: '16%',
+      top: '12.5%',
       left: '30%'
     },
     {
@@ -97,8 +88,8 @@ export default function Dashboard() {
       description: 'Validate your competency through AI-driven evaluation engines.',
       icon: Trophy,
       path: '/quiz',
-      top: '24%',
-      left: '70%'
+      top: '20%',
+      left: '72%'
     },
     {
       id: 'jobs',
@@ -106,8 +97,8 @@ export default function Dashboard() {
       description: 'Strategic role placement and matching based on your unique profile.',
       icon: Briefcase,
       path: '/jobs',
-      top: '32%',
-      left: '40%'
+      top: '27.5%',
+      left: '35%'
     },
     {
       id: 'cv-architect',
@@ -115,17 +106,17 @@ export default function Dashboard() {
       description: 'Engineered resumes optimized for ATS and human psychology.',
       icon: FileUser,
       path: '/cv',
-      top: '41%',
-      left: '65%'
+      top: '35%',
+      left: '68%'
     },
     {
-      id: 'ai-tutor',
-      title: 'Knowledge Mastery Engine',
-      description: 'Structured AI tutoring for true concept mastery.',
-      icon: BrainCircuit,
-      path: '/tutor',
-      top: '63%',
-      left: '52%'
+      id: 'resume-parser',
+      title: 'Resume Intelligence Engine',
+      description: 'Deep resume analysis to extract skills, roles, and career signals using AI.',
+      icon: FileSearch,
+      path: '/resume-parser',
+      top: '42.5%',
+      left: '32%'
     },
     {
       id: 'linkedin',
@@ -134,7 +125,7 @@ export default function Dashboard() {
       icon: Zap,
       path: '/linkedin',
       top: '50%',
-      left: '55%'
+      left: '70%'
     },
     {
       id: 'networking',
@@ -142,8 +133,17 @@ export default function Dashboard() {
       description: 'Real-time networking, hackathons, and virtual summits.',
       icon: Users,
       path: '/networking-events',
-      top: '60%',
-      left: '30%'
+      top: '57.5%',
+      left: '35%'
+    },
+    {
+      id: 'ai-tutor',
+      title: 'Knowledge Mastery Engine',
+      description: 'Structured AI tutoring for true concept mastery.',
+      icon: BrainCircuit,
+      path: '/tutor',
+      top: '65%',
+      left: '65%'
     },
     {
       id: 'career',
@@ -151,8 +151,8 @@ export default function Dashboard() {
       description: 'Analyze your aptitudes and map your professional trajectory.',
       icon: Search,
       path: '/career',
-      top: '70%',
-      left: '70%'
+      top: '72.5%',
+      left: '30%'
     },
     {
       id: 'music',
@@ -161,7 +161,7 @@ export default function Dashboard() {
       icon: Music,
       path: '/music',
       top: '80%',
-      left: '50%'
+      left: '70%'
     },
     {
       id: 'wellness',
@@ -169,8 +169,8 @@ export default function Dashboard() {
       description: 'Your conversational companion for emotional support and wellness.',
       icon: Heart,
       path: '/emotional-support',
-      top: '88%',
-      left: '35%'
+      top: '87.5%',
+      left: '40%'
     }
   ];
   return (
@@ -183,7 +183,7 @@ export default function Dashboard() {
       </div>
       <div className="map-canvas" ref={containerRef}>
         <div className="map-content-wrapper">
-          <svg className="connection-spine-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <svg className="connection-spine-svg" viewBox="0 0 100 200" preserveAspectRatio="none">
             <defs>
               <linearGradient id="activeGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="currentColor" stopOpacity="0.2" />
@@ -192,16 +192,16 @@ export default function Dashboard() {
             </defs>
             <path
               className="spine-path-bg"
-              d="M 50,5 C 50,11 30,10 30,16 C 30,22 70,20 70,24 C 70,28 40,28 40,32 C 40,37 65,36 65,41 C 65,46 55,46 55,50 C 55,54 30,54 30,60 C 30,66 70,64 70,70 C 70,76 50,76 50,80 C 50,84 35,84 35,88"
+              d="M 50,10 C 50,18 30,17 30,25 C 30,33 72,32 72,40 C 72,48 35,47 35,55 C 35,63 68,62 68,70 C 68,78 32,77 32,85 C 32,93 70,92 70,100 C 70,108 35,107 35,115 C 35,123 65,122 65,130 C 65,138 30,137 30,145 C 30,153 70,152 70,160 C 70,168 40,167 40,175"
             />
             <motion.path
               className="spine-path-active"
-              d="M 50,5 C 50,11 30,10 30,16 C 30,22 70,20 70,24 C 70,28 40,28 40,32 C 40,37 65,36 65,41 C 65,46 55,46 55,50 C 55,54 30,54 30,60 C 30,66 70,64 70,70 C 70,76 50,76 50,80 C 50,84 35,84 35,88"
+              d="M 50,10 C 50,18 30,17 30,25 C 30,33 72,32 72,40 C 72,48 35,47 35,55 C 35,63 68,62 68,70 C 68,78 32,77 32,85 C 32,93 70,92 70,100 C 70,108 35,107 35,115 C 35,123 65,122 65,130 C 65,138 30,137 30,145 C 30,153 70,152 70,160 C 70,168 40,167 40,175"
               style={{ pathLength: scrollYProgress }}
             />
             <path
               ref={pathRef}
-              d="M 50,5 C 50,11 30,10 30,16 C 30,22 70,20 70,24 C 70,28 40,28 40,32 C 40,37 65,36 65,41 C 65,46 55,46 55,50 C 55,54 30,54 30,60 C 30,66 70,64 70,70 C 70,76 50,76 50,80 C 50,84 35,84 35,88"
+              d="M 50,10 C 50,18 30,17 30,25 C 30,33 72,32 72,40 C 72,48 35,47 35,55 C 35,63 68,62 68,70 C 68,78 32,77 32,85 C 32,93 70,92 70,100 C 70,108 35,107 35,115 C 35,123 65,122 65,130 C 65,138 30,137 30,145 C 30,153 70,152 70,160 C 70,168 40,167 40,175"
               fill="none"
               stroke="none"
             />
