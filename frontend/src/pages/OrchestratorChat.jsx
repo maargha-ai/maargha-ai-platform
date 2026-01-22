@@ -1,11 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  ArrowRight,
+  User,
+  Bot,
+  Sparkles,
+  Mic,
+  Send
+} from "lucide-react";
+import { useTheme } from "../components/ThemeProvider";
+import { Button } from "../components/ui/button";
+import VoiceModal from "../components/VoiceModal";
 import {
   startMicStream,
   stopMicStream,
   muteMic,
   unmuteMic
 } from "../pages/emotional-support/useAudioStream";
+
+import "../styles/orchestrator.css";
 
 /* ---------------------------
    INLINE TTS
@@ -21,17 +35,33 @@ function speakText(text, onEnd) {
   window.speechSynthesis.speak(utterance);
 }
 
-export default function OrchestratorChat({ onClose }) {
+export default function OrchestratorChat() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const scrollRef = useRef(null);
 
   const chatWsRef = useRef(null);   // TEXT WS
   const liveWsRef = useRef(null);   // AUDIO WS
 
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      content: "Welcome to Maargha Orchestrator. I'm your AI career architect. How can I help you shape your future today?",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }
+  ]);
   const [input, setInput] = useState("");
-  const [connected, setConnected] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [liveMode, setLiveMode] = useState(false);
   const [status, setStatus] = useState(""); // "Listening...", "Thinking...", etc.
+  const [volume, setVolume] = useState(0);
+
+  const suggestions = [
+    "Analyze my resume quality",
+    "Generate a 6-month study plan",
+    "Mock interview: React Senior Dev",
+    "Find high-paying remote roles"
+  ];
 
   /* TEXT CHAT WS */
   useEffect(() => {
@@ -41,24 +71,36 @@ export default function OrchestratorChat({ onClose }) {
 
     ws.onopen = () => {
       console.log("[CHAT WS] Connected");
-      setConnected(true);
     };
 
     ws.onmessage = (e) => {
+      setIsTyping(false);
       const data = JSON.parse(e.data);
       if (data.navigate) {
         handleNavigation(data.navigate);
         return;
       }
       if (data.type === "CHAT") {
-        setMessages(p => [...p, { role: "assistant", content: data.content }]);
+        setMessages(p => [...p, {
+          role: "assistant",
+          content: data.content,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }]);
       }
     };
 
-    ws.onclose = () => setConnected(false);
+    ws.onclose = () => {
+      console.log("[CHAT WS] Closed");
+    };
 
     return () => ws.close();
   }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isTyping]);
 
   /* TOGGLE LIVE MODE */
   const toggleLiveMode = () => {
@@ -72,7 +114,7 @@ export default function OrchestratorChat({ onClose }) {
 
       ws.onopen = () => {
         console.log("[LIVE WS] Connected");
-        startMicStream(ws);
+        startMicStream(ws, (v) => setVolume(v));
         setStatus("Listening...");
       };
 
@@ -80,12 +122,20 @@ export default function OrchestratorChat({ onClose }) {
         const data = JSON.parse(e.data);
 
         if (data.type === "USER_TRANSCRIPT") {
-          setMessages(p => [...p, { role: "user", content: data.content }]);
+          setMessages(p => [...p, {
+            role: "user",
+            content: data.content,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }]);
           setStatus("Thinking...");
         }
 
         if (data.type === "CHAT") {
-          setMessages(p => [...p, { role: "assistant", content: data.content }]);
+          setMessages(p => [...p, {
+            role: "assistant",
+            content: data.content,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }]);
           muteMic();
           setStatus("Speaking...");
           speakText(data.content, () => {
@@ -100,6 +150,7 @@ export default function OrchestratorChat({ onClose }) {
         console.log("[LIVE WS] Closed");
         setStatus("");
         setLiveMode(false);
+        setVolume(0);
       };
 
       liveWsRef.current = ws;
@@ -107,29 +158,45 @@ export default function OrchestratorChat({ onClose }) {
 
     } else {
       console.log("[LIVE MODE] STOP");
-      setStatus("Stopping...");
-
-      if (liveWsRef.current?.readyState === WebSocket.OPEN) {
-        liveWsRef.current.send("STOP");
-      }
-
-      // Give a moment for STOP to be processed
-      setTimeout(() => {
-        stopMicStream();
-        liveWsRef.current?.close();
-        liveWsRef.current = null;
-        setLiveMode(false);
-        setStatus("");
-      }, 400);
+      closeLiveMode();
     }
+  };
+
+  const closeLiveMode = () => {
+    setStatus("Stopping...");
+    if (liveWsRef.current?.readyState === WebSocket.OPEN) {
+      liveWsRef.current.send("STOP");
+    }
+    setTimeout(() => {
+      stopMicStream();
+      liveWsRef.current?.close();
+      liveWsRef.current = null;
+      setLiveMode(false);
+      setStatus("");
+      setVolume(0);
+    }, 400);
   };
 
   /* SEND TEXT MESSAGE */
   const sendMessage = () => {
     if (!input.trim()) return;
-    chatWsRef.current.send(input);
-    setMessages(p => [...p, { role: "user", content: input }]);
-    setInput("");
+
+    if (chatWsRef.current && chatWsRef.current.readyState === WebSocket.OPEN) {
+      chatWsRef.current.send(input);
+      setMessages(p => [...p, {
+        role: "user",
+        content: input,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+      setInput("");
+      setIsTyping(true);
+    } else {
+      setMessages(p => [...p, {
+        role: "assistant",
+        content: "I'm currently disconnected. Please check your connection.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+    }
   };
 
   const handleNavigation = ({ tool, payload }) => {
@@ -140,54 +207,138 @@ export default function OrchestratorChat({ onClose }) {
       LinkedInAssistant: "/linkedin",
       QuizGenerator: "/quiz",
       TechNews: "/news",
-      MusicRecommender: "/news",
-      NetworkingEvents: "/news",
-      CVGeneration: "/news",
+      MusicRecommender: "/music",
+      NetworkingEvents: "/networking-events",
+      CVGeneration: "/cv",
       EmotionalSupport: "/emotional-support"
     };
     if (routes[tool]) navigate(routes[tool], payload ? { state: payload } : {});
   };
 
-  /* UI */
   return (
-    <div className="orchestrator-chat">
-      <div className="header">
-        <span>🧠 MAARGHA Orchestrator</span>
-        <button onClick={onClose}>✕</button>
+    <div className={`orchestrator-layout ${theme}`}>
+      <div className="orch-bg-overlay">
+        <div className="orch-gradient-sphere pulse-1"></div>
+        <div className="orch-gradient-sphere pulse-2"></div>
       </div>
 
-      <button
-        className={`live-btn ${liveMode ? "active" : ""}`}
-        onClick={toggleLiveMode}
-      >
-        🎤 {liveMode ? "Live Mode ON" : "Live Mode"}
-      </button>
-
-      {liveMode && status && (
-        <div className="status-bar" style={{ textAlign: "center", padding: "8px", color: "#666" }}>
-          {status}
-        </div>
-      )}
-
-      <div className="messages">
-        {messages.map((m, i) => (
-          <div key={i} className={`msg ${m.role}`}>
-            {m.content}
+      <main className="orch-main w-full h-full flex flex-col">
+        <header className="orch-header border-b border-border/40 backdrop-blur-md bg-background/50">
+          <div className="flex items-center justify-between w-full px-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/dashboard")}
+              className="rounded-full hover:bg-primary/10"
+            >
+              <ArrowLeft size={20} />
+            </Button>
+            <div className="flex flex-col items-center flex-1">
+              <h1 className="text-xl font-bold leading-none tracking-tight">Maargha Orchestrator</h1>
+              <span className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                Online
+              </span>
+            </div>
+            <div className="w-10" />
           </div>
-        ))}
-        {!connected && <div className="msg system">Connecting…</div>}
-      </div>
+        </header>
 
-      <div className="input-bar">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          placeholder="Talk to the orchestrator..."
-          disabled={liveMode} // optional: disable text input during voice mode
-        />
-        <button onClick={sendMessage} disabled={liveMode}>Send</button>
-      </div>
+        <div className="messages-viewport" ref={scrollRef}>
+          <div className="messages-inner">
+            {messages.map((m, i) => (
+              <div key={i} className={`msg-wrapper ${m.role === 'assistant' ? 'ai' : 'user'}`}>
+                <div className="msg-avatar">
+                  {m.role === "assistant" ? <Bot size={20} /> : <User size={20} />}
+                </div>
+                <div className="msg-content">
+                  <div className="msg-bubble">
+                    {m.content}
+                  </div>
+                  <span className="msg-time">{m.timestamp}</span>
+                </div>
+              </div>
+            ))}
+            {messages.length === 1 && (
+              <div className="suggestions-grid">
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    className="suggestion-chip"
+                    onClick={() => {
+                      if (chatWsRef.current?.readyState === WebSocket.OPEN) {
+                        chatWsRef.current.send(s);
+                        setMessages(p => [...p, { role: "user", content: s, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+                        setIsTyping(true);
+                      }
+                    }}
+                  >
+                    {s}
+                    <ArrowRight size={14} />
+                  </button>
+                ))}
+              </div>
+            )}
+            {isTyping && (
+              <div className="msg-wrapper ai">
+                <div className="msg-avatar">
+                  <Bot size={20} />
+                </div>
+                <div className="msg-content">
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <footer className="orch-footer">
+          <div className="input-container glass-morphism">
+            <textarea
+              placeholder="Message Maargha Orchestrator..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+              rows={1}
+            />
+            <div className="input-actions flex items-center gap-2">
+              <button
+                className={`mic-btn ${liveMode ? 'active' : ''}`}
+                onClick={toggleLiveMode}
+                title="Voice Mode"
+              >
+                <Mic size={18} />
+              </button>
+              <button
+                className={`send-btn ${input.trim() ? 'active' : ''}`}
+                onClick={sendMessage}
+                disabled={!input.trim()}
+              >
+                <Send size={18} />
+              </button>
+            </div>
+          </div>
+          <p className="footer-note">
+            Maargha AI may provide inaccurate info. Verify important career steps.
+          </p>
+        </footer>
+      </main>
+
+      <VoiceModal
+        isOpen={liveMode}
+        onClose={closeLiveMode}
+        status={status}
+        volume={volume}
+      />
     </div>
   );
 }
