@@ -116,7 +116,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    padding-bottom: 500px;
+    padding-bottom: 0;
 }
 
 .connection-spine-svg {

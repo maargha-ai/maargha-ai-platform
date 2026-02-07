@@ -50,6 +50,7 @@ class AgentState(TypedDict):
     quiz_topic: str | None
     quiz_level: str | None
     quiz_active: bool
+    asked_questions: set[str]
 
     # Quiz runtime
     current_question: dict

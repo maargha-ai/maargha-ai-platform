@@ -4,30 +4,49 @@ from app.core.llm_client import llm
 import json
 
 QUIZ_PROMPT_TEMPLATE = """
-You are an expert interviewer.
+You are a senior technical interviewer.
 
-Generate ONE question for the topic:
+Generate ONE UNIQUE interview question for the topic:
 "{topic}"
 
 Difficulty level: {level}
 
-Rules:
-- Open-ended question
-- No multiple choice
-- No answer
-- Practical if possible
-- Difficulty must match the level
+CRITICAL RULES:
+- The question MUST be substantially different from the above questions
+- Avoid generic or textbook-style questions
+- Focus on ONE distinct angle ONLY:
+  • real-world application
+  • debugging / troubleshooting
+  • performance optimization
+  • edge cases and failure scenarios
+  • architectural or design decisions
+  • trade-offs and reasoning
+  • scalability or constraints
 
-Return JSON only:
+Question rules:
+- Open-ended
+- No multiple choice
+- Do NOT include the answer
+- Scenario-based if possible
+- Difficulty must strictly match the level
+
+Return ONLY valid JSON:
 {{
   "question": "..."
 }}
 """
 
-async def generate_quiz_question(topic: str, level: str):
+async def generate_quiz_question(topic: str, level: str, previous_questions: list[str]):
+    previous_block = (
+        "\n".join(f"- {q}" for q in previous_questions)
+        if previous_questions
+        else "None"
+    )
+
     prompt = QUIZ_PROMPT_TEMPLATE.format(
         topic=topic,
-        level=level
+        level=level,
+        previous_questions=previous_block
     )
     response = await llm.ainvoke([HumanMessage(content=prompt)])
     raw = response.content.strip()
@@ -35,4 +54,4 @@ async def generate_quiz_question(topic: str, level: str):
     try:
         return json.loads(raw)
     except Exception:
-        return {"question": f"Explain {topic} concepts ({level} level)."}
+        return None

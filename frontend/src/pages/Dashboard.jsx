@@ -79,8 +79,17 @@ export default function Dashboard() {
       description: 'Real-time industry shifts and curated tech insights.',
       icon: Newspaper,
       path: '/news',
-      top: '12.5%',
-      left: '30%'
+      top: '27.5%',
+      left: '21%'
+    },
+    {
+      id: 'roadmap',
+      title: 'Roadmap',
+      description: 'Real-time industry shifts and curated tech insights.',
+      icon: Newspaper,
+      path: '/roadmap',
+      top: '15.5%',
+      left: '51%'
     },
     {
       id: 'quiz',
@@ -88,8 +97,8 @@ export default function Dashboard() {
       description: 'Validate your competency through AI-driven evaluation engines.',
       icon: Trophy,
       path: '/quiz',
-      top: '20%',
-      left: '72%'
+      top: '22%',
+      left: '42%'
     },
     {
       id: 'jobs',
@@ -97,8 +106,8 @@ export default function Dashboard() {
       description: 'Strategic role placement and matching based on your unique profile.',
       icon: Briefcase,
       path: '/jobs',
-      top: '27.5%',
-      left: '35%'
+      top: '64.5%',
+      left: '60%'
     },
     {
       id: 'cv-architect',
@@ -106,8 +115,8 @@ export default function Dashboard() {
       description: 'Engineered resumes optimized for ATS and human psychology.',
       icon: FileUser,
       path: '/cv',
-      top: '35%',
-      left: '68%'
+      top: '31%',
+      left: '53%'
     },
     {
       id: 'resume-parser',
@@ -115,8 +124,8 @@ export default function Dashboard() {
       description: 'Deep resume analysis to extract skills, roles, and career signals using AI.',
       icon: FileSearch,
       path: '/resume-parser',
-      top: '42.5%',
-      left: '32%'
+      top: '38.5%',
+      left: '23%'
     },
     {
       id: 'linkedin',
@@ -124,8 +133,8 @@ export default function Dashboard() {
       description: 'Maximize your profile impact and build high-value connections.',
       icon: Zap,
       path: '/linkedin',
-      top: '50%',
-      left: '70%'
+      top: '37.3%',
+      left: '51%'
     },
     {
       id: 'networking',
@@ -133,8 +142,8 @@ export default function Dashboard() {
       description: 'Real-time networking, hackathons, and virtual summits.',
       icon: Users,
       path: '/networking-events',
-      top: '57.5%',
-      left: '35%'
+      top: '45%',
+      left: '49%'
     },
     {
       id: 'ai-tutor',
@@ -142,8 +151,8 @@ export default function Dashboard() {
       description: 'Structured AI tutoring for true concept mastery.',
       icon: BrainCircuit,
       path: '/tutor',
-      top: '65%',
-      left: '65%'
+      top: '20.7%',
+      left: '77%'
     },
     {
       id: 'career',
@@ -151,8 +160,8 @@ export default function Dashboard() {
       description: 'Analyze your aptitudes and map your professional trajectory.',
       icon: Search,
       path: '/career',
-      top: '72.5%',
-      left: '30%'
+      top: '12.5%',
+      left: '20%'
     },
     {
       id: 'music',
@@ -160,8 +169,8 @@ export default function Dashboard() {
       description: 'AI-composed soundscapes for deep focus and mental clarity.',
       icon: Music,
       path: '/music',
-      top: '80%',
-      left: '70%'
+      top: '50.5%',
+      left: '75.3%'
     },
     {
       id: 'wellness',
@@ -169,8 +178,8 @@ export default function Dashboard() {
       description: 'Your conversational companion for emotional support and wellness.',
       icon: Heart,
       path: '/emotional-support',
-      top: '87.5%',
-      left: '40%'
+      top: '53%',
+      left: '38%'
     }
   ];
   return (
@@ -192,16 +201,40 @@ export default function Dashboard() {
             </defs>
             <path
               className="spine-path-bg"
-              d="M 50,10 C 50,18 30,17 30,25 C 30,33 72,32 72,40 C 72,48 35,47 35,55 C 35,63 68,62 68,70 C 68,78 32,77 32,85 C 32,93 70,92 70,100 C 70,108 35,107 35,115 C 35,123 65,122 65,130 C 65,138 30,137 30,145 C 30,153 70,152 70,160 C 70,168 40,167 40,175"
+              d="M 50,10 
+              C 55,18 20,17 20,25 
+              C 19,34 72,31 79,39 
+              C 85,49 35,47 23,53 
+              C 10,63 68,62 77,71 
+              C 85,82 32,77 24,85 
+              C 13,95 70,92 76,100 
+              C 80,109 35,107 35,115 
+              C 35,123 65,122 65,130"
             />
             <motion.path
               className="spine-path-active"
-              d="M 50,10 C 50,18 30,17 30,25 C 30,33 72,32 72,40 C 72,48 35,47 35,55 C 35,63 68,62 68,70 C 68,78 32,77 32,85 C 32,93 70,92 70,100 C 70,108 35,107 35,115 C 35,123 65,122 65,130 C 65,138 30,137 30,145 C 30,153 70,152 70,160 C 70,168 40,167 40,175"
+              d="M 50,10 
+              C 55,18 20,17 20,25 
+              C 19,34 72,31 79,39 
+              C 85,49 35,47 23,53 
+              C 10,63 68,62 77,71 
+              C 85,82 32,77 24,85 
+              C 13,95 70,92 76,100 
+              C 80,109 35,107 35,115 
+              C 35,123 65,122 65,130"
               style={{ pathLength: scrollYProgress }}
             />
             <path
               ref={pathRef}
-              d="M 50,10 C 50,18 30,17 30,25 C 30,33 72,32 72,40 C 72,48 35,47 35,55 C 35,63 68,62 68,70 C 68,78 32,77 32,85 C 32,93 70,92 70,100 C 70,108 35,107 35,115 C 35,123 65,122 65,130 C 65,138 30,137 30,145 C 30,153 70,152 70,160 C 70,168 40,167 40,175"
+              d="M 50,10 
+              C 55,18 20,17 20,25 
+              C 19,34 72,31 79,39 
+              C 85,49 35,47 23,53 
+              C 10,63 68,62 77,71 
+              C 85,82 32,77 24,85 
+              C 13,95 70,92 76,100 
+              C 80,109 35,107 35,115 
+              C 35,123 65,122 65,130"
               fill="none"
               stroke="none"
             />
@@ -252,7 +285,7 @@ export default function Dashboard() {
               </motion.div>
             );
           })}
-          <div style={{ paddingBottom: '500px', width: '100%' }}></div>
+          <div style={{ paddingBottom: '100px', width: '100%' }}></div>
         </div>
       </div>
       <div className="dashboard-hud">

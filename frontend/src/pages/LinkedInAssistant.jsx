@@ -15,6 +15,8 @@ import {
 import { useTheme } from "../components/ThemeProvider";
 import { Button } from "../components/ui/button";
 import "../styles/linkedin.css";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 export default function LinkedInAssistant() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
@@ -109,8 +111,8 @@ export default function LinkedInAssistant() {
               <div className="li-avatar">
                 {m.role === 'assistant' ? <Bot size={20} /> : <User size={20} />}
               </div>
-              <div className="li-bubble">
-                {m.text}
+              <div className="li-bubble markdown">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={{p: ({ children }) => <p className="mb-2">{children}</p>}}>{m.text}</ReactMarkdown>
               </div>
             </div>
           ))}

@@ -60,6 +60,7 @@
     padding: 2rem;
     display: flex;
     flex-direction: column;
+    max-height: calc(100vh - 180px);
 }
 .li-welcome {
     text-align: center;
@@ -179,6 +180,31 @@
 .li-send-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+/* Better markdown formatting */
+.li-bubble.markdown {
+  line-height: 1.6;
+}
+
+.li-bubble.markdown h1,
+.li-bubble.markdown h2,
+.li-bubble.markdown h3 {
+  font-weight: 700;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.li-bubble.markdown ul {
+  padding-left: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.li-bubble.markdown li {
+  margin-bottom: 0.4rem;
+}
+
+.li-bubble.markdown strong {
+  font-weight: 600;
 }
 @keyframes fade-in {
     from {

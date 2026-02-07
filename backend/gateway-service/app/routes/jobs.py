@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Request
 import httpx
 from app.config import settings
+from app.core.logger import logger
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 @router.post("/match")
 async def proxy_job_match(req: Request):
     body = await req.body()
-    print("\n[Gateway] jobs connection")
+    logger.info("jobs_match_request")
+
     headers = {
         "Authorization": req.headers.get("authorization"),
         "Content-Type": req.headers.get("content-type"),
@@ -20,4 +22,5 @@ async def proxy_job_match(req: Request):
             headers=headers,
         )
 
+    logger.info("jobs_match_response", status_code=resp.status_code)
     return resp.json()

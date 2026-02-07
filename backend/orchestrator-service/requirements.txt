@@ -31,3 +31,4 @@ openpyxl==3.1.5
 reportlab==4.4.9
 pdfplumber==0.11.9
 gliner==0.2.24
+mediapipe==0.10.32
