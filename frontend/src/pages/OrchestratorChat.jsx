@@ -5,7 +5,6 @@ import {
   ArrowRight,
   User,
   Bot,
-  Sparkles,
   Mic,
   Send
 } from "lucide-react";
@@ -20,10 +19,8 @@ import {
 } from "../pages/emotional-support/useAudioStream";
 
 import "../styles/orchestrator.css";
-
-/* ---------------------------
-   INLINE TTS
---------------------------- */
+import "../index.css";
+/*INLINE TTS*/
 function speakText(text, onEnd) {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-US";
@@ -244,8 +241,12 @@ export default function OrchestratorChat() {
           </div>
         </header>
 
-        <div className="messages-viewport" ref={scrollRef}>
-          <div className="messages-inner">
+        {/* Scrollable messages area */}
+        <div 
+          className="flex-1 overflow-y-auto custom-scroll px-4 py-6" 
+          ref={scrollRef}
+        >
+          <div className="max-w-4xl mx-auto space-y-6">
             {messages.map((m, i) => (
               <div key={i} className={`msg-wrapper ${m.role === 'assistant' ? 'ai' : 'user'}`}>
                 <div className="msg-avatar">
@@ -259,6 +260,7 @@ export default function OrchestratorChat() {
                 </div>
               </div>
             ))}
+
             {messages.length === 1 && (
               <div className="suggestions-grid">
                 {suggestions.map((s, i) => (
@@ -279,6 +281,7 @@ export default function OrchestratorChat() {
                 ))}
               </div>
             )}
+
             {isTyping && (
               <div className="msg-wrapper ai">
                 <div className="msg-avatar">

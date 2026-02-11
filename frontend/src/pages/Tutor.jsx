@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 import { useTheme } from "../components/ThemeProvider";
 import { Button } from "../components/ui/button";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+import "../index.css";
 
 export default function Tutor() {
   const navigate = useNavigate();
@@ -50,9 +54,13 @@ export default function Tutor() {
     return () => ws.close();
   }, []);
 
+  // Smooth auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth"
+      });
     }
   }, [messages, isTyping]);
 
@@ -107,7 +115,11 @@ export default function Tutor() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto relative z-10 scrollbar-thin px-4 py-8" ref={scrollRef}>
+      {/* Main chat area – scrollable with mouse wheel */}
+      <main 
+        className="flex-1 overflow-y-auto relative z-10 px-4 py-8 custom-scroll" 
+        ref={scrollRef}
+      >
         <div className="max-w-3xl mx-auto space-y-8">
           {messages.map((m, i) => (
             <div key={i} className={`flex gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
@@ -115,8 +127,10 @@ export default function Tutor() {
                 {m.role === 'assistant' ? <Bot size={18} /> : <User size={18} />}
               </div>
               <div className={`flex flex-col gap-1 max-w-[85%] ${m.role === 'user' ? 'items-end' : ''}`}>
-                <div className={`px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm ${m.role === 'assistant' ? 'bg-card border border-border/50 rounded-tl-sm' : 'bg-primary text-primary-foreground rounded-tr-sm'}`}>
-                  {m.text}
+                <div className={`px-5 py-4 rounded-2xl text-[15px] leading-7 shadow-sm prose prose-invert max-w-none ${m.role === 'assistant' ? 'bg-card border border-border/50 rounded-tl-sm' : 'bg-primary text-primary-foreground rounded-tr-sm'}`}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {m.text}
+                  </ReactMarkdown>
                 </div>
                 <span className="text-[10px] text-muted-foreground px-1">{m.timestamp}</span>
               </div>

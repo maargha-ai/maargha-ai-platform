@@ -2,6 +2,10 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { BrainCircuit } from "lucide-react";
+import { Map } from "lucide-react";
+import { Compass  } from "lucide-react";
+import { Route  } from "lucide-react";
+import { Flag  } from "lucide-react";
 import {
   Newspaper,
   Briefcase,
@@ -74,6 +78,15 @@ export default function Dashboard() {
       left: '50%'
     },
     {
+      id: 'career',
+      title: 'Career Discovery',
+      description: 'Analyze your aptitudes and map your professional trajectory.',
+      icon: Search,
+      path: '/career',
+      top: '12.5%',
+      left: '20%'
+    },
+    {
       id: 'news',
       title: 'Tech Pulse Digest',
       description: 'Real-time industry shifts and curated tech insights.',
@@ -84,9 +97,9 @@ export default function Dashboard() {
     },
     {
       id: 'roadmap',
-      title: 'Roadmap',
-      description: 'Real-time industry shifts and curated tech insights.',
-      icon: Newspaper,
+      title: 'Career Path Intelligence',
+      description: 'Clear learning roadmap with skills, tools, and projects.',
+      icon: Route,
       path: '/roadmap',
       top: '15.5%',
       left: '51%'
@@ -143,7 +156,7 @@ export default function Dashboard() {
       icon: Users,
       path: '/networking-events',
       top: '45%',
-      left: '49%'
+      left: '40%'
     },
     {
       id: 'ai-tutor',
@@ -155,22 +168,13 @@ export default function Dashboard() {
       left: '77%'
     },
     {
-      id: 'career',
-      title: 'Career Discovery',
-      description: 'Analyze your aptitudes and map your professional trajectory.',
-      icon: Search,
-      path: '/career',
-      top: '12.5%',
-      left: '20%'
-    },
-    {
       id: 'music',
       title: 'Sonic Therapy',
       description: 'AI-composed soundscapes for deep focus and mental clarity.',
       icon: Music,
       path: '/music',
-      top: '50.5%',
-      left: '75.3%'
+      top: '52%',
+      left: '50%'
     },
     {
       id: 'wellness',
@@ -178,8 +182,8 @@ export default function Dashboard() {
       description: 'Your conversational companion for emotional support and wellness.',
       icon: Heart,
       path: '/emotional-support',
-      top: '53%',
-      left: '38%'
+      top: '58%',
+      left: '36%'
     }
   ];
   return (
@@ -289,7 +293,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="dashboard-hud">
-        <div className="hud-profile" onClick={() => navigate('/roadmap')}>
+        <div className="hud-profile" onClick={() => navigate('/profile')}>
           <div className="profile-avatar">
             {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
           </div>

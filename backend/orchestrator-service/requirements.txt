@@ -24,7 +24,6 @@ uvicorn[standard]==3.11
 python-multipart==0.0.20
 feedparser==6.0.12
 opencv-python==4.12.0.88
-ultralytics==8.3.252
 pandas==2.3.3
 google-cloud-storage==3.8.0
 openpyxl==3.1.5
@@ -32,3 +31,5 @@ reportlab==4.4.9
 pdfplumber==0.11.9
 gliner==0.2.24
 mediapipe==0.10.32
+dash==4.0.0
+psycopg2==2.9.11

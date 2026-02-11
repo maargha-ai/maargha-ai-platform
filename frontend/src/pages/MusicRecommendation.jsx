@@ -19,6 +19,9 @@ export default function MusicRecommendation() {
   const [song, setSong] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const MIN_CHARS = 50;
+  const charCount = text.trim().length;
+  const isValid = charCount >= MIN_CHARS;
   useEffect(() => {
     if (!isPlaying || !canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -64,7 +67,7 @@ export default function MusicRecommendation() {
     return () => cancelAnimationFrame(animationId);
   }, [isPlaying]);
   const submit = async () => {
-    if (!text) return;
+    if (!isValid) return;
     setLoading(true);
     setSong(null);
     try {
@@ -121,13 +124,24 @@ export default function MusicRecommendation() {
                  placeholder="e.g. Feeling stressed about deadlines..." 
                  value={text}
                  onChange={(e) => setText(e.target.value)}
-                 onKeyDown={(e) => e.key === 'Enter' && submit()}
+                 onKeyDown={(e) => {
+                  if (e.key === "Enter" && isValid) submit();
+                }}
                />
-               <button className="play-btn" onClick={submit} disabled={loading || !text}>
-                 {loading ?  <Play size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
-                 {loading ? "Composing..." : "Play"}
-               </button>
-             </div>
+                 <button
+                    className="play-btn"
+                    onClick={submit}
+                    disabled={loading || !isValid}
+                  >
+                    <Play size={20} fill="currentColor" />
+                    {loading ? "Composing..." : "Play"}
+                  </button>
+                </div>
+
+                <div className={`char-hint ${isValid ? "ok" : "warn"}`}>
+                  {charCount}/{MIN_CHARS} characters
+                  {!isValid && " — please describe your mood in more detail"}
+                </div>
           </div>
         ) : (
           <div className="player-container">

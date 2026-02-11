@@ -9,6 +9,26 @@
     overflow: hidden;
     transition: background-color 0.3s, color 0.3s;
 }
+.char-hint {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  text-align: center;
+  transition: color 0.2s ease;
+}
+
+.char-hint.warn {
+  color: #f59e0b;
+}
+
+.char-hint.ok {
+  color: #22c55e;
+}
+
+.play-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .emotional-bg {
     position: absolute;
     inset: 0;

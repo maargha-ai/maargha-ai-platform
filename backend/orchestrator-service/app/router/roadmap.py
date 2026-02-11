@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
-from app.chains.roadmap_chain import generate_roadmap_video
+from app.chains.roadmap_chain import generate_roadmap
 
 router = APIRouter(prefix="/roadmap", tags=["Roadmap"])
 
@@ -8,12 +8,10 @@ class RoadmapRequest(BaseModel):
     career: str
 
 class RoadmapResponse(BaseModel):
-    video_url: str
+    career: str
+    steps: list
 
 @router.post("/generate", response_model=RoadmapResponse)
-async def generate_roadmap(req: RoadmapRequest):
-    video_url = await generate_roadmap_video(req.career)
-
-    return {
-        "video_url": video_url
-    }
+async def generate(req: RoadmapRequest):
+    roadmap = await generate_roadmap(req.career)
+    return roadmap

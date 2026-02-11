@@ -21,6 +21,7 @@ def detect_text_emotion(text: str, threshold: float = 0.6) -> list[str]:
         label = result["label"].lower()
         score = result["score"]
 
+        print(f"[Emotion Detector] Text input: {text}")
         print(f"[Emotion Detector] Detected emotion: {result}")
         if score < threshold:
             return ["Calm"]

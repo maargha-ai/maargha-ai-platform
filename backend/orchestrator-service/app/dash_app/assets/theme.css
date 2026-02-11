@@ -1,0 +1,43 @@
+/* Root */
+.dash-root {
+  padding: 16px;
+}
+
+/* Title */
+.dash-title {
+  margin-bottom: 12px;
+}
+
+/* Filters */
+.dash-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Grids */
+.dash-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Table */
+.dash-table-wrapper {
+  margin-top: 12px;
+}
+
+/* Light mode */
+body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Dark mode (Dash auto adds this when embedded) */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #ffffff;
+    color: #000000;
+  }
+}

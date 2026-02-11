@@ -1,80 +1,106 @@
 # app/chains/tutor_chain.py
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+from pathlib import Path
+import requests
+
 from langchain_community.vectorstores import FAISS
-from langchain_classic.chains import create_retrieval_chain
-from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import PromptTemplate
+from langchain_core.messages import HumanMessage
 
 from app.core.llm_client import llm
 from app.core.langchain_embeddings import LangchainSentenceEmbeddings
+from app.utils.gcs import generate_signed_url
+from app.core.config import settings
+
+
+GCP_BUCKET_NAME = settings.GCP_TUTOR_BUCKET
+GCP_VECTOR_DB_PREFIX = "tutor_faiss"
+
+LOCAL_VECTOR_DB_PATH = Path("app/static/vectordb/tutor_faiss")
+LOCAL_VECTOR_DB_PATH.mkdir(parents=True, exist_ok=True)
 
 _retriever = None
-_tutor_chain = None
 
 
-def build_vector_db(pdf_path="app/static/books/Hands-On-Machine-Learning.pdf"):
-    print("[Tutor] Loading textbook...")
+PROMPT_TEMPLATE = PromptTemplate.from_template(
+    """
+    You are an AI Tutor teaching IT concepts clearly and simply.
+    Use ONLY the provided context from the textbook.
 
-    try:
-        loader = PyPDFLoader(pdf_path)
-        docs = loader.load()
+    Question:
+    {question}
 
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=800,
-            chunk_overlap=100
+    CONTEXT:
+    {context}
+
+    Your response must include:
+    - Beginner-level explanation
+    - Real-world analogy
+    - 3-step learning plan
+    - A short quiz with answers
+    """
+)
+
+
+def download_vector_db():
+    for filename in ["index.faiss", "index.pkl"]:
+        local_file = LOCAL_VECTOR_DB_PATH / filename
+        if local_file.exists():
+            continue
+
+        signed_url = generate_signed_url(
+            GCP_BUCKET_NAME,
+            f"{GCP_VECTOR_DB_PREFIX}/{filename}"
         )
-        chunks = splitter.split_documents(docs)
+
+        response = requests.get(signed_url, timeout=60)
+        response.raise_for_status()
+
+        with open(local_file, "wb") as f:
+            f.write(response.content)
+
+
+def get_retriever():
+    global _retriever
+
+    if _retriever is None:
+        print("[Tutor] Loading FAISS vector DB")
+        download_vector_db()
 
         embeddings = LangchainSentenceEmbeddings()
 
-        vectordb = FAISS.from_documents(chunks, embeddings)
+        vectordb = FAISS.load_local(
+            folder_path=str(LOCAL_VECTOR_DB_PATH),
+            embeddings=embeddings,
+            allow_dangerous_deserialization=True
+        )
 
-        return vectordb.as_retriever(
+        _retriever = vectordb.as_retriever(
             search_type="similarity",
             k=4
         )
-    except Exception as e:
-        print(f"[Tutor] Failed with exception {e}")
+
+        print("[Tutor] Successfully loaded vectorDB")
+
+    return _retriever
 
 
-def build_tutor_chain(retriever):
-    prompt = PromptTemplate.from_template(
-        """
-        You are an AI Tutor teaching IT concepts clearly and simply.
-        Use ONLY the provided context from the textbook.
+async def ask_tutor(question: str) -> str:
+    retriever = get_retriever()
 
-        Question: {input}
+    # 1️⃣ Retrieve context
+    docs = retriever.invoke(question)
+    context = "\n\n".join(doc.page_content for doc in docs)
 
-        CONTEXT:
-        {context}
-
-        Your response must include:
-        - Beginner-level explanation
-        - Real-world analogy
-        - 3-step learning plan
-        - A short quiz with answers
-        """
+    # 2️⃣ Build prompt
+    prompt = PROMPT_TEMPLATE.format(
+        question=question,
+        context=context
     )
 
-    document_chain = create_stuff_documents_chain(llm, prompt)
-    return create_retrieval_chain(retriever, document_chain)
+    # 3️⃣ Call LLM (same style as roadmap_chain)
+    response = await llm.ainvoke([
+        HumanMessage(content=prompt)
+    ])
 
-
-def get_tutor_chain():
-    global _retriever, _tutor_chain
-
-    if _tutor_chain is None:
-        print("[Tutor] Initializing RAG tutor (one-time)")
-        _retriever = build_vector_db()
-        print("[Tutor] Sucessfully retrieved vectorDB")
-        _tutor_chain = build_tutor_chain(_retriever)
-        print("[Tutor] Sucessfully build Tutor Chain")
-
-    return _tutor_chain
-
-
-def ask_tutor(question: str) -> str:
-    chain = get_tutor_chain()
-    response = chain.invoke({"input": question})
-    return response["answer"]
+    return response.content

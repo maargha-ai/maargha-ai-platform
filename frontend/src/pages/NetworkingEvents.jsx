@@ -2,8 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, 
   Calendar, 
-  Users, 
-  ExternalLink,
   Globe,
   MapPin
 } from "lucide-react";
@@ -48,7 +46,7 @@ export default function NetworkingEvents() {
         <div className="iframe-wrapper">
           <iframe
             title="Networking Events Dashboard"
-            src="https://app.powerbi.com/reportEmbed?reportId=e053da7c-aacf-47a9-8d6a-e51472f94956&autoAuth=true&ctid=39fe8ff6-5063-4b45-ad25-ed60e20269a5"
+            src="http://localhost:8050"
             allowFullScreen
           />
         </div>

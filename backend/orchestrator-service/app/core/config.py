@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     GCP_BUCKET_NAME: str
     SONG_PATH: str 
 
-    # Roadmap
-    GCP_ROADMAP_BUCKET: str
+    # Tutor
+    GCP_TUTOR_BUCKET: str
 
 settings = Settings()

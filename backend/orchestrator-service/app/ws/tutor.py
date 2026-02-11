@@ -11,7 +11,7 @@ async def tutor_ws_handler(websocket: WebSocket, user_id: str):
         if msg["type"] == "tutor_question":
             question = msg["question"]
 
-            answer = ask_tutor(question)
+            answer = await ask_tutor(question)
 
             await websocket.send_text(json.dumps({
                 "type": "tutor_answer",

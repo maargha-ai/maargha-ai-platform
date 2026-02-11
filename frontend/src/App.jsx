@@ -17,6 +17,9 @@ import NewsDigest from "./pages/NewsDigest";
 import Tutor from "./pages/Tutor";
 import CVGeneration from "./pages/CVGeneration";
 import ResumeParser from "./pages/ResumeParser";
+import UserProfile from "./pages/UserProfile";
+import EditProfileModal from "./pages/EditProfileModal";
+
 
 import "./styles/stars.css";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -40,6 +43,8 @@ function App() {
         <Route path="/tutor" element={<Tutor />} />
         <Route path="/cv" element={<CVGeneration />} />
         <Route path="/resume-parser" element={<ResumeParser />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/editprofile" element={<EditProfileModal />} />
 
         <Route path="/dashboard" element={
           <ProtectedRoute>

@@ -10,7 +10,6 @@ router = APIRouter()
 @router.websocket("/ws/tutor")
 async def tutor_ws(websocket: WebSocket, token: str = Query(...)):
     await websocket.accept()
-    logger.info("tutor_ws_connected", user_id=user_id)
 
     payload = jwt.decode(
         token,
@@ -18,6 +17,8 @@ async def tutor_ws(websocket: WebSocket, token: str = Query(...)):
         algorithms=[settings.JWT_ALGORITHM]
     )
     user_id = payload["user_id"]
+
+    logger.info("tutor_ws_connected", user_id=user_id)
 
     orch_ws = await websockets.connect(
         f"{settings.ORCHESTRATOR_SERVICE_WS_URL}/ws/tutor/{user_id}"
