@@ -11,7 +11,7 @@ class ViolationTracker:
         return self.warnings
 
     def should_terminate(self):
-        return self.warnings > MAX_WARNINGS
+        return self.warnings >= MAX_WARNINGS
     
     def reset(self):
         self.warnings = max(0, self.warnings - 1)

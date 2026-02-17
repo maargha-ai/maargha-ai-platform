@@ -34,6 +34,31 @@ body {
   color: #000000;
 }
 
+/* GRID */
+.dash-grid-tags {
+    display: grid;
+    grid-template-columns: 0.8fr 2.2fr; /* donut small, tags big */
+    gap: 20px;
+    margin-top: 15px;
+}
+
+/* chart cards */
+.donut-box, .tag-box {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+/* dark mode auto */
+@media (prefers-color-scheme: dark) {
+    .donut-box, .tag-box {
+        background: #fffefe;
+        box-shadow: 0 3px 10px rgba(255,255,255,0.06);
+    }
+}
+
+
 /* Dark mode (Dash auto adds this when embedded) */
 @media (prefers-color-scheme: dark) {
   body {

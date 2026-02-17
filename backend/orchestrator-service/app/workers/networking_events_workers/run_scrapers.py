@@ -1,31 +1,51 @@
 import asyncio
-from app.workers.networking_events_workers.devpost_scraper import scrape_devpost
-from app.workers.networking_events_workers.devfolio_scraper import scrape_devfolio
-from app.workers.networking_events_workers.twitter_scraper import scrape_twitter
+import logging
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.workers.networking_events_workers.devpost_scraper import fetch_devpost_events
 from app.models.event import Event
 from app.db.database import AsyncSessionLocal
 
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
+
+logger = logging.getLogger("event_refresh")
+
+
 async def run():
-    # 1. Run sync scrapers safely in threads
-    devpost_events = await asyncio.to_thread(scrape_devpost)
-    devfolio_events = await asyncio.to_thread(scrape_devfolio)
-    twitter_events = await asyncio.to_thread(scrape_twitter)
+    logger.info("Starting daily event refresh job...")
 
-    all_events = devpost_events + devfolio_events + twitter_events
+    # -------- Fetch events --------
+    try:
+        devpost_events = await asyncio.to_thread(fetch_devpost_events)
+        logger.info(f"Fetched {len(devpost_events)} events")
+    except Exception:
+        logger.exception("Failed to fetch events")
+        return
 
-    # 2. Async DB write
+    if not devpost_events:
+        logger.warning("No events fetched — skipping DB update")
+        return
+
+    # -------- Update DB --------
     async with AsyncSessionLocal() as db:
-        for event in all_events:
-            try:
-                db.add(Event(**event))
-            except Exception as e:
-                print("Add failed:", e)
-
         try:
+            logger.info("Clearing old events...")
+            await db.execute(text("TRUNCATE TABLE events RESTART IDENTITY"))
             await db.commit()
-        except Exception as e:
-            print("Commit failed:", e)
+
+            logger.info("Inserting new events...")
+            await db.execute(Event.__table__.insert(), devpost_events)
+            await db.commit()
+
+            logger.info("Event refresh completed successfully!")
+
+        except SQLAlchemyError:
+            logger.exception("Database error — rollback")
             await db.rollback()
 
 

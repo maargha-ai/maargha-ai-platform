@@ -1,43 +1,155 @@
-import re
-from playwright.sync_api import sync_playwright
-from .utils import fallback_dates, detect_mode, detect_tags
+import requests
+import time
+from datetime import datetime
 
-def scrape_devpost():
-    events = []
+DEVPOST_API = "https://devpost.com/api/hackathons"
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto("https://devpost.com/hackathons", timeout=60000)
-        page.wait_for_load_state("networkidle")
+def parse_devpost_dates(date_text: str):
+    """
+    Returns proper datetime.date objects.
+    """
 
-        for _ in range(8):
-            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-            page.wait_for_timeout(1200)
+    if not date_text:
+        return None, None
 
-        cards = page.query_selector_all("a.flex-row.tile-anchor")
+    try:
+        date_text = date_text.strip()
 
-        for card in cards:
-            try:
-                text = card.inner_text()
-                href = card.get_attribute("href")
+        # Case 1: Full range with two years
+        if " - " in date_text and "," in date_text.split(" - ")[0]:
+            start_str, end_str = date_text.split(" - ")
 
-                start_date, end_date = fallback_dates()
+            start_date = datetime.strptime(
+                start_str.strip(),
+                "%b %d, %Y"
+            ).date()
 
-                events.append({
-                    "title": text.split("\n")[0].strip(),
+            end_date = datetime.strptime(
+                end_str.strip(),
+                "%b %d, %Y"
+            ).date()
+
+            return start_date, end_date
+
+        # Case 2: Single year at end
+        if " - " in date_text:
+            start_part, end_part = date_text.split(" - ")
+            year = end_part.split(",")[1].strip()
+
+            start_date = datetime.strptime(
+                f"{start_part.strip()} {year}",
+                "%b %d %Y"
+            ).date()
+
+            end_clean = end_part.split(",")[0].strip()
+
+            if " " not in end_clean:
+                month = start_part.split()[0]
+                end_clean = f"{month} {end_clean}"
+
+            end_date = datetime.strptime(
+                f"{end_clean} {year}",
+                "%b %d %Y"
+            ).date()
+
+            return start_date, end_date
+
+        # Case 3: Single date
+        start_date = datetime.strptime(
+            date_text.strip(),
+            "%b %d, %Y"
+        ).date()
+
+        return start_date, None
+
+    except Exception as e:
+        print("Date parse failed:", date_text, "| Error:", e)
+        return None, None
+
+def fetch_devpost_events(status_list=None):
+    if status_list is None:
+        status_list = ["open", "upcoming"]
+
+    all_events = []
+    seen_urls = set()  # prevent duplicates
+
+    for status in status_list:
+        print(f"\nFetching status: {status}")
+
+        page = 1
+
+        while True:
+            params = {
+                "page": page,
+                "status": status
+            }
+
+            response = requests.get(
+                DEVPOST_API,
+                params=params,
+                timeout=10,
+                headers={"User-Agent": "Mozilla/5.0"}
+            )
+
+            if response.status_code != 200:
+                print("Failed on page", page)
+                break
+
+            data = response.json()
+            hackathons = data.get("hackathons", [])
+
+            if not hackathons:
+                print("No more pages for", status)
+                break  # stops when empty page
+
+            for hackathon in hackathons:
+                url = hackathon.get("url")
+
+                # Avoid duplicates between open + upcoming
+                if url in seen_urls:
+                    continue
+
+                seen_urls.add(url)
+
+                date_text = hackathon.get("submission_period_dates")
+                start_date, end_date = parse_devpost_dates(date_text)
+
+                displayed_location = hackathon.get("displayed_location", {})
+                location = displayed_location.get("location")
+                if location=="Online":
+                    mode = "Online"
+                else:
+                    mode = "Offline"
+
+                all_events.append({
+                    "title": hackathon.get("title"),
                     "event_type": "hackathon",
-                    "mode": detect_mode(text),
-                    "platform": "devpost",
-                    "registration_url": f"https://devpost.com{re.sub(r'\\?.*', '', href)}",
+                    "location": location,
+                    "mode": mode,
+                    "registration_url": url,
                     "start_date": start_date,
                     "end_date": end_date,
-                    "location": "Online" if "online" in text.lower() else "In-person",
-                    "tags": detect_tags(text)
+                    "tags": hackathon.get("themes"),
                 })
-            except Exception:
-                continue
 
-        browser.close()
+            print(f"Fetched page {page} ({status}) — {len(hackathons)} events")
 
-    return events
+            page += 1
+            time.sleep(0.5)  # polite delay
+
+    return all_events
+
+
+if __name__ == "__main__":
+    events = fetch_devpost_events()
+
+    print("\nTotal events fetched:", len(events))
+
+    for e in events[:10]:
+        print("-" * 40)
+        print("Title:", e["title"])
+        print("mode:", e["mode"])
+        print("location:", e["location"])
+        print("start_date:", e["start_date"])
+        print("end_date:", e["end_date"])
+        print("URL:", e["registration_url"])

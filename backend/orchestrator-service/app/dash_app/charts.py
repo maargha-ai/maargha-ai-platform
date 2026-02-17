@@ -1,58 +1,50 @@
 import plotly.express as px
 
+THEME = dict(
+    plot_bgcolor="#E8EDFC",
+    paper_bgcolor="#FDFDFD",
+    font_color="#000000"
+)
+
 def donut_mode(df):
+    if df.empty:
+        return px.scatter(title="No data")
+
     fig = px.pie(
         df,
         names="mode",
         values="count",
-        hole=0.5,
+        hole=0.55,
+    )
+
+    fig.update_traces(
+        textposition="inside",
+        insidetextorientation="radial",
+        sort=False,
+        direction="clockwise",
+        domain=dict(x=[0, 1], y=[0, 1])   # occupy FULL graph area
     )
 
     fig.update_layout(
-        title="Event Mode",
+        title="Hackathon Mode",
         title_font=dict(size=14),
-        margin=dict(t=35, b=20),
-        font=dict(size=12),
-    )
 
-    return fig
+        # remove unused padding space
+        margin=dict(l=10, r=10, t=75, b=10),
 
+        # prevents plotly from reserving legend spacing
+        legend=dict(orientation="h", y=1.05, x=0.5, xanchor="center"),
 
-def bar_event_type(df):
-    fig = px.bar(
-        df,
-        x="event_type",
-        y="count",
-    )
-    fig.update_layout(
-        title="Events Types",
-        title_font=dict(size=14),
-        margin=dict(t=30, b=20),
-        font=dict(size=12),
-    )
-    return fig
-
-
-def bar_platform(df):
-    fig = px.bar(
-        df,
-        x="count",
-        y="platform",
-        orientation="h",
-    )
-
-    fig.update_layout(
-        title="Platforms Hosting Events",
-        title_font=dict(size=14),
-        margin=dict(t=35, b=20),
-        font=dict(size=12),
-        yaxis=dict(categoryorder="total ascending"),
+        **THEME
     )
 
     return fig
 
 
 def line_chart(df):
+    if df.empty:
+        return px.scatter(title="No data")
+
     fig = px.line(
         df,
         x="start_date",
@@ -66,14 +58,34 @@ def line_chart(df):
     )
 
     fig.update_layout(
-        title="Events Over Time",
+        title="Hackathons Over Time",
+        title_font=dict(size=14),
+        margin=dict(t=35, b=20),
+        xaxis=dict(
+            tickformat="%d %b",
+            tickangle=-45
+        ),
+        **THEME
+    )
+
+    return fig
+
+
+def bar_tags(df):
+    fig = px.bar(
+        df.sort_values("count", ascending=True),
+        x="count",
+        y="tag",
+        orientation="h",
+    )
+
+    fig.update_layout(
+        title="Popular Technologies",
         title_font=dict(size=14),
         margin=dict(t=35, b=20),
         font=dict(size=12),
-        xaxis=dict(
-            tickformat="%d %b",  
-            tickangle=-45
-        ),
+        yaxis=dict(categoryorder="total ascending"),
+        **THEME
     )
 
     return fig

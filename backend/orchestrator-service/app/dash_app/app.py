@@ -2,60 +2,47 @@ from dash import Dash, html, dcc, Input, Output, dash_table
 import pandas as pd
 
 from app.dash_app.data import load_events
-from app.dash_app.transforms import filter_events, group_count
-from app.dash_app.charts import *
+from app.dash_app.transforms import filter_events, events_per_day, events_by_mode, events_by_tags
+from app.dash_app.charts import donut_mode, line_chart, bar_tags
 
-df = load_events()
-df["month"] = pd.to_datetime(df["start_date"]).dt.strftime("%B")
-df["day"] = pd.to_datetime(df["start_date"]).dt.day
 
 app = Dash(__name__)
 
+
+# ========================= LAYOUT =========================
 app.layout = html.Div(
     className="dash-root",
     children=[
 
-        html.H3("Global Tech Events", className="dash-title"),
+        html.H3("Global Hackathons", className="dash-title"),
 
         # ---------- FILTERS ----------
         html.Div(
             className="dash-filters",
             children=[
                 dcc.Dropdown(
-                    id="event-type-filter",
-                    options=[{"label": e, "value": e} for e in sorted(df["event_type"].unique())],
-                    multi=True,
-                    placeholder="Event type",
-                ),
-                dcc.Dropdown(
                     id="mode-filter",
-                    options=[{"label": m, "value": m} for m in sorted(df["mode"].unique())],
                     multi=True,
                     placeholder="Mode",
                 ),
-                dcc.DatePickerRange(
-                    id="date-filter",
-                    start_date=df["start_date"].min(),
-                    end_date=df["start_date"].max(),
-                ),
+                dcc.DatePickerRange(id="date-filter"),
             ],
         ),
 
-        # ---------- CHARTS ROW 1 ----------
+        # ---------- TOP FULL WIDTH LINE ----------
         html.Div(
-            className="dash-grid-2",
+            className="dash-grid-1",
             children=[
-                dcc.Graph(id="mode-chart"),
-                dcc.Graph(id="type-chart"),
-            ],
-        ),
-
-        # ---------- CHARTS ROW 2 ----------
-        html.Div(
-            className="dash-grid-2",
-            children=[
-                dcc.Graph(id="platform-chart"),
                 dcc.Graph(id="date-chart"),
+            ],
+        ),
+
+        # ---------- SECOND ROW ----------
+        html.Div(
+            className="dash-grid-tags",
+            children=[
+                html.Div(dcc.Graph(id="mode-chart"), className="donut-box"),
+                html.Div(dcc.Graph(id="tag-chart"), className="tag-box"),
             ],
         ),
 
@@ -67,26 +54,18 @@ app.layout = html.Div(
                     id="event-table",
                     columns=[
                         {"name": "Title", "id": "title"},
-                        {"name": "Type", "id": "event_type"},
                         {"name": "Mode", "id": "mode"},
-                        {"name": "Month", "id": "month"},
-                        {"name": "Day", "id": "day"},
-                        {
-                            "name": "Apply",
-                            "id": "registration_url",
-                            "presentation": "markdown",
-                        },
+                        {"name": "Start Date", "id": "start_date"},
+                        {"name": "End Date", "id": "end_date"},
+                        {"name": "Apply", "id": "registration_url", "presentation": "markdown"},
                     ],
                     page_size=8,
                     style_as_list_view=True,
                     style_cell={
                         "fontSize": "13px",
                         "padding": "6px",
-                        "whiteSpace": "normal",
                         "textAlign": "left",
-                    },
-                    style_header={
-                        "fontWeight": "600",
+                        "whiteSpace": "normal",
                     },
                 )
             ],
@@ -95,50 +74,70 @@ app.layout = html.Div(
 )
 
 
-# ---------------- CALLBACK ----------------
+# ========================= INITIAL FILTER LOAD =========================
+@app.callback(
+    Output("mode-filter", "options"),
+    Output("date-filter", "start_date"),
+    Output("date-filter", "end_date"),
+    Input("date-filter", "id"),
+)
+def init_filters(_):
+    df = load_events()
+
+    df["start_date"] = pd.to_datetime(df["start_date"])
+
+    return (
+        [{"label": m, "value": m} for m in sorted(df["mode"].dropna().unique())],
+        df["start_date"].min().strftime("%Y-%m-%d"),
+        df["start_date"].max().strftime("%Y-%m-%d"),
+    )
+
+
+# ========================= MAIN DASHBOARD UPDATE =========================
 @app.callback(
     Output("mode-chart", "figure"),
-    Output("type-chart", "figure"),
-    Output("platform-chart", "figure"),
+    Output("tag-chart", "figure"),
     Output("date-chart", "figure"),
     Output("event-table", "data"),
-    Input("event-type-filter", "value"),
     Input("mode-filter", "value"),
     Input("date-filter", "start_date"),
     Input("date-filter", "end_date"),
 )
-def update_dashboard(event_types, modes, start, end):
-    # 1️⃣ Filter data
-    filtered = filter_events(df, event_types, modes, start, end)
+def update_dashboard(modes, start, end):
 
-    # 2️⃣ Prepare table data (IMPORTANT)
+    df = load_events()
+
+    # ensure datetime (IMPORTANT)
+    df["start_date"] = pd.to_datetime(df["start_date"])
+    df["end_date"] = pd.to_datetime(df["end_date"])
+
+    # apply filters
+    filtered = filter_events(df, modes, start, end)
+
+    # ---------- TABLE ----------
     table_df = filtered.copy()
 
+    # format dates nicely
+    table_df["start_date"] = pd.to_datetime(table_df["start_date"]).dt.strftime("%d %b %Y")
+    table_df["end_date"] = pd.to_datetime(table_df["end_date"]).dt.strftime("%d %b %Y")
+
+    # apply link
     table_df["registration_url"] = table_df["registration_url"].apply(
         lambda x: f"[Apply]({x})"
     )
 
-    table_columns = [
-        "title",
-        "event_type",
-        "mode",
-        "month",
-        "day",
-        "registration_url",
-    ]
+    table_data = table_df[
+        ["title", "mode", "start_date", "end_date", "registration_url"]
+    ].to_dict("records")
 
-    table_data = table_df[table_columns].to_dict("records")
+    # ---------- CHARTS ----------
+    mode_fig = donut_mode(events_by_mode(filtered))
+    tag_fig = bar_tags(events_by_tags(filtered))
+    date_fig = line_chart(events_per_day(filtered))
 
-    # 3️⃣ Return charts + table
-    return (
-        donut_mode(group_count(filtered, "mode")),
-        bar_event_type(group_count(filtered, "event_type")),
-        bar_platform(group_count(filtered, "platform")),
-        line_chart(group_count(filtered, "start_date")),
-        table_data,
-    )
+    return mode_fig, tag_fig, date_fig, table_data
 
 
-
+# ========================= RUN =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8050, debug=True)
