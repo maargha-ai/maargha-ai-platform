@@ -6,7 +6,9 @@ import {
   User,
   Bot,
   Mic,
-  Send
+  Send,
+  Cpu,
+  Target
 } from "lucide-react";
 import { useTheme } from "../components/ThemeProvider";
 import { Button } from "../components/ui/button";
@@ -241,12 +243,10 @@ export default function OrchestratorChat() {
           </div>
         </header>
 
-        {/* Scrollable messages area */}
-        <div 
-          className="flex-1 overflow-y-auto custom-scroll px-4 py-6" 
-          ref={scrollRef}
-        >
-          <div className="max-w-4xl mx-auto space-y-6">
+        {/* Chat Area - Full Width */}
+        <div className="orchestrator-chat-full">
+          {/* Scrollable messages area */}
+          <div className="messages-area" ref={scrollRef}>
             {messages.map((m, i) => (
               <div key={i} className={`msg-wrapper ${m.role === 'assistant' ? 'ai' : 'user'}`}>
                 <div className="msg-avatar">
@@ -297,43 +297,43 @@ export default function OrchestratorChat() {
               </div>
             )}
           </div>
-        </div>
 
-        <footer className="orch-footer">
-          <div className="input-container glass-morphism">
-            <textarea
-              placeholder="Message Maargha Orchestrator..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage();
-                }
-              }}
-              rows={1}
-            />
-            <div className="input-actions flex items-center gap-2">
-              <button
-                className={`mic-btn ${liveMode ? 'active' : ''}`}
-                onClick={toggleLiveMode}
-                title="Voice Mode"
-              >
-                <Mic size={18} />
-              </button>
-              <button
-                className={`send-btn ${input.trim() ? 'active' : ''}`}
-                onClick={sendMessage}
-                disabled={!input.trim()}
-              >
-                <Send size={18} />
-              </button>
+          <footer className="orch-footer">
+            <div className="input-container glass-morphism">
+              <textarea
+                placeholder="Message Maargha Orchestrator..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                  }
+                }}
+                rows={1}
+              />
+              <div className="input-actions flex items-center gap-2">
+                <button
+                  className={`mic-btn ${liveMode ? 'active' : ''}`}
+                  onClick={toggleLiveMode}
+                  title="Voice Mode"
+                >
+                  <Mic size={18} />
+                </button>
+                <button
+                  className={`send-btn ${input.trim() ? 'active' : ''}`}
+                  onClick={sendMessage}
+                  disabled={!input.trim()}
+                >
+                  <Send size={18} />
+                </button>
+              </div>
             </div>
-          </div>
-          <p className="footer-note">
-            Maargha AI may provide inaccurate info. Verify important career steps.
-          </p>
-        </footer>
+            <p className="footer-note">
+              Maargha AI may provide inaccurate info. Verify important career steps.
+            </p>
+          </footer>
+        </div>
       </main>
 
       <VoiceModal

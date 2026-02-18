@@ -4,3 +4,17 @@ python-dotenv==1.2.1
 djangorestframework==3.16.1
 djangorestframework-simplejwt==5.5.1
 django-cors-headers==4.9.0
+gunicorn==21.2.0
+pytest==8.2.0
+pytest-django==4.8.0
+pytest-cov==5.0.0
+pytest-mock==3.14.0
+black==24.4.2
+isort==5.13.2
+flake8==7.0.0
+mypy==1.8.0
+bandit==1.7.6
+pydocstyle==6.3.0
+autoflake==2.3.1
+pre-commit==3.7.0
+structlog==24.1.0

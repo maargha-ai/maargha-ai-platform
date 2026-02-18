@@ -570,3 +570,226 @@
   margin-left: 0 !important;
 }
 
+/* Orchestrator Feature Box Styles */
+.orchestrator-chat-full {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.orchestrator-content-wrapper {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.orchestrator-container {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.orchestrator-feature-section {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.orchestrator-feature-sidebar {
+  width: 280px;
+  max-width: 280px;
+  flex-shrink: 0;
+}
+
+.orchestrator-chat-engine {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+.orchestrator-feature-box {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  backdrop-filter: blur(14px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.orchestrator-feature-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+  border-color: hsl(var(--border));
+}
+
+.orchestrator-feature-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.orchestrator-feature-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: hsl(var(--card-foreground));
+  margin: 0;
+}
+
+.orchestrator-feature-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.orchestrator-feature-description {
+  color: hsl(var(--card-foreground));
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.orchestrator-feature-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.orchestrator-feature-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: hsl(var(--card-foreground));
+}
+
+.feature-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: hsl(var(--card-foreground));
+}
+
+.orchestrator-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.step p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: hsl(var(--card-foreground));
+}
+
+.orchestrator-feature-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: step-counter;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.orchestrator-feature-steps li {
+  counter-increment: step-counter;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  color: hsl(var(--foreground));
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.orchestrator-feature-steps li::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #8b5cf6;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.orchestrator-feature-steps li:hover {
+  background: hsl(var(--secondary) / 30%);
+  transform: translateX(4px);
+}
+
+.orchestrator-feature-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid hsl(var(--border) / 30%);
+}
+
+.orchestrator-feature-tip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, hsl(var(--secondary) / 20%), hsl(var(--secondary) / 10%));
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: hsl(var(--foreground));
+  transition: all 0.2s ease;
+}
+
+.orchestrator-feature-tip:hover {
+  background: linear-gradient(135deg, hsl(var(--secondary) / 30%), hsl(var(--secondary) / 20%));
+  transform: scale(1.02);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+

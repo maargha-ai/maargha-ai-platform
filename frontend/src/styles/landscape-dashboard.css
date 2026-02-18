@@ -144,6 +144,7 @@
     fill: none;
     stroke-linecap: round;
     filter: drop-shadow(0 0 12px hsla(var(--primary) / 40%));
+    transition: stroke-dashoffset 0.1s ease;
 }
 
 .map-node {

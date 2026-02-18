@@ -289,7 +289,6 @@ export default function Dashboard() {
               </motion.div>
             );
           })}
-          <div style={{ paddingBottom: '100px', width: '100%' }}></div>
         </div>
       </div>
       <div className="dashboard-hud">

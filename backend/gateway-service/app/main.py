@@ -8,11 +8,19 @@ from app.routes import (
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.middleware import logging_middleware
 from app.core.logger import logger
+import time
+
+# Import monitoring and logging
+from app.monitoring.logger import LoggingMiddleware, performance_monitor, gateway_logger
+from app.monitoring.health import router as health_router
 
 app = FastAPI(title="MAARGHA Gateway")
 
 # Middleware
 app.middleware("http")(logging_middleware)
+
+# Add structured logging middleware
+app.add_middleware(LoggingMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,6 +29,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include health check endpoints
+app.include_router(health_router)
 
 app.include_router(auth.router)
 app.include_router(orchestrator_ws.router)
@@ -35,7 +46,6 @@ app.include_router(linkedin.router)
 app.include_router(tutor_ws.router)
 app.include_router(cv.router)
 app.include_router(resume_parser.router)
-
 
 # Monitoring
 Instrumentator().instrument(app).expose(app)
