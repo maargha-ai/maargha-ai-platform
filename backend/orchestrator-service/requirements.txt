@@ -20,7 +20,6 @@ pydub==0.25.1
 pypdf2==3.0.1
 langgraph==1.0.4
 asyncpg==0.31.0
-uvicorn[standard]==3.11
 python-multipart==0.0.20
 feedparser==6.0.12
 opencv-python==4.12.0.88
