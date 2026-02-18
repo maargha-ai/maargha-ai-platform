@@ -1,6 +1,6 @@
 uvicorn==0.38.0
 fastapi==0.124.2
-groq-0.37.1
+groq==0.37.1
 dotenv==0.9.9
 gtts==2.5.4
 pillow==11.3.0
