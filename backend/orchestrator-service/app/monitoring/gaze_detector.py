@@ -41,12 +41,15 @@ def is_looking_away(frame_b64: str) -> bool:
         return True
 
     rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    mp_image_packet = mp.packet_creator.create_image(rgb)
+    
+    # Create MediaPipe Image object properly
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
 
     try:
-        result = _landmarker.detect(mp_image_packet)
-    except Exception:
+        result = _landmarker.detect(mp_image)
+    except Exception as e:
         # Model hiccup on a single frame should not trigger malpractice.
+        print(f"MediaPipe detection error: {e}")
         return False
 
     if not result.face_landmarks:
@@ -64,7 +67,8 @@ def is_looking_away(frame_b64: str) -> bool:
         right_upper = lm[386]
         right_lower = lm[374]
         nose = lm[1]
-    except Exception:
+    except Exception as e:
+        print(f"Error accessing landmarks: {e}")
         return False
 
     # Face box too small -> likely far/out of frame
@@ -73,7 +77,19 @@ def is_looking_away(frame_b64: str) -> bool:
     face_w = max(xs) - min(xs)
     face_h = max(ys) - min(ys)
     face_area = face_w * face_h
-    if face_area < 0.008:
+    
+    # More sensitive face area threshold (increased from 0.008)
+    if face_area < 0.012:
+        return True
+    
+    # Check if face is too close to edges (partial face view)
+    min_x = min(xs)
+    max_x = max(xs)
+    min_y = min(ys)
+    max_y = max(ys)
+    
+    # Face too close to any edge indicates partial view
+    if min_x < 0.05 or max_x > 0.95 or min_y < 0.05 or max_y > 0.95:
         return True
 
     # Eye openness ratio (very low on both eyes means closed/covered/not visible)
@@ -93,14 +109,22 @@ def is_looking_away(frame_b64: str) -> bool:
     inter_eye = np.linalg.norm(eye_center_left - eye_center_right)
     head_turned = inter_eye < 0.04
 
-    # Nose off-center -> looking away or mostly out of frame
-    off_center = nose.x < 0.14 or nose.x > 0.86 or nose.y < 0.08 or nose.y > 0.92
+    # More sensitive nose off-center detection (expanded thresholds)
+    off_center = nose.x < 0.20 or nose.x > 0.80 or nose.y < 0.10 or nose.y > 0.90
 
     # Strong eye occlusion signal.
     if eyes_hidden_strong:
         return True
 
-    # Medium-confidence conditions require corroboration to avoid false positives.
+    # More aggressive detection - any single condition should trigger
+    if eyes_hidden:
+        return True
+    if head_turned:
+        return True
+    if off_center:
+        return True
+
+    # Combined conditions for higher confidence
     if eyes_hidden and off_center:
         return True
     if head_turned and off_center:

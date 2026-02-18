@@ -2,6 +2,7 @@ from fastapi import WebSocket
 import json
 import asyncio
 import time
+import logging
 from collections import defaultdict, deque
 
 from app.quiz.service import generate_quiz_direct, generate_fallback_question
@@ -129,8 +130,10 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
 
                 try:
                     away = await asyncio.to_thread(is_looking_away, frame)
-                except Exception:
+                    logging.info(f"User {user_id}: Gaze detection result - away={away}")
+                except Exception as e:
                     away = False
+                    logging.error(f"User {user_id}: Gaze detection error - {str(e)}")
 
                 if away:
                     state["away_streak"] += 1
@@ -138,7 +141,8 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                     # Require sustained suspicious frames to reduce false positives.
                     if state["away_streak"] < 3:
                         continue
-                    state["away_streak"] = 0
+                    # Don't reset away_streak immediately - allow for continued violation detection
+                    # state["away_streak"] = 0  # Commented out to allow proper accumulation
 
                     # Cooldown between warning increments.
                     if now - state["last_warning_ts"] < 4.0:
@@ -146,8 +150,12 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                     state["last_warning_ts"] = now
 
                     warnings = state["violation_tracker"].register_violation()
+                    # Reset away_streak after registering a violation to prevent multiple rapid violations
+                    state["away_streak"] = 0
+                    logging.warning(f"User {user_id}: Violation registered - warnings={warnings}")
 
                     if state["violation_tracker"].should_terminate():
+                        logging.error(f"User {user_id}: Quiz terminated due to repeated malpractice")
                         if not state["finalized"]:
                             state["finalized"] = True
                             await websocket.send_text(json.dumps({
@@ -162,8 +170,10 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                     state["away_streak"] = 0
                     state["good_streak"] += 1
                     # Decay one warning after sustained attentive frames.
-                    if state["good_streak"] >= 3 and state["violation_tracker"].warnings > 0:
-                        state["violation_tracker"].reset()
+                    if state["good_streak"] >= 10 and state["violation_tracker"].warnings > 0:  # Increased from 3 to 10
+                        old_warnings = state["violation_tracker"].warnings
+                        state["violation_tracker"].decay_warning()  # Use decay_warning instead of reset
+                        logging.info(f"User {user_id}: Warning decayed from {old_warnings} to {state['violation_tracker'].warnings}")
                         state["good_streak"] = 0
 
             elif msg_type == "stop_quiz":

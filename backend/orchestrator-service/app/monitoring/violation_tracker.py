@@ -15,3 +15,7 @@ class ViolationTracker:
     
     def reset(self):
         self.warnings = max(0, self.warnings - 1)
+    
+    def decay_warning(self):
+        """Gradually decay warnings by 1, but never below 0"""
+        self.warnings = max(0, self.warnings - 1)

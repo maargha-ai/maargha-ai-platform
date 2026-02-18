@@ -6,14 +6,380 @@
     display: flex;
     flex-direction: column;
 }
+
+.career-top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: hsl(var(--background));
+    border-bottom: 1px solid hsl(var(--border) / 50%);
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    z-index: 100;
+}
+
+.career-content-wrapper {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    margin-top: 60px;
+}
+
+.career-feature-sidebar {
+    width: 320px;
+    padding: 1rem;
+    background: hsl(var(--background));
+    border-right: 1px solid hsl(var(--border) / 30%);
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.career-feature-box {
+    background: linear-gradient(135deg, hsl(var(--card) / 95%), hsl(var(--card) / 85%));
+    border: 1px solid hsl(var(--border) / 50%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.career-feature-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #8b5cf6, #7c3aed, #8b5cf6);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+.career-feature-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+    border-color: hsl(var(--border) / 80%);
+}
+
+.career-feature-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid hsl(var(--border) / 30%);
+}
+
+.career-feature-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    margin: 0;
+}
+
+.career-feature-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.career-feature-description {
+    color: hsl(var(--muted-foreground));
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.career-feature-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.career-feature-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    margin: 0 0 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.career-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.career-feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    color: hsl(var(--foreground));
+    font-size: 0.9rem;
+}
+
+.career-feature-list li:hover {
+    background: hsl(var(--secondary) / 50%);
+    transform: translateX(4px);
+}
+
+.career-feature-icon {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: hsl(var(--secondary) / 30%);
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.career-feature-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: step-counter;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.career-feature-steps li {
+    counter-increment: step-counter;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.25rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    color: hsl(var(--foreground));
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.career-feature-steps li::before {
+    content: counter(step-counter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #8b5cf6;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.career-feature-steps li:hover {
+    background: hsl(var(--secondary) / 30%);
+    transform: translateX(4px);
+}
+
+.career-feature-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid hsl(var(--border) / 30%);
+}
+
+.career-feature-tip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, hsl(var(--secondary) / 20%), hsl(var(--secondary) / 10%));
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: hsl(var(--foreground));
+    transition: all 0.2s ease;
+}
+
+.career-feature-tip:hover {
+    background: linear-gradient(135deg, hsl(var(--secondary) / 30%), hsl(var(--secondary) / 20%));
+    transform: scale(1.02);
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
 .career-container {
-    max-width: 900px;
-    margin: 0 auto;
-    width: 100%;
-    padding: 2rem;
+    display: flex;
+    gap: 2rem;
+}
+
+.career-prediction-box {
+    width: 320px;
+    padding: 1rem;
+    background: hsl(var(--background));
+    border-right: 1px solid hsl(var(--border) / 30%);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.career-prediction-box {
+    background: linear-gradient(135deg, hsl(var(--card) / 95%), hsl(var(--card) / 85%));
+    border: 1px solid hsl(var(--border) / 50%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.career-prediction-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #8b5cf6, #7c3aed, #8b5cf6);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+.career-prediction-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+    border-color: hsl(var(--border) / 80%);
+}
+
+.career-prediction-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid hsl(var(--border) / 30%);
+}
+
+.career-prediction-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    margin: 0;
+}
+
+.career-prediction-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.career-prediction-description {
+    color: hsl(var(--muted-foreground));
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.career-prediction-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.career-prediction-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    margin: 0 0 0.75rem 0;
+}
+
+.career-prediction-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: step-counter;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.career-prediction-steps li {
+    counter-increment: step-counter;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.25rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    color: hsl(var(--foreground));
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.career-prediction-steps li::before {
+    content: counter(step-counter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #8b5cf6;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.career-prediction-steps li:hover {
+    background: hsl(var(--secondary) / 30%);
+    transform: translateX(4px);
+}
+
+.career-prediction-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid hsl(var(--border) / 30%);
+}
+
+.career-prediction-tip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, hsl(var(--secondary) / 20%), hsl(var(--secondary) / 10%));
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: hsl(var(--foreground));
+    transition: all 0.2s ease;
+}
+
+.career-prediction-tip:hover {
+    background: linear-gradient(135deg, hsl(var(--secondary) / 30%), hsl(var(--secondary) / 20%));
+    transform: scale(1.02);
+}
+
+.career-discovery-engine {
     flex: 1;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
 }
 .career-header {

@@ -25,6 +25,9 @@ export default function LinkedInAssistant() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const scrollTimeoutRef = useRef(null);
+  
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const ws = new WebSocket(
@@ -41,11 +44,38 @@ export default function LinkedInAssistant() {
     ws.onerror = () => setIsTyping(false);
     return () => ws.close();
   }, []);
+  
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      // Only auto-scroll if user is not manually scrolling
+      if (!isUserScrolling) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
     }
-  }, [messages, isTyping]);
+  }, [messages, isTyping, isUserScrolling]);
+  
+  const handleWheel = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop += e.deltaY;
+    }
+  };
+  
+  const handleScroll = () => {
+    setIsUserScrolling(true);
+    
+    // Clear existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    // Reset user scrolling flag after 1 second of inactivity
+    scrollTimeoutRef.current = setTimeout(() => {
+      setIsUserScrolling(false);
+    }, 1000);
+  };
   const send = () => {
     if (!input.trim()) return;
     setMessages(prev => [...prev, { role: "user", text: input }]);
@@ -83,7 +113,43 @@ export default function LinkedInAssistant() {
           </div>
         </header>
         {}
-        <div className="li-chat-viewport" ref={scrollRef}>
+        <div className="li-content-wrapper">
+          <aside className="li-feature-sidebar">
+            <div className="li-feature-box">
+              <div className="li-feature-header">
+                <Linkedin size={24} className="text-blue-600" />
+                <h3>LinkedIn Growth AI</h3>
+              </div>
+              
+              <div className="li-feature-content">
+                <p className="li-feature-description">
+                  AI-powered LinkedIn assistant for professional growth.
+                </p>
+                
+                <div className="li-feature-sections">
+                  <div className="li-feature-section">
+                    <h4>How to Use</h4>
+                    <ol className="li-feature-steps">
+                      <li>Type your request</li>
+                      <li>Get AI suggestions</li>
+                      <li>Copy and implement</li>
+                      <li>Watch LinkedIn grow!</li>
+                    </ol>
+                  </div>
+                </div>
+                
+                <div className="li-feature-footer">
+                  <div className="li-feature-tip">
+                    <Sparkles size={16} className="text-yellow-500" />
+                    <span>Pro tip: Be specific for better results!</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+          
+          <div className="li-chat-container">
+            <div className="li-chat-viewport" ref={scrollRef} onScroll={handleScroll} onWheel={handleWheel}>
           {messages.length === 0 && (
             <div className="li-welcome">
                <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -112,7 +178,35 @@ export default function LinkedInAssistant() {
                 {m.role === 'assistant' ? <Bot size={20} /> : <User size={20} />}
               </div>
               <div className="li-bubble markdown">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} components={{p: ({ children }) => <p className="mb-2">{children}</p>}}>{m.text}</ReactMarkdown>
+                <ReactMarkdown 
+                  remarkPlugins={[remarkGfm]} 
+                  components={{
+                    p: ({ children }) => <p className="m-0 leading-none">{children}</p>,
+                    ul: ({ children }) => <ul className="m-0 pl-6 list-disc">{children}</ul>,
+                    li: ({ children }) => {
+                      // Check if this is a list item with strong text followed by text
+                      const text = String(children);
+                      const hasStrongAndText = text.includes('<strong>') && text.includes('</strong>') && 
+                                            text.replace(/<[^>]*>/g, '').includes(':');
+                      
+                      if (hasStrongAndText) {
+                        return (
+                          <li className="m-0 leading-none">
+                            <span dangerouslySetInnerHTML={{ 
+                              __html: text.replace(/<strong>(.*?)<\/strong>(.*)/, 
+                                '<strong class="font-semibold mr-1">$1</strong>$2') 
+                            }} />
+                          </li>
+                        );
+                      }
+                      
+                      return <li className="m-0 leading-none">{children}</li>;
+                    },
+                    strong: ({ children }) => <strong className="font-semibold mr-1">{children}</strong>
+                  }}
+                >
+                  {m.text}
+                </ReactMarkdown>
               </div>
             </div>
           ))}
@@ -152,6 +246,8 @@ export default function LinkedInAssistant() {
             </div>
           </div>
         </footer>
+      </div>
+      </div>
       </main>
     </div>
   );

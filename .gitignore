@@ -5,3 +5,7 @@ maarghaenv*
 *.mp4
 *.pdf
 
+proof-of-concept/**/models/
+proof-of-concept/**/vectordb/
+*.faiss
+*.pkl

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, Query
+from fastapi import APIRouter, WebSocket, Query, WebSocketDisconnect
 from jose import jwt
 import websockets
 import asyncio
@@ -22,13 +22,31 @@ async def quiz_ws(websocket: WebSocket, token: str = Query(...)):
     orch_ws = await websockets.connect(quiz_ws_url)
 
     async def frontend_to_backend():
-        while True:
-            msg = await websocket.receive_text()
-            await orch_ws.send(msg)
+        try:
+            while True:
+                msg = await websocket.receive_text()
+                await orch_ws.send(msg)
+        except WebSocketDisconnect:
+            return
+        except Exception:
+            return
 
     async def backend_to_frontend():
-        while True:
-            msg = await orch_ws.recv()
-            await websocket.send_text(msg)
+        try:
+            while True:
+                msg = await orch_ws.recv()
+                await websocket.send_text(msg)
+        except Exception:
+            return
 
-    await asyncio.gather(frontend_to_backend(), backend_to_frontend())
+    t1 = asyncio.create_task(frontend_to_backend())
+    t2 = asyncio.create_task(backend_to_frontend())
+
+    done, pending = await asyncio.wait({t1, t2}, return_when=asyncio.FIRST_COMPLETED)
+    for t in pending:
+        t.cancel()
+
+    try:
+        await orch_ws.close()
+    except Exception:
+        pass
