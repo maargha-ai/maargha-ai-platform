@@ -5,7 +5,7 @@ djangorestframework==3.16.1
 djangorestframework-simplejwt==5.5.1
 django-cors-headers==4.9.0
 gunicorn==21.2.0
-pytest==8.2.0
+pytest==8.2.2
 pytest-django==4.8.0
 pytest-cov==5.0.0
 pytest-mock==3.14.0
