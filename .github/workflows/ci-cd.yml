@@ -160,6 +160,11 @@ jobs:
       with:
         python-version: '3.11'
         
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y portaudio19-dev python3-pyaudio ffmpeg libsndfile1
+
     - name: Install dependencies
       working-directory: ./backend/orchestrator-service
       run: |
