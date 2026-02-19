@@ -81,14 +81,14 @@ def get_retriever():
 async def ask_tutor(question: str) -> str:
     retriever = get_retriever()
 
-    # 1️⃣ Retrieve context
+    # Retrieve context
     docs = retriever.invoke(question)
     context = "\n\n".join(doc.page_content for doc in docs)
 
-    # 2️⃣ Build prompt
+    # Build prompt
     prompt = PROMPT_TEMPLATE.format(question=question, context=context)
 
-    # 3️⃣ Call LLM (same style as roadmap_chain)
+    # Call LLM (same style as roadmap_chain)
     response = await llm.ainvoke([HumanMessage(content=prompt)])
 
     return response.content
