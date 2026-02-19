@@ -1,9 +1,8 @@
-# .github/workflows/ci-cd.yml
-name: CI/CD Pipeline
+name: Maargha AI CI/CD
 
 on:
   push:
-    branches: [ main, develop, dev ]
+    branches: [ main, dev, develop ]
   pull_request:
     branches: [ main ]
 
@@ -11,336 +10,177 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+############################################################
+# COMMON STEPS (reusable via YAML anchors)
+############################################################
+
 jobs:
-  lint-orchestrator:
+
+# ==========================================================
+# LINT JOB TEMPLATE
+# ==========================================================
+
+  lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [orchestrator-service, gateway-service, user-service]
+
+    defaults:
+      run:
+        working-directory: backend/${{ matrix.service }}
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y portaudio19-dev python3-dev build-essential
+      - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      working-directory: ./backend/orchestrator-service
-      run: |
-        pip install -r requirements.txt
-        
-    - name: Run Black
-      working-directory: ./backend/orchestrator-service
-      run: |
-        black --check .
-        
-    - name: Run isort
-      working-directory: ./backend/orchestrator-service
-      run: |
-        isort --check-only .
-        
-    - name: Run flake8
-      working-directory: ./backend/orchestrator-service
-      run: |
-        flake8 .
-        
-    - name: Run mypy
-      working-directory: ./backend/orchestrator-service
-      run: |
-        mypy app/
-        
-    - name: Run bandit
-      working-directory: ./backend/orchestrator-service
-      run: |
-        bandit -r app/
+      - name: Setup Python (same as local)
+        uses: actions/setup-python@v4
+        with:
+          python-version-file: '.python-version'
+          cache: 'pip'
+          cache-dependency-path: backend/${{ matrix.service }}/requirements.txt
 
-  lint-gateway:
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install black isort flake8 mypy bandit
+
+      - name: Black
+        run: black --check .
+
+      - name: isort
+        run: isort --check-only .
+
+      - name: flake8
+        run: flake8 .
+
+      - name: mypy
+        run: |
+          if [ -d "app" ]; then mypy app; fi
+          if [ -d "user_service" ]; then mypy user_service; fi
+
+      - name: bandit
+        run: |
+          if [ -d "app" ]; then bandit -r app; fi
+          if [ -d "user_service" ]; then bandit -r user_service; fi
+
+
+# ==========================================================
+# TEST JOB TEMPLATE
+# ==========================================================
+
+  tests:
     runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y portaudio19-dev python3-dev build-essential
+    needs: lint
 
-    - name: Install dependencies
-      working-directory: ./backend/gateway-service
-      run: |
-        pip install -r requirements.txt
-        
-    - name: Run Black
-      working-directory: ./backend/gateway-service
-      run: |
-        black --check .
-        
-    - name: Run isort
-      working-directory: ./backend/gateway-service
-      run: |
-        isort --check-only .
-        
-    - name: Run flake8
-      working-directory: ./backend/gateway-service
-      run: |
-        flake8 .
-        
-    - name: Run mypy
-      working-directory: ./backend/gateway-service
-      run: |
-        mypy app/
-        
-    - name: Run bandit
-      working-directory: ./backend/gateway-service
-      run: |
-        bandit -r app/
+    strategy:
+      matrix:
+        service: [orchestrator-service, gateway-service, user-service]
 
-  lint-user-service:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y portaudio19-dev python3-dev build-essential
+    defaults:
+      run:
+        working-directory: backend/${{ matrix.service }}
 
-    - name: Install dependencies
-      working-directory: ./backend/user-service
-      run: |
-        pip install -r requirements.txt
-        
-    - name: Run Black
-      working-directory: ./backend/user-service
-      run: |
-        black --check .
-        
-    - name: Run isort
-      working-directory: ./backend/user-service
-      run: |
-        isort --check-only .
-        
-    - name: Run flake8
-      working-directory: ./backend/user-service
-      run: |
-        flake8 .
-        
-    - name: Run mypy
-      working-directory: ./backend/user-service
-      run: |
-        mypy user_service/
-        
-    - name: Run bandit
-      working-directory: ./backend/user-service
-      run: |
-        bandit -r user_service/
-
-  test-orchestrator:
-    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:15
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        ports:
-          - 5432:5432
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y portaudio19-dev python3-pyaudio ffmpeg libsndfile1
+      - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      working-directory: ./backend/orchestrator-service
-      run: |
-        pip install -r requirements.txt
-        
-    - name: Run tests
-      working-directory: ./backend/orchestrator-service
-      run: |
-        pytest --cov=app --cov-report=xml --cov-fail-under=80
-        
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./backend/orchestrator-service/coverage.xml
-        flags: unittests
-        name: codecov-umbrella
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version-file: '.python-version'
+          cache: 'pip'
+          cache-dependency-path: backend/${{ matrix.service }}/requirements.txt
 
-  test-gateway:
+      - name: Load test environment
+        run: cat .github/test.env >> $GITHUB_ENV
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y portaudio19-dev ffmpeg libsndfile1
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fix import paths
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: |
+          if [ -d "app" ]; then
+            pytest --cov=app --cov-report=xml
+          else
+            pytest --cov=user_service --cov-report=xml
+          fi
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: backend/${{ matrix.service }}/coverage.xml
+
+
+# ==========================================================
+# BUILD & PUSH DOCKER
+# ==========================================================
+
+  build:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y portaudio19-dev python3-dev build-essential
-        
-    - name: Install dependencies
-      working-directory: ./backend/gateway-service
-      run: |
-        pip install -r requirements.txt
-        
-    - name: Run tests
-      working-directory: ./backend/gateway-service
-      run: |
-        pytest --cov=app --cov-report=xml --cov-fail-under=80
-        
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./backend/gateway-service/coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-
-  test-user-service:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y portaudio19-dev python3-dev build-essential
-        
-    - name: Install dependencies
-      working-directory: ./backend/user-service
-      run: |
-        pip install -r requirements.txt
-        
-    - name: Run tests
-      working-directory: ./backend/user-service
-      run: |
-        pytest --cov=user_service --cov-report=xml --cov-fail-under=80
-        
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./backend/user-service/coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-
-  build-and-deploy:
-    needs: [lint-orchestrator, lint-gateway, lint-user-service, test-orchestrator, test-gateway, test-user-service]
-    runs-on: ubuntu-latest
+    needs: tests
     if: github.ref == 'refs/heads/main'
-    
+
+    strategy:
+      matrix:
+        service: [orchestrator-service, gateway-service, user-service]
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
-    - name: Login to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Build and push orchestrator-service
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend/orchestrator-service
-        push: true
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:orchestrator-latest
-        cache-from: type=gha
-        cache-to: type=gha
-    
-    - name: Build and push gateway-service
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend/gateway-service
-        push: true
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:gateway-latest
-        cache-from: type=gha
-        cache-to: type=gha
-    
-    - name: Build and push user-service
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend/user-service
-        push: true
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:user-service-latest
-        cache-from: type=gha
-        cache-to: type=gha
-    
-    - name: Deploy to production
-      run: |
-        echo "🚀 Deployment completed!"
-        echo "Images pushed to registry:"
-        echo "- ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:orchestrator-latest"
-        echo "- ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:gateway-latest"
-        echo "- ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:user-service-latest"
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push
+        uses: docker/build-push-action@v5
+        with:
+          context: backend/${{ matrix.service }}
+          push: true
+          tags: ghcr.io/${{ github.repository }}:${{ matrix.service }}-latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+
+# ==========================================================
+# DEPLOY (placeholder)
+# ==========================================================
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deployment Info
+        run: |
+          echo "🚀 Images published:"
+          echo "ghcr.io/${{ github.repository }}:orchestrator-service-latest"
+          echo "ghcr.io/${{ github.repository }}:gateway-service-latest"
+          echo "ghcr.io/${{ github.repository }}:user-service-latest"

@@ -10,7 +10,7 @@ extend-exclude = '''
   | \.hg
   | \.mypy_cache
   | \.tox
-  | \.venv
+  | \.orchesenv
   | _build
   | buck-out
   | build
@@ -58,7 +58,7 @@ exclude = [
     "__pycache__",
     "build",
     "dist",
-    ".venv",
+    ".orchesenv",
     ".eggs",
     "*.egg-info",
     "migrations"

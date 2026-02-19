@@ -10,7 +10,7 @@ extend-exclude = '''
   | \.hg
   | \.mypy_cache
   | \.tox
-  | \.venv
+  | \.env
   | _build
   | buck-out
   | build
