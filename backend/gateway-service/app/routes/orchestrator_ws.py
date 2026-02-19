@@ -1,21 +1,23 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
-from jose import jwt, JWTError
 import asyncio
-import websockets
-from app.config import settings
 import traceback
 from typing import Dict
+
+import websockets
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+from jose import JWTError, jwt
+
+from app.config import settings
 
 router = APIRouter()
 
 # Global registry: user_id → active text chat WebSocket (or None)
-active_text_chats: Dict[str, WebSocket] = {}  # thread-safe enough for async with proper locking if needed
+active_text_chats: Dict[str, WebSocket] = (
+    {}
+)  # thread-safe enough for async with proper locking if needed
+
 
 @router.websocket("/ws/chat")
-async def orchestrator_ws(
-    websocket: WebSocket,
-    token: str = Query(...)
-):
+async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
     print("\n[Gateway] Text WS connection attempt")
 
     await websocket.accept()
@@ -66,6 +68,7 @@ async def orchestrator_ws(
         return
 
     try:
+
         async def frontend_to_orchestrator():
             try:
                 while True:
@@ -118,10 +121,7 @@ async def orchestrator_ws(
 
 
 @router.websocket("/ws/chat/live")
-async def orchestrator_chat_live(
-    websocket: WebSocket,
-    token: str = Query(...)
-):
+async def orchestrator_chat_live(websocket: WebSocket, token: str = Query(...)):
     print("\n[Gateway] Live WS connection attempt")
 
     await websocket.accept()
@@ -130,9 +130,7 @@ async def orchestrator_chat_live(
 
     try:
         payload = jwt.decode(
-            token,
-            settings.JWT_SECRET,
-            algorithms=[settings.JWT_ALGORITHM]
+            token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM]
         )
         user_id = payload.get("user_id")
         print("[Gateway Live] JWT decoded, user_id =", user_id)
@@ -174,7 +172,9 @@ async def orchestrator_chat_live(
                     msg = await websocket.receive()
                 except RuntimeError as e:
                     if "disconnect message has been received" in str(e):
-                        print("[Gateway Live] Frontend already disconnected – stopping forward")
+                        print(
+                            "[Gateway Live] Frontend already disconnected – stopping forward"
+                        )
                         break
                     raise
 
@@ -210,9 +210,7 @@ async def orchestrator_chat_live(
 
     try:
         await asyncio.gather(
-            frontend_to_orch(),
-            orch_to_frontend(),
-            return_exceptions=True
+            frontend_to_orch(), orch_to_frontend(), return_exceptions=True
         )
     finally:
         try:

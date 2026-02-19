@@ -1,27 +1,28 @@
-import os
 import io
+import os
+
 import numpy as np
 import soundfile as sf
 from dotenv import load_dotenv
-from transformers import pipeline
 from groq import Groq
 from openai import OpenAI
+from transformers import pipeline
 
 load_dotenv()
 
 # Clients
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 openai_client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1"
+    api_key=os.getenv("GROQ_API_KEY"), base_url="https://api.groq.com/openai/v1"
 )
 
 # Load text emotion model ONCE
 text_emotion_pipeline = pipeline(
     "text-classification",
     model="bhadresh-savani/distilbert-base-uncased-emotion",
-    device=-1
+    device=-1,
 )
+
 
 # -----------------------------
 # TEXT EMOTION
@@ -56,7 +57,7 @@ async def transcribe_audio(audio: np.ndarray) -> str:
             model="whisper-large-v3",
             file=("speech.wav", buffer, "audio/wav"),
             language="en",
-            temperature=0.0
+            temperature=0.0,
         )
 
         return transcription.text.strip()
@@ -75,7 +76,7 @@ def generate_response(text: str, emotion: str) -> str:
         "sad": "Be deeply empathetic, gentle, and comforting.",
         "angry": "Stay calm, patient, and understanding.",
         "fear": "Be soft, reassuring, and nurturing.",
-        "neutral": "Be warm, kind, and natural."
+        "neutral": "Be warm, kind, and natural.",
     }
 
     system_prompt = (
@@ -94,10 +95,10 @@ def generate_response(text: str, emotion: str) -> str:
             model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": text}
+                {"role": "user", "content": text},
             ],
             max_tokens=120,
-            temperature=0.85
+            temperature=0.85,
         )
 
         return response.choices[0].message.content.strip()

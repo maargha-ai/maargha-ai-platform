@@ -2,6 +2,7 @@
 
 MAX_WARNINGS = 3
 
+
 class ViolationTracker:
     def __init__(self):
         self.warnings = 0
@@ -12,10 +13,10 @@ class ViolationTracker:
 
     def should_terminate(self):
         return self.warnings >= MAX_WARNINGS
-    
+
     def reset(self):
         self.warnings = max(0, self.warnings - 1)
-    
+
     def decay_warning(self):
         """Gradually decay warnings by 1, but never below 0"""
         self.warnings = max(0, self.warnings - 1)

@@ -1,16 +1,15 @@
 import asyncio
 import logging
+
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.workers.networking_events_workers.devpost_scraper import fetch_devpost_events
-from app.models.event import Event
 from app.db.database import AsyncSessionLocal
-
+from app.models.event import Event
+from app.workers.networking_events_workers.devpost_scraper import fetch_devpost_events
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s"
+    level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s"
 )
 
 logger = logging.getLogger("event_refresh")

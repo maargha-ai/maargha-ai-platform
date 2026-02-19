@@ -1,6 +1,9 @@
 import uuid
+
 from fastapi import Request
+
 from app.core.logger import logger
+
 
 async def logging_middleware(request: Request, call_next):
     request_id = str(uuid.uuid4())

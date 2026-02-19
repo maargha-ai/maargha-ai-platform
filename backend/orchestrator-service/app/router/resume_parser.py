@@ -1,8 +1,10 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, File, UploadFile
+
 from app.chains.resume_parser_chain import extract_resume_entities
 from app.utils.pdf_reader import extract_text_from_pdf
 
 router = APIRouter(prefix="/resume", tags=["Resume Parsing"])
+
 
 @router.post("/parse")
 async def parse_resume(file: UploadFile = File(...)):
@@ -14,7 +16,4 @@ async def parse_resume(file: UploadFile = File(...)):
 
     entities = extract_resume_entities(text)
 
-    return {
-        "status": "success",
-        "entities": entities
-    }
+    return {"status": "success", "entities": entities}

@@ -1,20 +1,21 @@
-from fastapi import APIRouter, WebSocket, Query
-from jose import jwt
-import websockets
 import asyncio
+
+import websockets
+from fastapi import APIRouter, Query, WebSocket
+from jose import jwt
+
 from app.config import settings
 from app.core.logger import logger
 
 router = APIRouter()
+
 
 @router.websocket("/ws/tutor")
 async def tutor_ws(websocket: WebSocket, token: str = Query(...)):
     await websocket.accept()
 
     payload = jwt.decode(
-        token,
-        settings.JWT_SECRET,
-        algorithms=[settings.JWT_ALGORITHM]
+        token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM]
     )
     user_id = payload["user_id"]
 

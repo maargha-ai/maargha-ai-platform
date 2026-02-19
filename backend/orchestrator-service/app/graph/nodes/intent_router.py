@@ -1,7 +1,9 @@
 # app/intent/intent_router.py
 import json
 from typing import Literal
-from langchain_core.messages import SystemMessage, HumanMessage
+
+from langchain_core.messages import HumanMessage, SystemMessage
+
 from app.core.llm_client import llm
 
 IntentType = Literal[
@@ -13,7 +15,7 @@ IntentType = Literal[
     "tech_news",
     "emotional_support",
     "general_chat",
-    "unknown"
+    "unknown",
 ]
 
 INTENT_PROMPT = """
@@ -37,11 +39,14 @@ Reply ONLY as JSON:
 {{ "intent": "<intent>" }}
 """
 
+
 async def route_intent(message: str) -> IntentType:
-    response = await llm.ainvoke([
-        SystemMessage(content="You are an intent classifier."),
-        HumanMessage(content=INTENT_PROMPT.format(message=message))
-    ])
+    response = await llm.ainvoke(
+        [
+            SystemMessage(content="You are an intent classifier."),
+            HumanMessage(content=INTENT_PROMPT.format(message=message)),
+        ]
+    )
 
     try:
         return json.loads(response.content).get("intent", "unknown")

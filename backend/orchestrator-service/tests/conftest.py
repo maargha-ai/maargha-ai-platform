@@ -1,7 +1,9 @@
 # tests/conftest.py
-import pytest
 import asyncio
 from unittest.mock import AsyncMock, patch
+
+import pytest
+
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -9,6 +11,7 @@ def event_loop():
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
+
 
 @pytest.fixture
 def mock_websocket():
@@ -19,10 +22,11 @@ def mock_websocket():
     websocket.send_text.return_value = None
     return websocket
 
+
 @pytest.fixture
 def mock_performance_monitor():
     """Create a mock performance monitor"""
-    with patch('app.monitoring.logger.performance_monitor') as mock:
+    with patch("app.monitoring.logger.performance_monitor") as mock:
         mock.get_metrics.return_value = {
             "total_requests": 0,
             "total_errors": 0,
@@ -31,15 +35,17 @@ def mock_performance_monitor():
             "avg_response_time": 0,
             "max_response_time": 0,
             "min_response_time": 0,
-            "error_rate": 0
+            "error_rate": 0,
         }
         yield mock
+
 
 @pytest.fixture
 def mock_logger():
     """Create a mock logger"""
-    with patch('app.monitoring.logger.orchestrator_logger') as mock:
+    with patch("app.monitoring.logger.orchestrator_logger") as mock:
         yield mock
+
 
 @pytest.fixture
 def sample_graph_response():
@@ -48,9 +54,13 @@ def sample_graph_response():
         "agent_response": "This is a test response from the AI agent.",
         "messages": [
             {"role": "user", "content": "test input"},
-            {"role": "assistant", "content": "This is a test response from the AI agent."}
-        ]
+            {
+                "role": "assistant",
+                "content": "This is a test response from the AI agent.",
+            },
+        ],
     }
+
 
 @pytest.fixture
 def sample_navigation_response():
@@ -59,6 +69,6 @@ def sample_navigation_response():
         "navigate": "/roadmap",
         "messages": [
             {"role": "user", "content": "take me to roadmap"},
-            {"role": "assistant", "content": "Navigating to roadmap..."}
-        ]
+            {"role": "assistant", "content": "Navigating to roadmap..."},
+        ],
     }

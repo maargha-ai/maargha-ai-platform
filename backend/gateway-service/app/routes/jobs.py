@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Request
 import httpx
+from fastapi import APIRouter, Request
+
 from app.config import settings
 from app.core.logger import logger
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
+
 
 @router.post("/match")
 async def proxy_job_match(req: Request):

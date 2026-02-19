@@ -9,8 +9,9 @@ from io import BytesIO
 import tempfile
 
 load_dotenv()
-# Generate Roadmap Script using Groq 
+# Generate Roadmap Script using Groq
 client = Groq(api_key=os.getenv("career-growth"))
+
 
 def generate_roadmap_script(career: str):
     prompt = f"""
@@ -33,7 +34,7 @@ def generate_roadmap_script(career: str):
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.5
+        temperature=0.5,
     )
 
     return json.loads(response.choices[0].message.content)
@@ -65,7 +66,7 @@ def wrap_text(draw, text, font, max_width):
 
 
 # Generate Images for Each Slide (Pillow)
-def generate_slide_image(title:str, bullets: list):
+def generate_slide_image(title: str, bullets: list):
     width, height = 1280, 720
     # Cartoon gradient background
     img = Image.new("RGB", (width, height), color=(60, 120, 200))
@@ -135,7 +136,7 @@ def generate_career_video(career: str):
         image_bytes = generate_slide_image(slide["title"], slide["bullets"])
         audio_bytes = generate_audio_bytes(slide["voiceover"])
         slide_assets.append((image_bytes, audio_bytes))
-    
+
     assemble_video(slide_assets)
     print("Video generated: career_overview.mp4")
 

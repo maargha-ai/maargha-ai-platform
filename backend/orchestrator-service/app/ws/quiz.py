@@ -1,15 +1,16 @@
-from fastapi import WebSocket
-import json
 import asyncio
-import time
+import json
 import logging
+import time
 from collections import defaultdict, deque
 
-from app.quiz.service import generate_quiz_direct, generate_fallback_question
+from fastapi import WebSocket
+
 from app.chains.quiz_evaluation_chain import evaluate_quiz
-from app.utils.reset_quiz import reset_quiz_state
-from app.monitoring.violation_tracker import ViolationTracker
 from app.monitoring.gaze_detector import is_looking_away
+from app.monitoring.violation_tracker import ViolationTracker
+from app.quiz.service import generate_fallback_question, generate_quiz_direct
+from app.utils.reset_quiz import reset_quiz_state
 
 RECENT_QUESTIONS = defaultdict(lambda: deque(maxlen=30))
 
@@ -28,7 +29,9 @@ async def finalize_quiz(websocket: WebSocket, state: dict):
             timeout=45,
         )
     except Exception:
-        answered = [str(a).strip() for a in state["quiz_answers"].values() if str(a).strip()]
+        answered = [
+            str(a).strip() for a in state["quiz_answers"].values() if str(a).strip()
+        ]
         score = min(60, len(answered) * 20)
         evaluation = {
             "score": score,
@@ -36,11 +39,15 @@ async def finalize_quiz(websocket: WebSocket, state: dict):
             "summary": "Evaluation generated with fallback mode due to analyzer timeout.",
             "strengths": ["Responses were submitted and captured."],
             "weaknesses": ["Detailed AI analysis could not be completed in time."],
-            "suggestions": ["Retry once for full analysis or continue practicing concise concept-first answers."],
+            "suggestions": [
+                "Retry once for full analysis or continue practicing concise concept-first answers."
+            ],
             "feedback": "Fallback evaluation generated.",
         }
 
-    await websocket.send_text(json.dumps({"type": "quiz_evaluation", "result": evaluation}))
+    await websocket.send_text(
+        json.dumps({"type": "quiz_evaluation", "result": evaluation})
+    )
 
 
 async def _get_next_question(user_id: str, state: dict) -> dict:
@@ -101,11 +108,15 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                 state["quiz_topic"] = msg.get("topic")
                 state["quiz_level"] = msg.get("level")
 
-                history_key = _history_key(user_id, state["quiz_topic"], state["quiz_level"])
+                history_key = _history_key(
+                    user_id, state["quiz_topic"], state["quiz_level"]
+                )
                 state["asked_questions"] = set(RECENT_QUESTIONS[history_key])
 
                 q = await _get_next_question(user_id, state)
-                await websocket.send_text(json.dumps({"type": "quiz_question", "question": q["question"]}))
+                await websocket.send_text(
+                    json.dumps({"type": "quiz_question", "question": q["question"]})
+                )
 
             elif msg_type == "quiz_answer":
                 question = state.get("current_question")
@@ -115,7 +126,9 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                     state["quiz_answers"][question] = answer
 
                 q = await _get_next_question(user_id, state)
-                await websocket.send_text(json.dumps({"type": "quiz_question", "question": q["question"]}))
+                await websocket.send_text(
+                    json.dumps({"type": "quiz_question", "question": q["question"]})
+                )
 
             elif msg_type == "monitor_frame":
                 # Drop extra frames so monitoring does not block question/evaluation flow.
@@ -152,28 +165,45 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                     warnings = state["violation_tracker"].register_violation()
                     # Reset away_streak after registering a violation to prevent multiple rapid violations
                     state["away_streak"] = 0
-                    logging.warning(f"User {user_id}: Violation registered - warnings={warnings}")
+                    logging.warning(
+                        f"User {user_id}: Violation registered - warnings={warnings}"
+                    )
 
                     if state["violation_tracker"].should_terminate():
-                        logging.error(f"User {user_id}: Quiz terminated due to repeated malpractice")
+                        logging.error(
+                            f"User {user_id}: Quiz terminated due to repeated malpractice"
+                        )
                         if not state["finalized"]:
                             state["finalized"] = True
-                            await websocket.send_text(json.dumps({
-                                "type": "quiz_terminated",
-                                "reason": "Repeated malpractice detected",
-                            }))
+                            await websocket.send_text(
+                                json.dumps(
+                                    {
+                                        "type": "quiz_terminated",
+                                        "reason": "Repeated malpractice detected",
+                                    }
+                                )
+                            )
                             await finalize_quiz(websocket, state)
                         break
 
-                    await websocket.send_text(json.dumps({"type": "quiz_warning", "warnings": warnings}))
+                    await websocket.send_text(
+                        json.dumps({"type": "quiz_warning", "warnings": warnings})
+                    )
                 else:
                     state["away_streak"] = 0
                     state["good_streak"] += 1
                     # Decay one warning after sustained attentive frames.
-                    if state["good_streak"] >= 10 and state["violation_tracker"].warnings > 0:  # Increased from 3 to 10
+                    if (
+                        state["good_streak"] >= 10
+                        and state["violation_tracker"].warnings > 0
+                    ):  # Increased from 3 to 10
                         old_warnings = state["violation_tracker"].warnings
-                        state["violation_tracker"].decay_warning()  # Use decay_warning instead of reset
-                        logging.info(f"User {user_id}: Warning decayed from {old_warnings} to {state['violation_tracker'].warnings}")
+                        state[
+                            "violation_tracker"
+                        ].decay_warning()  # Use decay_warning instead of reset
+                        logging.info(
+                            f"User {user_id}: Warning decayed from {old_warnings} to {state['violation_tracker'].warnings}"
+                        )
                         state["good_streak"] = 0
 
             elif msg_type == "stop_quiz":

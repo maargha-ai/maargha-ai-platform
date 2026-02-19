@@ -1,10 +1,14 @@
-from dash import Dash, html, dcc, Input, Output, dash_table
 import pandas as pd
+from dash import Dash, Input, Output, dash_table, dcc, html
 
+from app.dash_app.charts import bar_tags, donut_mode, line_chart
 from app.dash_app.data import load_events
-from app.dash_app.transforms import filter_events, events_per_day, events_by_mode, events_by_tags
-from app.dash_app.charts import donut_mode, line_chart, bar_tags
-
+from app.dash_app.transforms import (
+    events_by_mode,
+    events_by_tags,
+    events_per_day,
+    filter_events,
+)
 
 app = Dash(__name__)
 
@@ -13,9 +17,7 @@ app = Dash(__name__)
 app.layout = html.Div(
     className="dash-root",
     children=[
-
         html.H3("Global Hackathons", className="dash-title"),
-
         # ---------- FILTERS ----------
         html.Div(
             className="dash-filters",
@@ -28,7 +30,6 @@ app.layout = html.Div(
                 dcc.DatePickerRange(id="date-filter"),
             ],
         ),
-
         # ---------- TOP FULL WIDTH LINE ----------
         html.Div(
             className="dash-grid-1",
@@ -36,7 +37,6 @@ app.layout = html.Div(
                 dcc.Graph(id="date-chart"),
             ],
         ),
-
         # ---------- SECOND ROW ----------
         html.Div(
             className="dash-grid-tags",
@@ -45,7 +45,6 @@ app.layout = html.Div(
                 html.Div(dcc.Graph(id="tag-chart"), className="tag-box"),
             ],
         ),
-
         # ---------- TABLE ----------
         html.Div(
             className="dash-table-wrapper",
@@ -57,7 +56,11 @@ app.layout = html.Div(
                         {"name": "Mode", "id": "mode"},
                         {"name": "Start Date", "id": "start_date"},
                         {"name": "End Date", "id": "end_date"},
-                        {"name": "Apply", "id": "registration_url", "presentation": "markdown"},
+                        {
+                            "name": "Apply",
+                            "id": "registration_url",
+                            "presentation": "markdown",
+                        },
                     ],
                     page_size=8,
                     style_as_list_view=True,
@@ -118,7 +121,9 @@ def update_dashboard(modes, start, end):
     table_df = filtered.copy()
 
     # format dates nicely
-    table_df["start_date"] = pd.to_datetime(table_df["start_date"]).dt.strftime("%d %b %Y")
+    table_df["start_date"] = pd.to_datetime(table_df["start_date"]).dt.strftime(
+        "%d %b %Y"
+    )
     table_df["end_date"] = pd.to_datetime(table_df["end_date"]).dt.strftime("%d %b %Y")
 
     # apply link

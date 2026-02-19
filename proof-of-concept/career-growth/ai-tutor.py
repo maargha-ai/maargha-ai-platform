@@ -12,21 +12,14 @@ VECTOR_DB_PATH = "vectordb/tutor_faiss"
 class LocalSentenceEmbeddings(Embeddings):
     def __init__(self):
         self.model = SentenceTransformer(
-            "sentence-transformers/all-MiniLM-L6-v2",
-            cache_folder="./models"
+            "sentence-transformers/all-MiniLM-L6-v2", cache_folder="./models"
         )
 
     def embed_documents(self, texts):
-        return self.model.encode(
-            texts,
-            convert_to_numpy=True
-        ).tolist()
+        return self.model.encode(texts, convert_to_numpy=True).tolist()
 
     def embed_query(self, text):
-        return self.model.encode(
-            text,
-            convert_to_numpy=True
-        ).tolist()
+        return self.model.encode(text, convert_to_numpy=True).tolist()
 
 
 def build_and_save_vectordb():
@@ -35,10 +28,7 @@ def build_and_save_vectordb():
     loader = PyPDFLoader(PDF_PATH)
     docs = loader.load()
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
-        chunk_overlap=100
-    )
+    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
     chunks = splitter.split_documents(docs)
 
     embeddings = LocalSentenceEmbeddings()

@@ -1,9 +1,8 @@
-from sqlalchemy import String, Date
+from sqlalchemy import JSON, Date, String
+from sqlalchemy.orm import Mapped, mapped_column
+
 from app.db.database import Base
 
-from sqlalchemy import String, JSON
-from sqlalchemy.orm import Mapped, mapped_column
-from app.db.database import Base
 
 class Event(Base):
     __tablename__ = "events"

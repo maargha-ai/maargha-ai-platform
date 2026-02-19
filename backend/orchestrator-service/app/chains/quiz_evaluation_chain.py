@@ -1,9 +1,11 @@
 # app/chains/quiz_evaluation_chain.py
-from langchain_core.messages import HumanMessage
-from app.core.llm_client import llm
 import asyncio
 import json
 import re
+
+from langchain_core.messages import HumanMessage
+
+from app.core.llm_client import llm
 
 EVAL_PROMPT_TEMPLATE = """
 You are a senior technical interviewer.
@@ -84,7 +86,9 @@ async def evaluate_quiz(career: str, quiz_answers: dict):
             "summary": "No answers were submitted.",
             "strengths": [],
             "weaknesses": ["No evaluable response content provided."],
-            "suggestions": ["Attempt at least 3 concise, relevant answers before terminating."],
+            "suggestions": [
+                "Attempt at least 3 concise, relevant answers before terminating."
+            ],
             "feedback": "No answers were submitted.",
         }
 
@@ -127,9 +131,15 @@ async def evaluate_quiz(career: str, quiz_answers: dict):
 
     final_score = min(model_score, _quality_cap(quiz_answers))
 
-    strengths = parsed.get("strengths") if isinstance(parsed.get("strengths"), list) else []
-    weaknesses = parsed.get("weaknesses") if isinstance(parsed.get("weaknesses"), list) else []
-    suggestions = parsed.get("suggestions") if isinstance(parsed.get("suggestions"), list) else []
+    strengths = (
+        parsed.get("strengths") if isinstance(parsed.get("strengths"), list) else []
+    )
+    weaknesses = (
+        parsed.get("weaknesses") if isinstance(parsed.get("weaknesses"), list) else []
+    )
+    suggestions = (
+        parsed.get("suggestions") if isinstance(parsed.get("suggestions"), list) else []
+    )
     summary = str(parsed.get("summary", "")).strip() or "Evaluation generated."
 
     # Backward-compatible text block for any old UI paths.
@@ -137,7 +147,12 @@ async def evaluate_quiz(career: str, quiz_answers: dict):
         f"Summary: {summary}",
         "Strengths: " + ("; ".join(strengths) if strengths else "None highlighted."),
         "Weaknesses: " + ("; ".join(weaknesses) if weaknesses else "None highlighted."),
-        "Suggestions: " + ("; ".join(suggestions) if suggestions else "Keep practicing with deeper, structured answers."),
+        "Suggestions: "
+        + (
+            "; ".join(suggestions)
+            if suggestions
+            else "Keep practicing with deeper, structured answers."
+        ),
     ]
 
     return {

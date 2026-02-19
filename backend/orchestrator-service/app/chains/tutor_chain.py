@@ -1,17 +1,16 @@
 # app/chains/tutor_chain.py
 
 from pathlib import Path
+
 import requests
-
 from langchain_community.vectorstores import FAISS
-from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import HumanMessage
+from langchain_core.prompts import PromptTemplate
 
-from app.core.llm_client import llm
-from app.core.langchain_embeddings import LangchainSentenceEmbeddings
-from app.utils.gcs import generate_signed_url
 from app.core.config import settings
-
+from app.core.langchain_embeddings import LangchainSentenceEmbeddings
+from app.core.llm_client import llm
+from app.utils.gcs import generate_signed_url
 
 GCP_BUCKET_NAME = settings.GCP_TUTOR_BUCKET
 GCP_VECTOR_DB_PREFIX = "tutor_faiss"
@@ -22,8 +21,7 @@ LOCAL_VECTOR_DB_PATH.mkdir(parents=True, exist_ok=True)
 _retriever = None
 
 
-PROMPT_TEMPLATE = PromptTemplate.from_template(
-    """
+PROMPT_TEMPLATE = PromptTemplate.from_template("""
     You are an AI Tutor teaching IT concepts clearly and simply.
     Use ONLY the provided context from the textbook.
 
@@ -38,8 +36,7 @@ PROMPT_TEMPLATE = PromptTemplate.from_template(
     - Real-world analogy
     - 3-step learning plan
     - A short quiz with answers
-    """
-)
+    """)
 
 
 def download_vector_db():
@@ -49,8 +46,7 @@ def download_vector_db():
             continue
 
         signed_url = generate_signed_url(
-            GCP_BUCKET_NAME,
-            f"{GCP_VECTOR_DB_PREFIX}/{filename}"
+            GCP_BUCKET_NAME, f"{GCP_VECTOR_DB_PREFIX}/{filename}"
         )
 
         response = requests.get(signed_url, timeout=60)
@@ -72,13 +68,10 @@ def get_retriever():
         vectordb = FAISS.load_local(
             folder_path=str(LOCAL_VECTOR_DB_PATH),
             embeddings=embeddings,
-            allow_dangerous_deserialization=True
+            allow_dangerous_deserialization=True,
         )
 
-        _retriever = vectordb.as_retriever(
-            search_type="similarity",
-            k=4
-        )
+        _retriever = vectordb.as_retriever(search_type="similarity", k=4)
 
         print("[Tutor] Successfully loaded vectorDB")
 
@@ -93,14 +86,9 @@ async def ask_tutor(question: str) -> str:
     context = "\n\n".join(doc.page_content for doc in docs)
 
     # 2️⃣ Build prompt
-    prompt = PROMPT_TEMPLATE.format(
-        question=question,
-        context=context
-    )
+    prompt = PROMPT_TEMPLATE.format(question=question, context=context)
 
     # 3️⃣ Call LLM (same style as roadmap_chain)
-    response = await llm.ainvoke([
-        HumanMessage(content=prompt)
-    ])
+    response = await llm.ainvoke([HumanMessage(content=prompt)])
 
     return response.content

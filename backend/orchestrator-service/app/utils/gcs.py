@@ -1,8 +1,10 @@
-from google.cloud import storage
-from datetime import timedelta
 import os
+from datetime import timedelta
+
+from google.cloud import storage
 
 client = storage.Client()
+
 
 def generate_signed_url(bucket_name: str, object_path: str) -> str:
     bucket = client.bucket(bucket_name)

@@ -1,15 +1,10 @@
-from reportlab.lib.pagesizes import A4
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    HRFlowable,
-)
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
-from reportlab.lib.colors import HexColor
 from io import BytesIO
+
+from reportlab.lib.colors import HexColor
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table
 
 
 def cv_text_to_pdf(cv_text: str) -> bytes:
@@ -172,9 +167,7 @@ def cv_text_to_pdf(cv_text: str) -> bytes:
 
         # ---------- BULLETS ----------
         if line.startswith("-"):
-            elements.append(
-                Paragraph(f"• {line[1:].strip()}", bullet_style)
-            )
+            elements.append(Paragraph(f"• {line[1:].strip()}", bullet_style))
             i += 1
             continue
 

@@ -1,6 +1,7 @@
 import logging
-import structlog
 import os
+
+import structlog
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
@@ -15,9 +16,7 @@ structlog.configure(
         structlog.processors.TimeStamper(fmt="iso"),
         structlog.processors.JSONRenderer(),
     ],
-    wrapper_class=structlog.make_filtering_bound_logger(
-        getattr(logging, LOG_LEVEL)
-    ),
+    wrapper_class=structlog.make_filtering_bound_logger(getattr(logging, LOG_LEVEL)),
 )
 
 logger = structlog.get_logger("gateway")

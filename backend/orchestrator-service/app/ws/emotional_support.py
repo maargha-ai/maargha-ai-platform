@@ -1,23 +1,24 @@
-from fastapi import WebSocket
 import json
-import numpy as np
-
-from app.agents.emotional_support_agent import (
-    transcribe_audio,
-    detect_text_emotion,
-    generate_response
-)
-
 import time
 
+import numpy as np
+from fastapi import WebSocket
+
+from app.agents.emotional_support_agent import (
+    detect_text_emotion,
+    generate_response,
+    transcribe_audio,
+)
+
 IGNORE_SECONDS_AFTER_REPLY = 2.0
+
 
 async def emotional_support_ws(websocket: WebSocket, user_id: str):
     await websocket.accept()
     print(f"[EMO] Connected user {user_id}")
 
     audio_buffer = []
-    ignore_until = 0.0   # 🔥 CRITICAL
+    ignore_until = 0.0  # 🔥 CRITICAL
 
     try:
         while True:
@@ -25,7 +26,7 @@ async def emotional_support_ws(websocket: WebSocket, user_id: str):
 
             now = time.time()
             if now < ignore_until:
-                continue   # 🚫 HARD IGNORE WINDOW
+                continue  # 🚫 HARD IGNORE WINDOW
 
             # STOP SIGNAL
             if message.get("text") == "STOP":
@@ -36,7 +37,7 @@ async def emotional_support_ws(websocket: WebSocket, user_id: str):
                 audio_buffer.clear()
 
                 # 🔒 SHORT AUDIO GUARD
-                if len(full_audio) < 16000:   # <1s
+                if len(full_audio) < 16000:  # <1s
                     continue
 
                 text = await transcribe_audio(full_audio)
@@ -46,26 +47,32 @@ async def emotional_support_ws(websocket: WebSocket, user_id: str):
                     continue
 
                 if text.lower() in {
-                    "thank you", "thanks", "okay", "yes", "no", "um",
-                    "you're welcome", "how can i help you", "i'm here for you"
+                    "thank you",
+                    "thanks",
+                    "okay",
+                    "yes",
+                    "no",
+                    "um",
+                    "you're welcome",
+                    "how can i help you",
+                    "i'm here for you",
                 }:
                     continue
 
                 # SEND USER TEXT
-                await websocket.send_text(json.dumps({
-                    "type": "user_text",
-                    "text": text
-                }))
+                await websocket.send_text(
+                    json.dumps({"type": "user_text", "text": text})
+                )
 
                 emotion = detect_text_emotion(text)
                 reply = generate_response(text, emotion)
 
                 # SEND AGENT REPLY
-                await websocket.send_text(json.dumps({
-                    "type": "agent_reply",
-                    "text": reply,
-                    "emotion": emotion
-                }))
+                await websocket.send_text(
+                    json.dumps(
+                        {"type": "agent_reply", "text": reply, "emotion": emotion}
+                    )
+                )
 
                 # 🔥 THIS IS THE KEY LINE
                 ignore_until = time.time() + IGNORE_SECONDS_AFTER_REPLY

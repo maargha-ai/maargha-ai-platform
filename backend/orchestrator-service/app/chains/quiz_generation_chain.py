@@ -1,8 +1,10 @@
 # app/chains/quiz_generation_chain.py
-from langchain_core.messages import HumanMessage
-from app.core.llm_client import llm
 import json
 import re
+
+from langchain_core.messages import HumanMessage
+
+from app.core.llm_client import llm
 
 QUIZ_PROMPT_TEMPLATE = """
 You are a senior technical interviewer.

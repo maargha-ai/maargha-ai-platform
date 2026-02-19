@@ -1,9 +1,11 @@
 # app/graph/nodes/reasoning_node.py
 import json
-from langchain_core.messages import SystemMessage, HumanMessage
+
+from langchain_core.messages import HumanMessage, SystemMessage
+
 from app.core.llm_client import llm
-from app.graph.nodes.intent_router import route_intent
 from app.core.state import AgentState
+from app.graph.nodes.intent_router import route_intent
 
 SYSTEM_PROMPT = """
 You are a conversational AI agent for a career platform.
@@ -36,6 +38,7 @@ Format:
 }
 """
 
+
 async def reasoning_node(state: AgentState):
     user_msg = state["messages"][-1]["content"]
 
@@ -44,8 +47,7 @@ async def reasoning_node(state: AgentState):
 
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
-        HumanMessage(
-            content=f"""
+        HumanMessage(content=f"""
                     User message:
                     {user_msg}
 
@@ -53,9 +55,8 @@ async def reasoning_node(state: AgentState):
                     {intent_hint}
 
                     Decide next action.
-                    """
-                    )
-                ]
+                    """),
+    ]
 
     response = await llm.ainvoke(messages)
 
@@ -65,7 +66,7 @@ async def reasoning_node(state: AgentState):
         # Fallback to safe chat
         return {
             "agent_action": "CHAT",
-            "agent_response": "I'm here 😊 How can I help you today?"
+            "agent_response": "I'm here 😊 How can I help you today?",
         }
 
     action = plan.get("action", "CHAT")
@@ -73,9 +74,9 @@ async def reasoning_node(state: AgentState):
     if action == "CHAT":
         return {
             "agent_action": "CHAT",
-            "agent_response": plan.get("response", "Got it 🙂")
+            "agent_response": plan.get("response", "Got it 🙂"),
         }
     return {
         "agent_action": action,
-        "agent_action_input": plan.get("action_input") or {}
+        "agent_action_input": plan.get("action_input") or {},
     }

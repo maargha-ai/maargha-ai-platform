@@ -1,8 +1,9 @@
 # app/monitoring/gaze_detector.py
 import base64
+
 import cv2
-import numpy as np
 import mediapipe as mp
+import numpy as np
 
 # Tasks API imports
 from mediapipe.tasks import python
@@ -41,7 +42,7 @@ def is_looking_away(frame_b64: str) -> bool:
         return True
 
     rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    
+
     # Create MediaPipe Image object properly
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
 
@@ -77,26 +78,37 @@ def is_looking_away(frame_b64: str) -> bool:
     face_w = max(xs) - min(xs)
     face_h = max(ys) - min(ys)
     face_area = face_w * face_h
-    
+
     # More sensitive face area threshold (increased from 0.008)
     if face_area < 0.012:
         return True
-    
+
     # Check if face is too close to edges (partial face view)
     min_x = min(xs)
     max_x = max(xs)
     min_y = min(ys)
     max_y = max(ys)
-    
+
     # Face too close to any edge indicates partial view
     if min_x < 0.05 or max_x > 0.95 or min_y < 0.05 or max_y > 0.95:
         return True
 
     # Eye openness ratio (very low on both eyes means closed/covered/not visible)
-    left_eye_h = np.linalg.norm(np.array([left_upper.x, left_upper.y]) - np.array([left_lower.x, left_lower.y]))
-    left_eye_w = np.linalg.norm(np.array([left_eye_outer.x, left_eye_outer.y]) - np.array([left_eye_inner.x, left_eye_inner.y]))
-    right_eye_h = np.linalg.norm(np.array([right_upper.x, right_upper.y]) - np.array([right_lower.x, right_lower.y]))
-    right_eye_w = np.linalg.norm(np.array([right_eye_outer.x, right_eye_outer.y]) - np.array([right_eye_inner.x, right_eye_inner.y]))
+    left_eye_h = np.linalg.norm(
+        np.array([left_upper.x, left_upper.y]) - np.array([left_lower.x, left_lower.y])
+    )
+    left_eye_w = np.linalg.norm(
+        np.array([left_eye_outer.x, left_eye_outer.y])
+        - np.array([left_eye_inner.x, left_eye_inner.y])
+    )
+    right_eye_h = np.linalg.norm(
+        np.array([right_upper.x, right_upper.y])
+        - np.array([right_lower.x, right_lower.y])
+    )
+    right_eye_w = np.linalg.norm(
+        np.array([right_eye_outer.x, right_eye_outer.y])
+        - np.array([right_eye_inner.x, right_eye_inner.y])
+    )
 
     left_ratio = left_eye_h / max(left_eye_w, 1e-6)
     right_ratio = right_eye_h / max(right_eye_w, 1e-6)
@@ -104,8 +116,18 @@ def is_looking_away(frame_b64: str) -> bool:
     eyes_hidden_strong = left_ratio < 0.02 and right_ratio < 0.02
 
     # Very small inter-eye distance -> extreme yaw / partial face
-    eye_center_left = np.array([(left_eye_outer.x + left_eye_inner.x) / 2, (left_eye_outer.y + left_eye_inner.y) / 2])
-    eye_center_right = np.array([(right_eye_outer.x + right_eye_inner.x) / 2, (right_eye_outer.y + right_eye_inner.y) / 2])
+    eye_center_left = np.array(
+        [
+            (left_eye_outer.x + left_eye_inner.x) / 2,
+            (left_eye_outer.y + left_eye_inner.y) / 2,
+        ]
+    )
+    eye_center_right = np.array(
+        [
+            (right_eye_outer.x + right_eye_inner.x) / 2,
+            (right_eye_outer.y + right_eye_inner.y) / 2,
+        ]
+    )
     inter_eye = np.linalg.norm(eye_center_left - eye_center_right)
     head_turned = inter_eye < 0.04
 

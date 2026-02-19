@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def filter_events(df, modes, start, end):
     filtered = df.copy()
 
@@ -11,8 +12,7 @@ def filter_events(df, modes, start, end):
         end = pd.to_datetime(end)
 
         filtered = filtered[
-            (filtered["start_date"] >= start) &
-            (filtered["start_date"] <= end)
+            (filtered["start_date"] >= start) & (filtered["start_date"] <= end)
         ]
 
     return filtered
@@ -28,11 +28,7 @@ def events_per_day(df):
 
 
 def events_by_mode(df):
-    return (
-        df.groupby("mode")
-        .size()
-        .reset_index(name="count")
-    )
+    return df.groupby("mode").size().reset_index(name="count")
 
 
 def events_by_tags(df):

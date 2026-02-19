@@ -1,6 +1,8 @@
-from app.schemas.cv import CVInput
 from langchain_core.messages import HumanMessage
+
 from app.core.llm_client import llm
+from app.schemas.cv import CVInput
+
 
 def build_cv_prompt(data: CVInput) -> str:
     skills_text = "\n".join(f"- {s}" for s in data.skills)
@@ -47,7 +49,5 @@ Generate the resume content exactly inside this structure.
 # -------- Chain Function --------
 async def generate_cv(data: CVInput) -> str:
     prompt = build_cv_prompt(data)
-    response = await llm.ainvoke(
-        [HumanMessage(content=prompt)]
-    )
+    response = await llm.ainvoke([HumanMessage(content=prompt)])
     return response.content.strip()

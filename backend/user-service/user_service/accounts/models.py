@@ -1,6 +1,11 @@
 import uuid
+
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.utils import timezone
 
 
@@ -10,7 +15,7 @@ class UserManager(BaseUserManager):
             raise ValueError("The Email field must be set")
         if not full_name:
             raise ValueError("Full name must be set")
-        
+
         email = self.normalize_email(email)
         user = self.model(email=email, full_name=full_name, **extra_fields)
         user.set_password(password)
@@ -32,7 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
-    objects = UserManager() 
+    objects = UserManager()
 
     USERNAME_FIELD = "email"
 

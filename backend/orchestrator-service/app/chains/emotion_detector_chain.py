@@ -3,7 +3,7 @@ from transformers import pipeline
 emotion_pipeline = pipeline(
     "text-classification",
     model="bhadresh-savani/distilbert-base-uncased-emotion",
-    device=-1
+    device=-1,
 )
 
 FAST_EMOTION_MAP = {
@@ -14,6 +14,7 @@ FAST_EMOTION_MAP = {
     "surprise": ["Excitement", "Curiosity"],
     "love": ["Love", "Calm", "Caring", "Comfort", "Hope"],
 }
+
 
 def detect_text_emotion(text: str, threshold: float = 0.6) -> list[str]:
     try:
@@ -30,5 +31,3 @@ def detect_text_emotion(text: str, threshold: float = 0.6) -> list[str]:
 
     except Exception:
         return ["Calm"]
-    
-    

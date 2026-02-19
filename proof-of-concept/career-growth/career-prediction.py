@@ -28,8 +28,9 @@ QUESTIONS = [
     "Do you enjoy configuring routers, switches and firewalls? (yes/no)",
     "Are you interested in game engines like Unity or Unreal Engine? (yes/no)",
     "Would you enjoy a role in teaching, mentorship, or educational content creation? (yes/no)",
-    "How much time daily can you commit to learning? (hours/day)"
+    "How much time daily can you commit to learning? (hours/day)",
 ]
+
 
 # Prompt Builder
 def build_prompt(answers: dict):
@@ -57,23 +58,25 @@ def build_prompt(answers: dict):
     ]
     """
 
+
 # LLM call
 def call_llm(prompt: str):
     response = client.chat.completions.create(
         model="llama-3.3-70B-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
-        max_tokens=1200
+        max_tokens=1200,
     )
 
     return response
+
 
 # Run interactive assessment
 def run_career_prediction():
     print("\n==== IT Career Predictor ====n")
     answers = {}
 
-    # ask questions 
+    # ask questions
     for q in QUESTIONS:
         ans = input(q + "\n> ")
         answers[q] = ans
@@ -89,11 +92,12 @@ def run_career_prediction():
     print(" Recommended Careers \n")
 
     for c in careers:
-        
+
         print(f"Career: {c['title']}")
         print(f"Reason: {c['reason']}")
-        print("Skills:", ",".join(c['skills']))
+        print("Skills:", ",".join(c["skills"]))
         print()
+
 
 if __name__ == "__main__":
 

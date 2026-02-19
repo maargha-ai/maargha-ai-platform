@@ -1,17 +1,20 @@
-from fastapi import APIRouter, WebSocket, Query
-from jose import jwt
-import websockets
 import asyncio
-from app.core.logger import logger
+
+import websockets
+from fastapi import APIRouter, Query, WebSocket
+from jose import jwt
+
 from app.config import settings
+from app.core.logger import logger
 
 router = APIRouter()
+
 
 @router.websocket("/ws/career")
 async def career_ws(websocket: WebSocket, token: str = Query(...)):
     await websocket.accept()
     logger.info("career_ws_connected")
-    
+
     payload = jwt.decode(
         token,
         settings.JWT_SECRET,

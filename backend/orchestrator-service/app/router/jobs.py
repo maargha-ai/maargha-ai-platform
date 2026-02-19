@@ -1,16 +1,17 @@
 # app/router/jobs.py
-from fastapi import APIRouter, UploadFile, File, Form, Depends
-import tempfile
 import os
+import tempfile
+
+from fastapi import APIRouter, Depends, File, Form, UploadFile
+
 from app.chains.jobs_chain import find_jobs_for_cv
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
+
 @router.post("/match")
 async def match_jobs(
-    role: str = Form(...),
-    location: str = Form(...),
-    cv: UploadFile = File(...)
+    role: str = Form(...), location: str = Form(...), cv: UploadFile = File(...)
 ):
     # Save CV temporarily
     suffix = ".pdf"
@@ -20,11 +21,7 @@ async def match_jobs(
         cv_path = tmp.name
 
     try:
-        results = await find_jobs_for_cv(
-            cv_path=cv_path,
-            role=role,
-            location=location
-        )
+        results = await find_jobs_for_cv(cv_path=cv_path, role=role, location=location)
 
         formatted = [
             {
@@ -33,15 +30,12 @@ async def match_jobs(
                 "company": job["company"],
                 "link": job["link"],
                 "desc": job.get("desc", ""),
-                "source": job["source"]
+                "source": job["source"],
             }
             for score, job in results
         ]
 
-        return {
-            "count": len(formatted),
-            "jobs": formatted
-        }
+        return {"count": len(formatted), "jobs": formatted}
 
     finally:
         if os.path.exists(cv_path):

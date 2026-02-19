@@ -1,22 +1,28 @@
 # app/main.py
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.middleware.cors import CORSMiddleware
-from app.graph.orchestrator_graph import app as graph_app
-from app.core.state import AgentState
-from app.db.database import engine, Base
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles
-from app.ws import quiz, emotional_support, career, linkedin, tutor, live_chat
-from app.router import music, roadmap, jobs, news, cv, resume_parser
-from fastapi import WebSocket
 import json
-from dotenv import load_dotenv
 import os
 import time
+from pathlib import Path
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
+from app.core.state import AgentState
+from app.db.database import Base, engine
+from app.graph.orchestrator_graph import app as graph_app
+from app.monitoring.health import router as health_router
 
 # Import monitoring and logging
-from app.monitoring.logger import LoggingMiddleware, performance_monitor, orchestrator_logger, websocket_logger
-from app.monitoring.health import router as health_router
+from app.monitoring.logger import (
+    LoggingMiddleware,
+    orchestrator_logger,
+    performance_monitor,
+    websocket_logger,
+)
+from app.router import cv, jobs, music, news, resume_parser, roadmap
+from app.ws import career, emotional_support, linkedin, live_chat, quiz, tutor
 
 load_dotenv()
 
@@ -51,145 +57,121 @@ app.include_router(news.router)
 app.include_router(cv.router)
 app.include_router(resume_parser.router)
 
+
 @app.websocket("/ws/career/{user_id}")
 async def career_ws(websocket: WebSocket, user_id: str):
     start_time = time.time()
     performance_monitor.record_websocket_connection()
-    
+
     try:
         orchestrator_logger.info(
             "Career WebSocket connection started",
-            extra={
-                "user_id": user_id,
-                "endpoint": "/ws/career"
-            }
+            extra={"user_id": user_id, "endpoint": "/ws/career"},
         )
         await career.career_ws_handler(websocket, user_id)
     except Exception as e:
         orchestrator_logger.error(
-            "Career WebSocket error",
-            error=e,
-            extra={"user_id": user_id}
+            "Career WebSocket error", error=e, extra={"user_id": user_id}
         )
     finally:
         performance_monitor.record_websocket_disconnection()
         websocket_logger.info(
-            "Career WebSocket connection closed",
-            extra={"user_id": user_id}
+            "Career WebSocket connection closed", extra={"user_id": user_id}
         )
+
 
 @app.websocket("/ws/quiz/{user_id}")
 async def quiz_ws(websocket: WebSocket, user_id: str):
     start_time = time.time()
     performance_monitor.record_websocket_connection()
-    
+
     try:
         orchestrator_logger.info(
             "Quiz WebSocket connection started",
-            extra={
-                "user_id": user_id,
-                "endpoint": "/ws/quiz"
-            }
+            extra={"user_id": user_id, "endpoint": "/ws/quiz"},
         )
         await quiz.quiz_ws_handler(websocket, user_id)
     except Exception as e:
         orchestrator_logger.error(
-            "Quiz WebSocket error",
-            error=e,
-            extra={"user_id": user_id}
+            "Quiz WebSocket error", error=e, extra={"user_id": user_id}
         )
     finally:
         performance_monitor.record_websocket_disconnection()
         websocket_logger.info(
-            "Quiz WebSocket connection closed",
-            extra={"user_id": user_id}
+            "Quiz WebSocket connection closed", extra={"user_id": user_id}
         )
+
 
 @app.websocket("/ws/emotional-support/{user_id}")
 async def emotional_support_ws_route(websocket: WebSocket, user_id: str):
     start_time = time.time()
     performance_monitor.record_websocket_connection()
-    
+
     try:
         orchestrator_logger.info(
             "Emotional Support WebSocket connection started",
-            extra={
-                "user_id": user_id,
-                "endpoint": "/ws/emotional-support"
-            }
+            extra={"user_id": user_id, "endpoint": "/ws/emotional-support"},
         )
         await emotional_support.emotional_support_ws(websocket, user_id)
     except Exception as e:
         orchestrator_logger.error(
-            "Emotional Support WebSocket error",
-            error=e,
-            extra={"user_id": user_id}
+            "Emotional Support WebSocket error", error=e, extra={"user_id": user_id}
         )
     finally:
         performance_monitor.record_websocket_disconnection()
         websocket_logger.info(
-            "Emotional Support WebSocket connection closed",
-            extra={"user_id": user_id}
+            "Emotional Support WebSocket connection closed", extra={"user_id": user_id}
         )
+
 
 @app.websocket("/ws/linkedin/{user_id}")
 async def linkedin_ws(websocket: WebSocket, user_id: str):
     start_time = time.time()
     performance_monitor.record_websocket_connection()
-    
+
     try:
         orchestrator_logger.info(
             "LinkedIn WebSocket connection started",
-            extra={
-                "user_id": user_id,
-                "endpoint": "/ws/linkedin"
-            }
+            extra={"user_id": user_id, "endpoint": "/ws/linkedin"},
         )
         await linkedin.linkedin_ws_handler(websocket, user_id)
     except Exception as e:
         orchestrator_logger.error(
-            "LinkedIn WebSocket error",
-            error=e,
-            extra={"user_id": user_id}
+            "LinkedIn WebSocket error", error=e, extra={"user_id": user_id}
         )
     finally:
         performance_monitor.record_websocket_disconnection()
         websocket_logger.info(
-            "LinkedIn WebSocket connection closed",
-            extra={"user_id": user_id}
+            "LinkedIn WebSocket connection closed", extra={"user_id": user_id}
         )
+
 
 @app.websocket("/ws/tutor/{user_id}")
 async def tutor_ws(websocket: WebSocket, user_id: str):
     start_time = time.time()
     performance_monitor.record_websocket_connection()
-    
+
     try:
         orchestrator_logger.info(
             "Tutor WebSocket connection started",
-            extra={
-                "user_id": user_id,
-                "endpoint": "/ws/tutor"
-            }
+            extra={"user_id": user_id, "endpoint": "/ws/tutor"},
         )
         await tutor.tutor_ws_handler(websocket, user_id)
     except Exception as e:
         orchestrator_logger.error(
-            "Tutor WebSocket error",
-            error=e,
-            extra={"user_id": user_id}
+            "Tutor WebSocket error", error=e, extra={"user_id": user_id}
         )
     finally:
         performance_monitor.record_websocket_disconnection()
         websocket_logger.info(
-            "Tutor WebSocket connection closed",
-            extra={"user_id": user_id}
+            "Tutor WebSocket connection closed", extra={"user_id": user_id}
         )
+
 
 @app.on_event("startup")
 async def on_startup():
     orchestrator_logger.info("Maargha Orchestrator starting up")
-    
+
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
@@ -198,11 +180,12 @@ async def on_startup():
         orchestrator_logger.error("Database initialization failed", error=e)
         raise
 
+
 @app.websocket("/ws/chat/live")
 async def chat_live(websocket: WebSocket):
     start_time = time.time()
     performance_monitor.record_websocket_connection()
-    
+
     try:
         orchestrator_logger.info("Live chat WebSocket connection started")
         await live_chat.chat_live_ws(websocket)
@@ -212,14 +195,15 @@ async def chat_live(websocket: WebSocket):
         performance_monitor.record_websocket_disconnection()
         websocket_logger.info("Live chat WebSocket connection closed")
 
+
 @app.websocket("/ws/chat")
 async def chat_ws(websocket: WebSocket):
     start_time = time.time()
     performance_monitor.record_websocket_connection()
-    
+
     await websocket.accept()
     orchestrator_logger.info("Chat WebSocket connection established")
-    
+
     state: AgentState = {
         "user_id": id(websocket),
         "messages": [],
@@ -231,10 +215,7 @@ async def chat_ws(websocket: WebSocket):
             text = await websocket.receive_text()
             orchestrator_logger.info(
                 "Chat message received",
-                extra={
-                    "user_id": state["user_id"],
-                    "message_length": len(text)
-                }
+                extra={"user_id": state["user_id"], "message_length": len(text)},
             )
 
             state["messages"].append({"role": "user", "content": text})
@@ -243,30 +224,27 @@ async def chat_ws(websocket: WebSocket):
             state.update(output)
 
             if state.get("agent_response"):
-                await websocket.send_text(json.dumps({
-                    "type": "CHAT",
-                    "content": state["agent_response"]
-                }))
-                
+                await websocket.send_text(
+                    json.dumps({"type": "CHAT", "content": state["agent_response"]})
+                )
+
                 orchestrator_logger.info(
                     "Chat response sent",
                     extra={
                         "user_id": state["user_id"],
-                        "response_length": len(state["agent_response"])
-                    }
+                        "response_length": len(state["agent_response"]),
+                    },
                 )
 
             if state.get("navigate"):
-                await websocket.send_text(json.dumps({
-                    "navigate": state["navigate"]
-                }))
-                
+                await websocket.send_text(json.dumps({"navigate": state["navigate"]}))
+
                 orchestrator_logger.info(
                     "Navigation command sent",
                     extra={
                         "user_id": state["user_id"],
-                        "navigate_to": state["navigate"]
-                    }
+                        "navigate_to": state["navigate"],
+                    },
                 )
 
             state.pop("agent_response", None)
@@ -274,15 +252,11 @@ async def chat_ws(websocket: WebSocket):
 
     except WebSocketDisconnect:
         orchestrator_logger.info(
-            "Chat WebSocket disconnected",
-            extra={"user_id": state["user_id"]}
+            "Chat WebSocket disconnected", extra={"user_id": state["user_id"]}
         )
     except Exception as e:
         orchestrator_logger.error(
-            "Chat WebSocket error",
-            error=e,
-            extra={"user_id": state["user_id"]}
+            "Chat WebSocket error", error=e, extra={"user_id": state["user_id"]}
         )
     finally:
         performance_monitor.record_websocket_disconnection()
-

@@ -1,8 +1,10 @@
-import requests
 import time
 from datetime import datetime
 
+import requests
+
 DEVPOST_API = "https://devpost.com/api/hackathons"
+
 
 def parse_devpost_dates(date_text: str):
     """
@@ -19,15 +21,9 @@ def parse_devpost_dates(date_text: str):
         if " - " in date_text and "," in date_text.split(" - ")[0]:
             start_str, end_str = date_text.split(" - ")
 
-            start_date = datetime.strptime(
-                start_str.strip(),
-                "%b %d, %Y"
-            ).date()
+            start_date = datetime.strptime(start_str.strip(), "%b %d, %Y").date()
 
-            end_date = datetime.strptime(
-                end_str.strip(),
-                "%b %d, %Y"
-            ).date()
+            end_date = datetime.strptime(end_str.strip(), "%b %d, %Y").date()
 
             return start_date, end_date
 
@@ -37,8 +33,7 @@ def parse_devpost_dates(date_text: str):
             year = end_part.split(",")[1].strip()
 
             start_date = datetime.strptime(
-                f"{start_part.strip()} {year}",
-                "%b %d %Y"
+                f"{start_part.strip()} {year}", "%b %d %Y"
             ).date()
 
             end_clean = end_part.split(",")[0].strip()
@@ -47,24 +42,19 @@ def parse_devpost_dates(date_text: str):
                 month = start_part.split()[0]
                 end_clean = f"{month} {end_clean}"
 
-            end_date = datetime.strptime(
-                f"{end_clean} {year}",
-                "%b %d %Y"
-            ).date()
+            end_date = datetime.strptime(f"{end_clean} {year}", "%b %d %Y").date()
 
             return start_date, end_date
 
         # Case 3: Single date
-        start_date = datetime.strptime(
-            date_text.strip(),
-            "%b %d, %Y"
-        ).date()
+        start_date = datetime.strptime(date_text.strip(), "%b %d, %Y").date()
 
         return start_date, None
 
     except Exception as e:
         print("Date parse failed:", date_text, "| Error:", e)
         return None, None
+
 
 def fetch_devpost_events(status_list=None):
     if status_list is None:
@@ -79,16 +69,13 @@ def fetch_devpost_events(status_list=None):
         page = 1
 
         while True:
-            params = {
-                "page": page,
-                "status": status
-            }
+            params = {"page": page, "status": status}
 
             response = requests.get(
                 DEVPOST_API,
                 params=params,
                 timeout=10,
-                headers={"User-Agent": "Mozilla/5.0"}
+                headers={"User-Agent": "Mozilla/5.0"},
             )
 
             if response.status_code != 200:
@@ -116,21 +103,23 @@ def fetch_devpost_events(status_list=None):
 
                 displayed_location = hackathon.get("displayed_location", {})
                 location = displayed_location.get("location")
-                if location=="Online":
+                if location == "Online":
                     mode = "Online"
                 else:
                     mode = "Offline"
 
-                all_events.append({
-                    "title": hackathon.get("title"),
-                    "event_type": "hackathon",
-                    "location": location,
-                    "mode": mode,
-                    "registration_url": url,
-                    "start_date": start_date,
-                    "end_date": end_date,
-                    "tags": hackathon.get("themes"),
-                })
+                all_events.append(
+                    {
+                        "title": hackathon.get("title"),
+                        "event_type": "hackathon",
+                        "location": location,
+                        "mode": mode,
+                        "registration_url": url,
+                        "start_date": start_date,
+                        "end_date": end_date,
+                        "tags": hackathon.get("themes"),
+                    }
+                )
 
             print(f"Fetched page {page} ({status}) — {len(hackathons)} events")
 

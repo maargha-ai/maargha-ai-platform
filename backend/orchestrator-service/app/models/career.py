@@ -1,7 +1,9 @@
 # app/db/models.py
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, DateTime, String
 from sqlalchemy.sql import func
+
 from app.db.database import Base
+
 
 class Career(Base):
     __tablename__ = "careers"

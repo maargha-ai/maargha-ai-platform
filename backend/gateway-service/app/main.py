@@ -1,18 +1,30 @@
-from fastapi import FastAPI
-from prometheus_fastapi_instrumentator import Instrumentator
-from app.routes import (
-    auth, orchestrator_ws, quiz_ws, 
-    emotional_support_ws, song_recommend, career_ws,
-    roadmap, jobs, news, linkedin, tutor_ws, cv, resume_parser
-    )
-from fastapi.middleware.cors import CORSMiddleware
-from app.core.middleware import logging_middleware
-from app.core.logger import logger
 import time
 
-# Import monitoring and logging
-from app.monitoring.logger import LoggingMiddleware, performance_monitor, gateway_logger
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
+
+from app.core.logger import logger
+from app.core.middleware import logging_middleware
 from app.monitoring.health import router as health_router
+
+# Import monitoring and logging
+from app.monitoring.logger import LoggingMiddleware, gateway_logger, performance_monitor
+from app.routes import (
+    auth,
+    career_ws,
+    cv,
+    emotional_support_ws,
+    jobs,
+    linkedin,
+    news,
+    orchestrator_ws,
+    quiz_ws,
+    resume_parser,
+    roadmap,
+    song_recommend,
+    tutor_ws,
+)
 
 app = FastAPI(title="MAARGHA Gateway")
 

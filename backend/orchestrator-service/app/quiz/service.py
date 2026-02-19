@@ -1,5 +1,6 @@
-from app.chains.quiz_generation_chain import generate_quiz_question
 import re
+
+from app.chains.quiz_generation_chain import generate_quiz_question
 
 
 def is_similar(q1: str, q2: str) -> bool:
@@ -21,12 +22,11 @@ def _shorten_question(question: str, max_words: int = 24) -> str:
         trimmed += "?"
     return trimmed
 
+
 async def generate_quiz_direct(topic, level, asked_questions):
     for _ in range(3):
         quiz = await generate_quiz_question(
-            topic=topic,
-            level=level,
-            previous_questions=list(asked_questions)
+            topic=topic, level=level, previous_questions=list(asked_questions)
         )
 
         if not quiz:
@@ -41,9 +41,7 @@ async def generate_quiz_direct(topic, level, asked_questions):
         return {"question": question}
 
     # Resilient fallback so quiz never gets blocked on uniqueness.
-    fallback = (
-        f"In one concise scenario, explain a key theoretical trade-off in {topic} and justify your reasoning at {level} level."
-    )
+    fallback = f"In one concise scenario, explain a key theoretical trade-off in {topic} and justify your reasoning at {level} level."
     if fallback not in asked_questions:
         asked_questions.add(fallback)
         return {"question": fallback}

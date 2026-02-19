@@ -1,10 +1,13 @@
-""" Settings loader """
+"""Settings loader"""
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, AnyUrl
 from typing import Optional
+
 from dotenv import load_dotenv
+from pydantic import AnyUrl, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 load_dotenv()
+
 
 class Settings(BaseSettings):
 
@@ -12,10 +15,8 @@ class Settings(BaseSettings):
     SOME_APP_SETTING: str | None = None
 
     model_config = SettingsConfigDict(
-        env_file = ".env",
-        env_file_encoding = "utf-8",
-        extra="ignore"
-        )
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
 
     # App
     APP_NAME: str = "Orchestrator-service"
@@ -44,9 +45,10 @@ class Settings(BaseSettings):
 
     # Song recommendation
     GCP_BUCKET_NAME: str
-    SONG_PATH: str 
+    SONG_PATH: str
 
     # Tutor
     GCP_TUTOR_BUCKET: str
+
 
 settings = Settings()

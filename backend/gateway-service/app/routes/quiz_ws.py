@@ -1,10 +1,13 @@
-from fastapi import APIRouter, WebSocket, Query, WebSocketDisconnect
-from jose import jwt
-import websockets
 import asyncio
+
+import websockets
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+from jose import jwt
+
 from app.config import settings
 
 router = APIRouter()
+
 
 @router.websocket("/ws/quiz")
 async def quiz_ws(websocket: WebSocket, token: str = Query(...)):

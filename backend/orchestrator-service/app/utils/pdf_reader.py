@@ -1,5 +1,7 @@
-import pdfplumber
 import io
+
+import pdfplumber
+
 
 def extract_text_from_pdf(file_bytes: bytes) -> str:
     text = ""

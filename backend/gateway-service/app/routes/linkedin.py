@@ -1,19 +1,20 @@
-from fastapi import APIRouter, WebSocket, Query
-from jose import jwt
-import websockets
 import asyncio
+
+import websockets
+from fastapi import APIRouter, Query, WebSocket
+from jose import jwt
+
 from app.config import settings
 
 router = APIRouter()
+
 
 @router.websocket("/ws/linkedin")
 async def linkedin_ws(websocket: WebSocket, token: str = Query(...)):
     await websocket.accept()
     print("\n[Gateway] linkedin connection")
     payload = jwt.decode(
-        token,
-        settings.JWT_SECRET,
-        algorithms=[settings.JWT_ALGORITHM]
+        token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM]
     )
     user_id = payload["user_id"]
 

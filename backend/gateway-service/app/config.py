@@ -1,7 +1,9 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 class Settings:
     USER_SERVICE_URL = os.getenv("USER_SERVICE_URL")

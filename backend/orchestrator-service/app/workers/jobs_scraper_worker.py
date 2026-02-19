@@ -1,9 +1,11 @@
 # app/workers/job_scraper_worker.py
-from playwright.sync_api import sync_playwright
 import random
 import time
 
+from playwright.sync_api import sync_playwright
+
 SITES = ["Indeed", "Naukri", "Internshala", "LinkedIn"]
+
 
 def scrape_site(page, site_name, query, location):
     jobs = []
@@ -17,11 +19,15 @@ def scrape_site(page, site_name, query, location):
             encoded_query = f"%22{base_query}%22"  # Exact "Data Science" match
             location_plus = location.replace(" ", "+")
             url = f"https://in.indeed.com/jobs?q={encoded_query}&l={location_plus}&fromage=7"  # Last 7 days for fresh hits
-            page.goto(url, wait_until="domcontentloaded", timeout=90000)  # networkidle waits for AJAX
+            page.goto(
+                url, wait_until="domcontentloaded", timeout=90000
+            )  # networkidle waits for AJAX
             page.wait_for_timeout(random.randint(3000, 5000))  # Random human pause
             # Enhanced scrolling: 3 gradual scrolls to load ~20-30 jobs
             for i in range(3):
-                page.evaluate(f"window.scrollBy(0, {800 * (i + 1)})")  # Incremental scroll
+                page.evaluate(
+                    f"window.scrollBy(0, {800 * (i + 1)})"
+                )  # Incremental scroll
                 page.wait_for_timeout(random.randint(1500, 3000))
             # === PRIORITY SELECTORS (Dec 2025 - India Layout) ===
             cards = page.query_selector_all('li[data-testid="jobsearch-JobCard"]')
@@ -30,50 +36,67 @@ def scrape_site(page, site_name, query, location):
                 cards = page.query_selector_all('div[data-testid="job-container"]')
             # Fallback 2: Legacy with data-jk (still ~10% of pages)
             if not cards:
-                cards = page.query_selector_all('div[data-jk]')     
+                cards = page.query_selector_all("div[data-jk]")
             # Fallback 3: Broad beacon (for beacon-tracked jobs)
             if not cards:
-                cards = page.query_selector_all('div.job_seen_beacon')
+                cards = page.query_selector_all("div.job_seen_beacon")
             print(f"({len(cards)} cards found)", end=" → ")
             success_count = 0
             for card in cards[:30]:  # Cap at 30 to avoid overload
                 try:
                     # === Title (Multi-fallback) ===
                     title = "N/A"
-                    title_elem = card.query_selector('[data-testid="jobTitle"] span[title]')
+                    title_elem = card.query_selector(
+                        '[data-testid="jobTitle"] span[title]'
+                    )
                     if title_elem:
                         title = title_elem.get_attribute("title")
                     else:
-                        title_elem = card.query_selector('h2 a span[title]')
+                        title_elem = card.query_selector("h2 a span[title]")
                         if title_elem:
-                            title = title_elem.get_attribute("title") or title_elem.inner_text()                   
+                            title = (
+                                title_elem.get_attribute("title")
+                                or title_elem.inner_text()
+                            )
                     # === Company ===
                     company = "N/A"
                     company_elem = card.query_selector('[data-testid="company-name"]')
                     if company_elem:
                         company = company_elem.inner_text()
                     else:
-                        company_elem = card.query_selector('span.companyName')
+                        company_elem = card.query_selector("span.companyName")
                         if company_elem:
                             company = company_elem.inner_text()
                     # === Link ===
                     link = ""
-                    link_elem = card.query_selector('a[data-jk]')
+                    link_elem = card.query_selector("a[data-jk]")
                     if link_elem:
                         href = link_elem.get_attribute("href")
-                        link = f"https://in.indeed.com{href}" if href and href.startswith("/") else href
+                        link = (
+                            f"https://in.indeed.com{href}"
+                            if href and href.startswith("/")
+                            else href
+                        )
                     else:
-                        link_elem = card.query_selector('h2 a')
+                        link_elem = card.query_selector("h2 a")
                         if link_elem:
                             href = link_elem.get_attribute("href")
-                            link = f"https://in.indeed.com{href}" if href and href.startswith("/") else href
+                            link = (
+                                f"https://in.indeed.com{href}"
+                                if href and href.startswith("/")
+                                else href
+                            )
                     # === Description ===
                     desc = ""
-                    desc_elem = card.query_selector('[data-testid="jobsearch-JobCard-description"]')
+                    desc_elem = card.query_selector(
+                        '[data-testid="jobsearch-JobCard-description"]'
+                    )
                     if desc_elem:
                         desc = desc_elem.inner_text()
                     else:
-                        desc_elems = card.query_selector_all('div[data-testid="jobsearch-JobCard-reqSnippet"] li')
+                        desc_elems = card.query_selector_all(
+                            'div[data-testid="jobsearch-JobCard-reqSnippet"] li'
+                        )
                         desc_parts = []
                         for li in desc_elems[:3]:  # Top 3 bullets
                             text = li.inner_text()
@@ -81,19 +104,27 @@ def scrape_site(page, site_name, query, location):
                                 desc_parts.append(text)
                         desc = " • ".join(desc_parts)
                     if title != "N/A" and link and "indeed" in link:
-                        jobs.append({
-                            "title": title.strip(),
-                            "company": company.strip(),
-                            "link": link,
-                            "desc": (desc.strip()[:400] + "...") if len(desc) > 400 else desc.strip(),  # Truncate
-                            "source": "Indeed"
-                        })
+                        jobs.append(
+                            {
+                                "title": title.strip(),
+                                "company": company.strip(),
+                                "link": link,
+                                "desc": (
+                                    (desc.strip()[:400] + "...")
+                                    if len(desc) > 400
+                                    else desc.strip()
+                                ),  # Truncate
+                                "source": "Indeed",
+                            }
+                        )
                         success_count += 1
                 except Exception:
                     continue  # Skip broken cards
             print(f"Success: {success_count} jobs")
             if success_count == 0:
-                print("Debug: Check console for page errors or try without quotes in query.")
+                print(
+                    "Debug: Check console for page errors or try without quotes in query."
+                )
 
         elif site_name == "Naukri":
             url = f"https://www.naukri.com/{query.replace(' ', '-')}-jobs-in-{location.replace(' ', '-')}"
@@ -101,7 +132,8 @@ def scrape_site(page, site_name, query, location):
             page.wait_for_timeout(5000)
             try:
                 page.click("span.nI-gNb-icon-close", timeout=2000)
-            except: pass
+            except:
+                pass
             for _ in range(3):
                 page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
                 page.wait_for_timeout(1500)
@@ -117,7 +149,15 @@ def scrape_site(page, site_name, query, location):
                     desc_elem = card.query_selector(".job-desc")
                     desc = desc_elem.inner_text() if desc_elem else ""
                     if title != "N/A" and link:
-                        jobs.append({"title": title.strip(),"company": company.strip(),"link": link,"desc": desc.strip(),"source": "Naukri"})
+                        jobs.append(
+                            {
+                                "title": title.strip(),
+                                "company": company.strip(),
+                                "link": link,
+                                "desc": desc.strip(),
+                                "source": "Naukri",
+                            }
+                        )
                 except:
                     continue
             print(f"Success: {len(jobs)} jobs")
@@ -135,19 +175,34 @@ def scrape_site(page, site_name, query, location):
                     company_elem = card.query_selector(".company-name")
                     company = company_elem.inner_text() if company_elem else "N/A"
                     link_elem = card.query_selector("a[href*='/job/detail']")
-                    link = "https://internshala.com" + link_elem.get_attribute("href") if link_elem else ""
+                    link = (
+                        "https://internshala.com" + link_elem.get_attribute("href")
+                        if link_elem
+                        else ""
+                    )
                     desc_elem = card.query_selector(".internship-details")
                     desc = desc_elem.inner_text() if desc_elem else ""
                     if title != "N/A" and link:
-                        jobs.append({"title": title.strip(), "company": company.strip(), "link": link, "desc": desc.strip(), "source": "Internshala"})
-                except: continue
+                        jobs.append(
+                            {
+                                "title": title.strip(),
+                                "company": company.strip(),
+                                "link": link,
+                                "desc": desc.strip(),
+                                "source": "Internshala",
+                            }
+                        )
+                except:
+                    continue
             print(f"Success: {len(jobs)} jobs")
 
         elif site_name == "LinkedIn":
             url = f"https://www.linkedin.com/jobs/search?keywords={query.replace(' ', '%20')}&location={location}"
             page.goto(url, wait_until="domcontentloaded", timeout=90000)
             page.wait_for_timeout(8000)
-            cards = page.query_selector_all(".base-card, .jobs-search-results__list-item")
+            cards = page.query_selector_all(
+                ".base-card, .jobs-search-results__list-item"
+            )
             print(f"({len(cards)} cards found)", end=" → ")
             for card in cards[:20]:
                 try:
@@ -158,8 +213,17 @@ def scrape_site(page, site_name, query, location):
                     link_elem = card.query_selector("a.base-card__full-link")
                     link = link_elem.get_attribute("href") if link_elem else ""
                     if title != "N/A" and link:
-                        jobs.append({"title": title.strip(), "company": company.strip(), "link": link.split("?")[0], "desc": "", "source": "LinkedIn"})
-                except: continue
+                        jobs.append(
+                            {
+                                "title": title.strip(),
+                                "company": company.strip(),
+                                "link": link.split("?")[0],
+                                "desc": "",
+                                "source": "LinkedIn",
+                            }
+                        )
+                except:
+                    continue
             print(f"Success: {len(jobs)} jobs")
 
     except Exception as e:

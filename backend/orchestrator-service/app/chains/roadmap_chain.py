@@ -1,7 +1,10 @@
 # app/chains/roadmap_chain.py
 import json
-from app.core.llm_client import llm
+
 from langchain_core.messages import HumanMessage
+
+from app.core.llm_client import llm
+
 
 async def generate_roadmap(career: str):
     prompt = f"""
@@ -34,5 +37,3 @@ async def generate_roadmap(career: str):
 
     response = await llm.ainvoke([HumanMessage(content=prompt)])
     return json.loads(response.content)
-
-

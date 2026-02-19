@@ -1,9 +1,11 @@
 # app/core/llm_client.py
-from typing import List, Dict, Optional, Union
+from typing import Dict, List, Optional, Union
+
 from groq import Groq
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from openai import OpenAI
+
 from app.core.config import settings
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 
 
 class LLMClient:
@@ -28,8 +30,7 @@ class LLMClient:
         self.client = Groq(api_key=settings.GROQ_API_KEY)
         # OpenAI-compatible endpoint powered by Groq (for Whisper, etc.)
         self.client_openai = OpenAI(
-            api_key=settings.GROQ_API_KEY,
-            base_url="https://api.groq.com/openai/v1"
+            api_key=settings.GROQ_API_KEY, base_url="https://api.groq.com/openai/v1"
         )
 
     def _init_openai(self):
@@ -39,25 +40,37 @@ class LLMClient:
         self.client_openai = OpenAI(api_key=settings.OPENAI_API_KEY)
 
     # ——— Legacy sync method (still useful for simple calls) ———
-    def chat_completion(self, prompt: str, system_prompt: Optional[str] = None, model: Optional[str] = None, temperature: float = 0.3, max_tokens: int = 1200) -> str:
+    def chat_completion(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        model: Optional[str] = None,
+        temperature: float = 0.3,
+        max_tokens: int = 1200,
+    ) -> str:
         messages = self._build_messages(prompt, system_prompt)
 
         model = "llama-3.1-8b-instant"
         resp = self.client.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens
-            )
+            model=model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
         return resp.choices[0].message.content.strip()
 
     # ——— ASYNC: The one used by LangGraph & chains ———
-    async def ainvoke(self, messages: List[Union[HumanMessage, SystemMessage]], model: Optional[str] = None, temperature: float = 0.3, max_tokens: int = 1200) -> AIMessage:
+    async def ainvoke(
+        self,
+        messages: List[Union[HumanMessage, SystemMessage]],
+        model: Optional[str] = None,
+        temperature: float = 0.3,
+        max_tokens: int = 1200,
+    ) -> AIMessage:
         # print("\n[DEBUG][llm_client] Incoming LangChain messages:")
         # for m in messages:
         #     print(" - type:", m.type, "| content:", m.content)
 
-        
         # Role conversion
         def convert_role(m):
             if isinstance(m, HumanMessage):
@@ -69,17 +82,16 @@ class LLMClient:
             raise ValueError(f"Unknown message type: {m.type}")
 
         raw_messages = [
-            {"role": convert_role(m), "content": m.content}
-            for m in messages
+            {"role": convert_role(m), "content": m.content} for m in messages
         ]
 
         model = "llama-3.3-70b-versatile"
         response = self.client.chat.completions.create(
-                model=model,
-                messages=raw_messages,
-                temperature=temperature,
-                max_tokens=max_tokens
-            )
+            model=model,
+            messages=raw_messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
         content = response.choices[0].message.content.strip()
         return AIMessage(content=content)
 
@@ -96,7 +108,9 @@ class LLMClient:
 
     # ——— Helper ———
     @staticmethod
-    def _build_messages(prompt: str, system_prompt: Optional[str]) -> List[Dict[str, str]]:
+    def _build_messages(
+        prompt: str, system_prompt: Optional[str]
+    ) -> List[Dict[str, str]]:
         msgs: List[Dict[str, str]] = []
         if system_prompt:
             msgs.append({"role": "system", "content": system_prompt})

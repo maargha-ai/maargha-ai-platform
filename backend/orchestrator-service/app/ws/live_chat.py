@@ -1,11 +1,14 @@
 # orchestrator-service/app/ws/live_chat.py
-from fastapi import WebSocket
-import numpy as np
-import json
-from app.graph.orchestrator_graph import app as graph_app
-from app.core.state import AgentState
-from app.agents.emotional_support_agent import transcribe_audio
 import asyncio  # NEW: for watchdog
+import json
+
+import numpy as np
+from fastapi import WebSocket
+
+from app.agents.emotional_support_agent import transcribe_audio
+from app.core.state import AgentState
+from app.graph.orchestrator_graph import app as graph_app
+
 
 async def chat_live_ws(websocket: WebSocket):
     await websocket.accept()
@@ -39,29 +42,41 @@ async def chat_live_ws(websocket: WebSocket):
                 audio = np.frombuffer(message["bytes"], dtype=np.float32)
                 audio_buffer.append(audio)
                 # NEW: Log more details for debug
-                print(f"[LIVE CHAT] Audio chunk received | Length: {len(audio)} | Max amp: {np.max(np.abs(audio)):.4f} | Buffer size: {len(audio_buffer)}")
+                print(
+                    f"[LIVE CHAT] Audio chunk received | Length: {len(audio)} | Max amp: {np.max(np.abs(audio)):.4f} | Buffer size: {len(audio_buffer)}"
+                )
                 continue
 
             if message.get("text") == "STOP":
                 if not audio_buffer:
                     print("[LIVE CHAT] No audio to process")
                     # NEW: Send status to frontend
-                    await websocket.send_text(json.dumps({
-                        "type": "STATUS",
-                        "content": "No speech detected. Try speaking again."
-                    }))
+                    await websocket.send_text(
+                        json.dumps(
+                            {
+                                "type": "STATUS",
+                                "content": "No speech detected. Try speaking again.",
+                            }
+                        )
+                    )
                     continue
 
                 audio_np = np.concatenate(audio_buffer)
                 # NEW: Check if audio is silent (debug)
                 max_amp = np.max(np.abs(audio_np))
-                print(f"[LIVE CHAT] Processing audio | Total length: {len(audio_np)} | Max amp: {max_amp:.4f}")
+                print(
+                    f"[LIVE CHAT] Processing audio | Total length: {len(audio_np)} | Max amp: {max_amp:.4f}"
+                )
                 if max_amp < 0.001:  # Too silent? Skip or handle
                     print("[LIVE CHAT] Audio too silent, skipping")
-                    await websocket.send_text(json.dumps({
-                        "type": "STATUS",
-                        "content": "Audio too quiet. Check mic volume."
-                    }))
+                    await websocket.send_text(
+                        json.dumps(
+                            {
+                                "type": "STATUS",
+                                "content": "Audio too quiet. Check mic volume.",
+                            }
+                        )
+                    )
                     audio_buffer.clear()
                     continue
 
@@ -70,41 +85,42 @@ async def chat_live_ws(websocket: WebSocket):
 
                 if not text:
                     print("[LIVE CHAT] Empty transcript, skipping")
-                    await websocket.send_text(json.dumps({
-                        "type": "STATUS",
-                        "content": "No speech detected in audio."
-                    }))
+                    await websocket.send_text(
+                        json.dumps(
+                            {
+                                "type": "STATUS",
+                                "content": "No speech detected in audio.",
+                            }
+                        )
+                    )
                     audio_buffer.clear()
                     continue
 
-                await websocket.send_text(json.dumps({
-                    "type": "USER_TRANSCRIPT",
-                    "content": text
-                }))
+                await websocket.send_text(
+                    json.dumps({"type": "USER_TRANSCRIPT", "content": text})
+                )
 
                 state["messages"].append({"role": "user", "content": text})
                 output = await graph_app.ainvoke(state)
                 state.update(output)
 
                 if state.get("agent_response"):
-                    await websocket.send_text(json.dumps({
-                        "type": "CHAT",
-                        "content": state["agent_response"]
-                    }))
+                    await websocket.send_text(
+                        json.dumps({"type": "CHAT", "content": state["agent_response"]})
+                    )
 
                 if state.get("navigate"):
-                    await websocket.send_text(json.dumps({
-                        "navigate": state["navigate"]
-                    }))
+                    await websocket.send_text(
+                        json.dumps({"navigate": state["navigate"]})
+                    )
 
                 state.pop("agent_response", None)
                 state.pop("navigate", None)
 
                 # NEW: Send resume status
-                await websocket.send_text(json.dumps({
-                    "type": "STATUS",
-                    "content": "Listening again..."
-                }))
+                await websocket.send_text(
+                    json.dumps({"type": "STATUS", "content": "Listening again..."})
+                )
 
                 audio_buffer.clear()  # Explicit clear
 

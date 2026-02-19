@@ -1,15 +1,16 @@
-from fastapi import APIRouter, Response
 import httpx
+from fastapi import APIRouter, Response
+
 from app.config import settings
 
 router = APIRouter(prefix="/cv", tags=["CV"])
+
 
 @router.post("/generate")
 async def generate_cv(payload: dict):
     async with httpx.AsyncClient(timeout=60) as client:
         res = await client.post(
-            f"{settings.ORCHESTRATOR_SERVICE_URL}/cv/generate",
-            json=payload
+            f"{settings.ORCHESTRATOR_SERVICE_URL}/cv/generate", json=payload
         )
         return res.json()
 
@@ -18,12 +19,9 @@ async def generate_cv(payload: dict):
 async def generate_cv_pdf(payload: dict):
     async with httpx.AsyncClient(timeout=60) as client:
         res = await client.post(
-            f"{settings.ORCHESTRATOR_SERVICE_URL}/cv/generate/pdf",
-            json=payload
+            f"{settings.ORCHESTRATOR_SERVICE_URL}/cv/generate/pdf", json=payload
         )
 
         return Response(
-            content=res.content,
-            media_type="application/pdf",
-            headers=res.headers
+            content=res.content, media_type="application/pdf", headers=res.headers
         )

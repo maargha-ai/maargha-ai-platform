@@ -1,6 +1,7 @@
 # app/graph/nodes/action_node.py
 from app.core.state import AgentState
 
+
 async def action_node(state: AgentState):
     action = state.get("agent_action")
 
@@ -14,14 +15,11 @@ async def action_node(state: AgentState):
         return {
             "agent_action": "CHAT",
             "agent_response": state.get("agent_response"),
-            "agent_done": True
+            "agent_done": True,
         }
 
     # Tool navigation
     return {
-        "navigate": {
-            "tool": action,
-            "payload": state.get("agent_action_input") or {}
-        },
-        "agent_done": True
+        "navigate": {"tool": action, "payload": state.get("agent_action_input") or {}},
+        "agent_done": True,
     }

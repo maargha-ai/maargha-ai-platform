@@ -1,10 +1,13 @@
-from fastapi import APIRouter, WebSocket, Query
-from jose import jwt
-import websockets
 import asyncio
+
+import websockets
+from fastapi import APIRouter, Query, WebSocket
+from jose import jwt
+
 from app.config import settings
 
 router = APIRouter()
+
 
 @router.websocket("/ws/emotional-support")
 async def emotional_support_ws(websocket: WebSocket, token: str = Query(...)):
@@ -19,7 +22,9 @@ async def emotional_support_ws(websocket: WebSocket, token: str = Query(...)):
     user_id = payload["user_id"]
 
     # 🔁 Connect to orchestrator WS
-    orch_ws_url = f"{settings.ORCHESTRATOR_SERVICE_WS_URL}/ws/emotional-support/{user_id}"
+    orch_ws_url = (
+        f"{settings.ORCHESTRATOR_SERVICE_WS_URL}/ws/emotional-support/{user_id}"
+    )
     orch_ws = await websockets.connect(orch_ws_url)
 
     async def frontend_to_backend():

@@ -1,9 +1,11 @@
 from datetime import date, timedelta
 
+
 def fallback_dates():
     start = date.today()
     end = start + timedelta(days=2)
     return start, end
+
 
 def detect_mode(text: str) -> str:
     t = text.lower()
@@ -12,6 +14,7 @@ def detect_mode(text: str) -> str:
     if "offline" in t or "in-person" in t:
         return "offline"
     return "hybrid"
+
 
 def detect_tags(text: str) -> list:
     tags = []

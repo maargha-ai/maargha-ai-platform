@@ -1,10 +1,9 @@
-from rest_framework import generics
 from django.contrib.auth import get_user_model
-from rest_framework.permissions import AllowAny
+from rest_framework import generics
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
@@ -32,24 +31,18 @@ class RegisterView(generics.CreateAPIView):
 
 
 class LogoutView(APIView):
-    authentication_classes = []  
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
         refresh = request.data.get("refresh")
 
         if not refresh:
-            return Response(
-                {"detail": "Refresh token required"},
-                status=400
-            )
+            return Response({"detail": "Refresh token required"}, status=400)
 
         try:
             token = RefreshToken(refresh)
             token.blacklist()
             return Response({"detail": "Logged out"})
         except Exception:
-            return Response(
-                {"detail": "Invalid token"},
-                status=400
-            )
+            return Response({"detail": "Invalid token"}, status=400)

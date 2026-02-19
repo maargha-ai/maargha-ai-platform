@@ -1,6 +1,9 @@
-from fastapi import WebSocket
 import json
+
+from fastapi import WebSocket
+
 from app.chains.tutor_chain import ask_tutor
+
 
 async def tutor_ws_handler(websocket: WebSocket, user_id: str):
     await websocket.accept()
@@ -13,7 +16,6 @@ async def tutor_ws_handler(websocket: WebSocket, user_id: str):
 
             answer = await ask_tutor(question)
 
-            await websocket.send_text(json.dumps({
-                "type": "tutor_answer",
-                "answer": answer
-            }))
+            await websocket.send_text(
+                json.dumps({"type": "tutor_answer", "answer": answer})
+            )
