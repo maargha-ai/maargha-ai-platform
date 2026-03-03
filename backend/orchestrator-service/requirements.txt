@@ -1,4 +1,4 @@
-uvicorn==0.38.0
+uvicorn[standard]==0.30.6
 fastapi==0.124.2
 groq>=0.30.0,<1.0.0
 dotenv==0.9.9
@@ -46,4 +46,3 @@ bandit==1.7.6
 pydocstyle==6.3.0
 autoflake==2.3.1
 pre-commit==3.7.0
-uvicorn[standard]==3.11
