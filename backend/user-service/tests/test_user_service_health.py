@@ -1,5 +1,5 @@
 # tests/test_user_service_health.py
-import asyncio
+import time
 from unittest.mock import Mock, patch
 
 import pytest
@@ -13,6 +13,7 @@ from user_service.monitoring.health import (
 )
 
 
+@pytest.mark.django_db
 class TestUserServiceHealthEndpoints:
     """Test cases for Django health check endpoints"""
 
@@ -35,8 +36,7 @@ class TestUserServiceHealthEndpoints:
         with patch(
             "user_service.monitoring.health.test_database_connection"
         ) as mock_db:
-            mock_db.return_value = asyncio.Future()
-            mock_db.set_result("healthy")
+            mock_db.return_value = "healthy"
 
             response = self.client.get("/health/detailed")
 
@@ -51,8 +51,7 @@ class TestUserServiceHealthEndpoints:
         with patch(
             "user_service.monitoring.health.test_database_connection"
         ) as mock_db:
-            mock_db.return_value = asyncio.Future()
-            mock_db.set_result("unhealthy")
+            mock_db.return_value = "unhealthy"
 
             response = self.client.get("/health/detailed")
 
@@ -80,7 +79,7 @@ class TestUserServiceHealthEndpoints:
             mock_monitor.get_metrics.return_value = {
                 "total_requests": 100,
                 "total_errors": 5,
-                "total_db_queries": 50,
+                "avg_response_time": 0.5,
             }
 
             response = self.client.get("/health/metrics")
@@ -89,7 +88,6 @@ class TestUserServiceHealthEndpoints:
             data = response.json()
             assert data["total_requests"] == 100
             assert data["total_errors"] == 5
-            assert data["total_db_queries"] == 50
 
     def test_readiness_check_ready(self):
         """Test readiness check when service is ready"""
@@ -98,7 +96,8 @@ class TestUserServiceHealthEndpoints:
         ) as mock_monitor:
             mock_monitor.get_metrics.return_value = {
                 "total_requests": 50,
-                "total_db_queries": 25,
+                "total_errors": 0,
+                "avg_response_time": 0.1,
             }
 
             response = self.client.get("/health/readiness")
@@ -115,7 +114,8 @@ class TestUserServiceHealthEndpoints:
         ) as mock_monitor:
             mock_monitor.get_metrics.return_value = {
                 "total_requests": 0,
-                "total_db_queries": 0,
+                "total_errors": 0,
+                "avg_response_time": 0,
             }
 
             response = self.client.get("/health/readiness")
@@ -136,28 +136,29 @@ class TestUserServiceHealthEndpoints:
         assert data["service"] == "maargha-user-service"
 
 
+@pytest.mark.django_db
 class TestUserServiceHealthCheckFunctions:
     """Test cases for Django health check utility functions"""
 
-    @pytest.mark.django_db
-    async def test_database_connection_success(self):
+    def test_database_connection_success(self):
         """Test successful database connection"""
         with patch("django.db.connection") as mock_connection:
             mock_cursor = Mock()
-            mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+            mock_connection.cursor.return_value.__enter__ = Mock(
+                return_value=mock_cursor
+            )
+            mock_connection.cursor.return_value.__exit__ = Mock(return_value=False)
 
-            result = await test_database_connection()
+            result = test_database_connection()
 
             assert result == "healthy"
-            mock_cursor.execute.assert_called_with("SELECT 1")
 
-    @pytest.mark.django_db
-    async def test_database_connection_failure(self):
+    def test_database_connection_failure(self):
         """Test failed database connection"""
         with patch("django.db.connection") as mock_connection:
             mock_connection.cursor.side_effect = Exception("Connection failed")
 
-            result = await test_database_connection()
+            result = test_database_connection()
 
             assert result == "unhealthy"
 

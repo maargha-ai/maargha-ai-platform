@@ -21,7 +21,8 @@ LOCAL_VECTOR_DB_PATH.mkdir(parents=True, exist_ok=True)
 _retriever = None
 
 
-PROMPT_TEMPLATE = PromptTemplate.from_template("""
+PROMPT_TEMPLATE = PromptTemplate.from_template(
+    """\
     You are an AI Tutor teaching IT concepts clearly and simply.
     Use ONLY the provided context from the textbook.
 
@@ -36,7 +37,8 @@ PROMPT_TEMPLATE = PromptTemplate.from_template("""
     - Real-world analogy
     - 3-step learning plan
     - A short quiz with answers
-    """)
+    """
+)
 
 
 def download_vector_db():

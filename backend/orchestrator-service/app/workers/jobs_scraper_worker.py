@@ -264,7 +264,8 @@ def scrape_jobs_sync(query: str, location: str, max_jobs: int = 200):
 
         page = context.new_page()
 
-        context.add_init_script("""
+        context.add_init_script(
+            """\
             Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
             window.navigator.chrome = { runtime: {} };
             Object.defineProperty(
@@ -273,7 +274,8 @@ def scrape_jobs_sync(query: str, location: str, max_jobs: int = 200):
                 { get: () => ['en-US', 'en'] }
             );
             Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
-            """)
+            """
+        )
 
         for site in SITES:
             jobs = scrape_site(page, site, query, location)

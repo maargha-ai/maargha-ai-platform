@@ -1,12 +1,13 @@
 # user_service/monitoring/logger.py
 
 import logging
-import structlog
 import time
 import traceback
 from datetime import datetime
 from functools import wraps
 from typing import Any, Dict
+
+import structlog
 from django.utils.deprecation import MiddlewareMixin
 
 

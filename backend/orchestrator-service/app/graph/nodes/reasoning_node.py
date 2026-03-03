@@ -47,7 +47,8 @@ async def reasoning_node(state: AgentState):
 
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
-        HumanMessage(content=f"""
+        HumanMessage(
+            content=f"""\
                     User message:
                     {user_msg}
 
@@ -55,7 +56,8 @@ async def reasoning_node(state: AgentState):
                     {intent_hint}
 
                     Decide next action.
-                    """),
+                    """
+        ),
     ]
 
     response = await llm.ainvoke(messages)
