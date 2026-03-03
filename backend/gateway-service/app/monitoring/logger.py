@@ -5,9 +5,9 @@ import time
 import traceback
 from datetime import datetime
 from functools import wraps
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
-from fastapi import Request, Response
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 
@@ -99,7 +99,7 @@ def log_function_call(func):
 
         try:
             gateway_logger.info(
-                f"Function call started",
+                "Function call started",
                 extra={
                     "function": function_name,
                     "args_count": len(args),
@@ -111,7 +111,7 @@ def log_function_call(func):
 
             execution_time = time.time() - start_time
             gateway_logger.info(
-                f"Function call completed",
+                "Function call completed",
                 extra={
                     "function": function_name,
                     "execution_time": round(execution_time, 3),
@@ -124,7 +124,7 @@ def log_function_call(func):
         except Exception as e:
             execution_time = time.time() - start_time
             gateway_logger.error(
-                f"Function call failed",
+                "Function call failed",
                 error=e,
                 extra={
                     "function": function_name,
@@ -145,7 +145,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
         # Log request
         api_logger.info(
-            f"HTTP request received",
+            "HTTP request received",
             extra={
                 "method": request.method,
                 "url": str(request.url),
@@ -160,7 +160,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             # Log response
             process_time = time.time() - start_time
             api_logger.info(
-                f"HTTP response sent",
+                "HTTP response sent",
                 extra={
                     "method": request.method,
                     "url": str(request.url),
@@ -174,7 +174,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             process_time = time.time() - start_time
             api_logger.error(
-                f"HTTP request failed",
+                "HTTP request failed",
                 error=e,
                 extra={
                     "method": request.method,

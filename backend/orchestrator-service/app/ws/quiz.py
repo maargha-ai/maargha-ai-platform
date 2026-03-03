@@ -150,9 +150,7 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                     )
                 except Exception as e:
                     away = False
-                    logging.error(
-                        "User %s: Gaze detection error - %s", user_id, str(e)
-                    )
+                    logging.error("User %s: Gaze detection error - %s", user_id, str(e))
 
                 if away:
                     state["away_streak"] += 1

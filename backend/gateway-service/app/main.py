@@ -1,15 +1,13 @@
-import time
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from app.core.logger import logger
 from app.core.middleware import logging_middleware
 from app.monitoring.health import router as health_router
 
 # Import monitoring and logging
-from app.monitoring.logger import LoggingMiddleware, gateway_logger, performance_monitor
+from app.monitoring.logger import LoggingMiddleware
 from app.routes import (
     auth,
     career_ws,

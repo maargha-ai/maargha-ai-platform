@@ -1,5 +1,5 @@
 # Auth Routes
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request
 
 from app.core.logger import logger
 from app.services.user_client import login_user, logout_user, register_user

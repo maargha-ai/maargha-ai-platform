@@ -1,5 +1,4 @@
 # app/monitoring/health.py
-import asyncio
 import time
 from typing import Any, Dict
 

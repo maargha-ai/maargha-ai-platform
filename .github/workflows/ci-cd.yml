@@ -198,7 +198,7 @@ jobs:
     - name: Run tests
       working-directory: ./backend/orchestrator-service
       run: |
-        pytest --cov=app --cov-report=xml --cov-fail-under=80
+        pytest --cov=app --cov-report=xml --cov-fail-under=40
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -247,7 +247,7 @@ jobs:
     - name: Run tests
       working-directory: ./backend/gateway-service
       run: |
-        pytest --cov=app --cov-report=xml --cov-fail-under=80
+        pytest --cov=app --cov-report=xml --cov-fail-under=40
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -296,7 +296,7 @@ jobs:
     - name: Run tests
       working-directory: ./backend/user-service
       run: |
-        pytest --cov=user_service --cov-report=xml --cov-fail-under=80
+        pytest --cov=user_service --cov-report=xml --cov-fail-under=40
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

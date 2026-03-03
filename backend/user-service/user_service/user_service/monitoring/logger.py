@@ -14,6 +14,7 @@ from django.utils.deprecation import MiddlewareMixin
 # STRUCTLOG CONFIGURATION (GLOBAL SETUP)
 # ---------------------------------------------------
 
+
 def setup_logging(level: str = "INFO"):
     logging.basicConfig(
         format="%(message)s",
@@ -39,6 +40,7 @@ setup_logging("INFO")
 # STRUCTURED LOGGER CLASS
 # ---------------------------------------------------
 
+
 class StructuredLogger:
     def __init__(self, name: str):
         self.logger = structlog.get_logger(name)
@@ -46,7 +48,9 @@ class StructuredLogger:
     def info(self, message: str, extra: Dict[str, Any] = None):
         self.logger.info(message, **(extra or {}))
 
-    def error(self, message: str, error: Exception = None, extra: Dict[str, Any] = None):
+    def error(
+        self, message: str, error: Exception = None, extra: Dict[str, Any] = None
+    ):
         log_data = extra or {}
 
         if error:
@@ -74,6 +78,7 @@ monitoring_logger = StructuredLogger("user_service_monitoring")
 # ---------------------------------------------------
 # FUNCTION CALL DECORATOR
 # ---------------------------------------------------
+
 
 def log_function_call(func):
     @wraps(func)
@@ -125,6 +130,7 @@ def log_function_call(func):
 # PERFORMANCE MONITOR
 # ---------------------------------------------------
 
+
 class PerformanceMonitor:
     def __init__(self):
         self.metrics = {
@@ -160,6 +166,7 @@ performance_monitor = PerformanceMonitor()
 # ---------------------------------------------------
 # DJANGO LOGGING MIDDLEWARE
 # ---------------------------------------------------
+
 
 class LoggingMiddleware(MiddlewareMixin):
     def process_request(self, request):
