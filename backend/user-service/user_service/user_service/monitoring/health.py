@@ -86,5 +86,9 @@ def readiness_check() -> Dict[str, Any]:
 def liveness_check() -> Dict[str, Any]:
     """Liveness check for Kubernetes/container orchestration"""
     return JsonResponse(
-        {"status": "alive", "timestamp": time.time(), "service": "maargha-user-service"}
+        {
+            "status": "alive",
+            "timestamp": time.time(),
+            "service": "maargha-user-service",
+        }
     )

@@ -18,16 +18,15 @@ def scrape_site(page, site_name, query, location):
             base_query = query.replace(" ", "+")
             encoded_query = f"%22{base_query}%22"  # Exact "Data Science" match
             location_plus = location.replace(" ", "+")
-            url = f"https://in.indeed.com/jobs?q={encoded_query}&l={location_plus}&fromage=7"  # Last 7 days for fresh hits
-            page.goto(
-                url, wait_until="domcontentloaded", timeout=90000
-            )  # networkidle waits for AJAX
+            url = (
+                "https://in.indeed.com/jobs?"
+                f"q={encoded_query}&l={location_plus}&fromage=7"
+            )
+            page.goto(url, wait_until="domcontentloaded", timeout=90000)
             page.wait_for_timeout(random.randint(3000, 5000))  # Random human pause
             # Enhanced scrolling: 3 gradual scrolls to load ~20-30 jobs
             for i in range(3):
-                page.evaluate(
-                    f"window.scrollBy(0, {800 * (i + 1)})"
-                )  # Incremental scroll
+                page.evaluate(f"window.scrollBy(0, {800 * (i + 1)})")
                 page.wait_for_timeout(random.randint(1500, 3000))
             # === PRIORITY SELECTORS (Dec 2025 - India Layout) ===
             cards = page.query_selector_all('li[data-testid="jobsearch-JobCard"]')
@@ -40,7 +39,7 @@ def scrape_site(page, site_name, query, location):
             # Fallback 3: Broad beacon (for beacon-tracked jobs)
             if not cards:
                 cards = page.query_selector_all("div.job_seen_beacon")
-            print(f"({len(cards)} cards found)", end=" → ")
+            print(f"({len(cards)} cards found)", end=" -> ")
             success_count = 0
             for card in cards[:30]:  # Cap at 30 to avoid overload
                 try:
@@ -102,7 +101,7 @@ def scrape_site(page, site_name, query, location):
                             text = li.inner_text()
                             if text:
                                 desc_parts.append(text)
-                        desc = " • ".join(desc_parts)
+                        desc = " - ".join(desc_parts)
                     if title != "N/A" and link and "indeed" in link:
                         jobs.append(
                             {
@@ -123,22 +122,25 @@ def scrape_site(page, site_name, query, location):
             print(f"Success: {success_count} jobs")
             if success_count == 0:
                 print(
-                    "Debug: Check console for page errors or try without quotes in query."
+                    "Debug: Check console for page errors or try without quotes "
+                    "in query."
                 )
 
         elif site_name == "Naukri":
-            url = f"https://www.naukri.com/{query.replace(' ', '-')}-jobs-in-{location.replace(' ', '-')}"
+            query_slug = query.replace(" ", "-")
+            location_slug = location.replace(" ", "-")
+            url = f"https://www.naukri.com/{query_slug}-jobs-in-{location_slug}"
             page.goto(url, wait_until="domcontentloaded", timeout=90000)
             page.wait_for_timeout(5000)
             try:
                 page.click("span.nI-gNb-icon-close", timeout=2000)
-            except:
+            except Exception:
                 pass
             for _ in range(3):
                 page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
                 page.wait_for_timeout(1500)
             cards = page.query_selector_all(".cust-job-tuple")
-            print(f"({len(cards)} cards found)", end=" → ")
+            print(f"({len(cards)} cards found)", end=" -> ")
             for card in cards[:20]:
                 try:
                     title_elem = card.query_selector("a.title")
@@ -158,7 +160,7 @@ def scrape_site(page, site_name, query, location):
                                 "source": "Naukri",
                             }
                         )
-                except:
+                except Exception:
                     continue
             print(f"Success: {len(jobs)} jobs")
 
@@ -167,7 +169,7 @@ def scrape_site(page, site_name, query, location):
             page.goto(url, wait_until="domcontentloaded", timeout=90000)
             page.wait_for_timeout(4000)
             cards = page.query_selector_all(".internship_meta")
-            print(f"({len(cards)} cards found)", end=" → ")
+            print(f"({len(cards)} cards found)", end=" -> ")
             for card in cards[:25]:
                 try:
                     title_elem = card.query_selector("a[href*='/job/detail']")
@@ -192,18 +194,22 @@ def scrape_site(page, site_name, query, location):
                                 "source": "Internshala",
                             }
                         )
-                except:
+                except Exception:
                     continue
             print(f"Success: {len(jobs)} jobs")
 
         elif site_name == "LinkedIn":
-            url = f"https://www.linkedin.com/jobs/search?keywords={query.replace(' ', '%20')}&location={location}"
+            query_encoded = query.replace(" ", "%20")
+            url = (
+                "https://www.linkedin.com/jobs/search?"
+                f"keywords={query_encoded}&location={location}"
+            )
             page.goto(url, wait_until="domcontentloaded", timeout=90000)
             page.wait_for_timeout(8000)
             cards = page.query_selector_all(
                 ".base-card, .jobs-search-results__list-item"
             )
-            print(f"({len(cards)} cards found)", end=" → ")
+            print(f"({len(cards)} cards found)", end=" -> ")
             for card in cards[:20]:
                 try:
                     title_elem = card.query_selector("h3.base-search-card__title")
@@ -222,7 +228,7 @@ def scrape_site(page, site_name, query, location):
                                 "source": "LinkedIn",
                             }
                         )
-                except:
+                except Exception:
                     continue
             print(f"Success: {len(jobs)} jobs")
 
@@ -258,12 +264,18 @@ def scrape_jobs_sync(query: str, location: str, max_jobs: int = 200):
 
         page = context.new_page()
 
-        context.add_init_script("""
+        context.add_init_script(
+            """
             Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
             window.navigator.chrome = { runtime: {} };
-            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+            Object.defineProperty(
+                navigator,
+                'languages',
+                { get: () => ['en-US', 'en'] }
+            );
             Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
-        """)
+            """
+        )
 
         for site in SITES:
             jobs = scrape_site(page, site, query, location)

@@ -27,7 +27,7 @@ async def chat_live_ws(websocket: WebSocket):
         while True:
             await asyncio.sleep(30)  # Check every 30s
             if asyncio.get_event_loop().time() - last_activity > 300:  # 5 min idle
-                print("[LIVE CHAT] Idle timeout – closing")
+                print("[LIVE CHAT] Idle timeout - closing")
                 await websocket.close()
                 break
 
@@ -43,7 +43,9 @@ async def chat_live_ws(websocket: WebSocket):
                 audio_buffer.append(audio)
                 # NEW: Log more details for debug
                 print(
-                    f"[LIVE CHAT] Audio chunk received | Length: {len(audio)} | Max amp: {np.max(np.abs(audio)):.4f} | Buffer size: {len(audio_buffer)}"
+                    "[LIVE CHAT] Audio chunk received | Length: "
+                    f"{len(audio)} | Max amp: {np.max(np.abs(audio)):.4f} | "
+                    f"Buffer size: {len(audio_buffer)}"
                 )
                 continue
 
@@ -65,7 +67,8 @@ async def chat_live_ws(websocket: WebSocket):
                 # NEW: Check if audio is silent (debug)
                 max_amp = np.max(np.abs(audio_np))
                 print(
-                    f"[LIVE CHAT] Processing audio | Total length: {len(audio_np)} | Max amp: {max_amp:.4f}"
+                    "[LIVE CHAT] Processing audio | Total length: "
+                    f"{len(audio_np)} | Max amp: {max_amp:.4f}"
                 )
                 if max_amp < 0.001:  # Too silent? Skip or handle
                     print("[LIVE CHAT] Audio too silent, skipping")

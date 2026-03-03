@@ -10,7 +10,7 @@ from app.config import settings
 
 router = APIRouter()
 
-# Global registry: user_id → active text chat WebSocket (or None)
+# Global registry: user_id -> active text chat WebSocket (or None)
 active_text_chats: Dict[str, WebSocket] = (
     {}
 )  # thread-safe enough for async with proper locking if needed
@@ -18,7 +18,7 @@ active_text_chats: Dict[str, WebSocket] = (
 
 @router.websocket("/ws/chat")
 async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
-    print("\n[Gateway] Text WS connection attempt")
+    print("[Gateway] Text WS connection attempt")
 
     await websocket.accept()
     print("[Gateway] Frontend text WS accepted")
@@ -49,7 +49,7 @@ async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
         print(f"[Gateway] Closing old text WS for user {user_id}")
         try:
             await old_ws.close(code=1000)  # normal closure
-        except:
+        except Exception:
             pass
 
     active_text_chats[user_id] = websocket
@@ -61,7 +61,7 @@ async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
     try:
         orch_ws = await websockets.connect(orchestrator_ws_url)
         print("[Gateway] Connected to orchestrator WS")
-    except Exception as e:
+    except Exception:
         print("[Gateway] FAILED to connect to orchestrator WS")
         traceback.print_exc()
         await websocket.close()
@@ -80,10 +80,10 @@ async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
                         break
 
                     if message.get("bytes") is not None:
-                        print("[Gateway Text] → Orch AUDIO")
+                        print("[Gateway Text] -> Orch AUDIO")
                         await orch_ws.send(message["bytes"])
                     elif message.get("text") is not None:
-                        print("[Gateway Text] → Orch TEXT:", message["text"])
+                        print("[Gateway Text] -> Orch TEXT:", message["text"])
                         await orch_ws.send(message["text"])
 
             except Exception as e:
@@ -94,7 +94,7 @@ async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
             try:
                 while True:
                     msg = await orch_ws.recv()
-                    print("[Gateway Text] Orch → Frontend:", msg)
+                    print("[Gateway Text] Orch -> Frontend:", msg)
                     await websocket.send_text(msg)
             except Exception:
                 pass
@@ -107,7 +107,7 @@ async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
     except WebSocketDisconnect:
         print("[Gateway Text] Frontend disconnected")
 
-    except Exception as e:
+    except Exception:
         print("[Gateway Text] WS runtime error")
         traceback.print_exc()
 
@@ -122,7 +122,7 @@ async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
 
 @router.websocket("/ws/chat/live")
 async def orchestrator_chat_live(websocket: WebSocket, token: str = Query(...)):
-    print("\n[Gateway] Live WS connection attempt")
+    print("[Gateway] Live WS connection attempt")
 
     await websocket.accept()
 
@@ -173,7 +173,8 @@ async def orchestrator_chat_live(websocket: WebSocket, token: str = Query(...)):
                 except RuntimeError as e:
                     if "disconnect message has been received" in str(e):
                         print(
-                            "[Gateway Live] Frontend already disconnected – stopping forward"
+                            "[Gateway Live] Frontend already disconnected "
+                            "- stopping forward"
                         )
                         break
                     raise
@@ -190,7 +191,7 @@ async def orchestrator_chat_live(websocket: WebSocket, token: str = Query(...)):
         finally:
             try:
                 await orch_ws.close()
-            except:
+            except Exception:
                 pass
 
     async def orch_to_frontend():
@@ -215,7 +216,7 @@ async def orchestrator_chat_live(websocket: WebSocket, token: str = Query(...)):
     finally:
         try:
             await orch_ws.close()
-        except:
+        except Exception:
             pass
         # try:
         #     await websocket.close()

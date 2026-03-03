@@ -41,7 +41,10 @@ async def generate_quiz_direct(topic, level, asked_questions):
         return {"question": question}
 
     # Resilient fallback so quiz never gets blocked on uniqueness.
-    fallback = f"In one concise scenario, explain a key theoretical trade-off in {topic} and justify your reasoning at {level} level."
+    fallback = (
+        "In one concise scenario, explain a key theoretical trade-off in "
+        f"{topic} and justify your reasoning at {level} level."
+    )
     if fallback not in asked_questions:
         asked_questions.add(fallback)
         return {"question": fallback}
@@ -51,10 +54,19 @@ async def generate_quiz_direct(topic, level, asked_questions):
 
 def generate_fallback_question(topic, level, asked_questions, offset=0):
     candidates = [
-        f"Explain the core theoretical principles behind {topic} for a {level} learner.",
-        f"What are the key conceptual trade-offs in {topic}, and why do they matter?",
-        f"Describe one important failure mode in {topic} and the theory behind mitigating it.",
-        f"How would you reason about constraints and assumptions in {topic} from first principles?",
+        (
+            "Explain the core theoretical principles behind "
+            f"{topic} for a {level} learner."
+        ),
+        "What are the key conceptual trade-offs in {topic}, and why do they matter?",
+        (
+            "Describe one important failure mode in "
+            f"{topic} and the theory behind mitigating it."
+        ),
+        (
+            "How would you reason about constraints and assumptions in "
+            f"{topic} from first principles?"
+        ),
     ]
     if candidates:
         shift = offset % len(candidates)
@@ -64,6 +76,9 @@ def generate_fallback_question(topic, level, asked_questions, offset=0):
             asked_questions.add(q)
             return {"question": q}
 
-    backup = f"What is the most important theoretical concept in {topic}, and how does it influence design decisions?"
+    backup = (
+        "What is the most important theoretical concept in "
+        f"{topic}, and how does it influence design decisions?"
+    )
     asked_questions.add(backup)
     return {"question": backup}

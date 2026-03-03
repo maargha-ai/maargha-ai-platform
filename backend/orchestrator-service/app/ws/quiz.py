@@ -40,7 +40,8 @@ async def finalize_quiz(websocket: WebSocket, state: dict):
             "strengths": ["Responses were submitted and captured."],
             "weaknesses": ["Detailed AI analysis could not be completed in time."],
             "suggestions": [
-                "Retry once for full analysis or continue practicing concise concept-first answers."
+                "Retry once for full analysis or continue practicing concise "
+                "concept-first answers."
             ],
             "feedback": "Fallback evaluation generated.",
         }
@@ -131,7 +132,8 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                 )
 
             elif msg_type == "monitor_frame":
-                # Drop extra frames so monitoring does not block question/evaluation flow.
+                # Drop extra frames so monitoring does not block
+                # question/evaluation flow.
                 now = time.monotonic()
                 if now - state["last_monitor_ts"] < 0.8:
                     continue
@@ -143,10 +145,14 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
 
                 try:
                     away = await asyncio.to_thread(is_looking_away, frame)
-                    logging.info(f"User {user_id}: Gaze detection result - away={away}")
+                    logging.info(
+                        "User %s: Gaze detection result - away=%s", user_id, away
+                    )
                 except Exception as e:
                     away = False
-                    logging.error(f"User {user_id}: Gaze detection error - {str(e)}")
+                    logging.error(
+                        "User %s: Gaze detection error - %s", user_id, str(e)
+                    )
 
                 if away:
                     state["away_streak"] += 1
@@ -154,8 +160,9 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                     # Require sustained suspicious frames to reduce false positives.
                     if state["away_streak"] < 3:
                         continue
-                    # Don't reset away_streak immediately - allow for continued violation detection
-                    # state["away_streak"] = 0  # Commented out to allow proper accumulation
+                    # Don't reset away_streak immediately - allow for continued
+                    # violation detection.
+                    # state["away_streak"] = 0  # Commented out to allow accumulation
 
                     # Cooldown between warning increments.
                     if now - state["last_warning_ts"] < 4.0:
@@ -163,15 +170,19 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                     state["last_warning_ts"] = now
 
                     warnings = state["violation_tracker"].register_violation()
-                    # Reset away_streak after registering a violation to prevent multiple rapid violations
+                    # Reset away_streak after registering a violation to prevent
+                    # multiple rapid violations.
                     state["away_streak"] = 0
                     logging.warning(
-                        f"User {user_id}: Violation registered - warnings={warnings}"
+                        "User %s: Violation registered - warnings=%s",
+                        user_id,
+                        warnings,
                     )
 
                     if state["violation_tracker"].should_terminate():
                         logging.error(
-                            f"User {user_id}: Quiz terminated due to repeated malpractice"
+                            "User %s: Quiz terminated due to repeated malpractice",
+                            user_id,
                         )
                         if not state["finalized"]:
                             state["finalized"] = True
@@ -198,11 +209,12 @@ async def quiz_ws_handler(websocket: WebSocket, user_id: str):
                         and state["violation_tracker"].warnings > 0
                     ):  # Increased from 3 to 10
                         old_warnings = state["violation_tracker"].warnings
-                        state[
-                            "violation_tracker"
-                        ].decay_warning()  # Use decay_warning instead of reset
+                        state["violation_tracker"].decay_warning()
                         logging.info(
-                            f"User {user_id}: Warning decayed from {old_warnings} to {state['violation_tracker'].warnings}"
+                            "User %s: Warning decayed from %s to %s",
+                            user_id,
+                            old_warnings,
+                            state["violation_tracker"].warnings,
                         )
                         state["good_streak"] = 0
 

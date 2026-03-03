@@ -13,7 +13,7 @@ def extract_cv_text(path: str):
         reader = PdfReader(path)
         text = ""
         for page in reader.pages:
-            text += page.extract_text() + "\n"
+            text += page.extract_text() + ""
         return text.lower()
     except Exception as e:
         print(f"CV Read Error: {e}")
@@ -33,7 +33,7 @@ def match_and_rank(cv_text: str, jobs: list):
         ranked = [(sim, job) for sim, job in zip(similarities, jobs)]
         ranked.sort(key=lambda x: x[0], reverse=True)
         return ranked[:50]
-    except:
+    except Exception:
         return [(0.0, job) for job in jobs[:50]]
 
 

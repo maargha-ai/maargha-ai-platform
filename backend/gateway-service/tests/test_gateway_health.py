@@ -1,11 +1,10 @@
 # tests/test_gateway_health.py
-import asyncio
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.monitoring.health import router, test_external_services
+from app.monitoring.health import test_external_services
 
 
 class TestGatewayHealthEndpoints:
@@ -29,9 +28,11 @@ class TestGatewayHealthEndpoints:
 
     def test_detailed_health_check_success(self):
         """Test detailed health check with all services healthy"""
-        with patch("app.monitoring.health.test_external_services") as mock_external:
-            mock_external.return_value = asyncio.Future()
-            mock_external.return_value.set_result({"orchestrator": "healthy"})
+        with patch(
+            "app.monitoring.health.test_external_services",
+            new_callable=AsyncMock,
+        ) as mock_external:
+            mock_external.return_value = {"orchestrator": "healthy"}
 
             response = self.client.get("/health/detailed")
 
@@ -43,9 +44,11 @@ class TestGatewayHealthEndpoints:
 
     def test_detailed_health_check_degraded(self):
         """Test detailed health check with degraded services"""
-        with patch("app.monitoring.health.test_external_services") as mock_external:
-            mock_external.return_value = asyncio.Future()
-            mock_external.return_value.set_result({"orchestrator": "unhealthy"})
+        with patch(
+            "app.monitoring.health.test_external_services",
+            new_callable=AsyncMock,
+        ) as mock_external:
+            mock_external.return_value = {"orchestrator": "unhealthy"}
 
             response = self.client.get("/health/detailed")
 

@@ -1,15 +1,13 @@
 # tests/test_gateway_logger.py
-import json
-import time
 from unittest.mock import Mock, patch
 
 import pytest
+from fastapi import Request, Response
 
 from app.monitoring.logger import (
     LoggingMiddleware,
     PerformanceMonitor,
     StructuredLogger,
-    log_function_call,
 )
 
 
@@ -92,9 +90,6 @@ class TestGatewayLoggingMiddleware:
 
     async def test_middleware_logs_request_response(self):
         """Test middleware logs HTTP requests and responses"""
-        from fastapi import Request, Response
-        from starlette.middleware.base import BaseHTTPMiddleware
-
         # Create mock request and response
         mock_request = Mock(spec=Request)
         mock_request.method = "GET"
@@ -102,20 +97,17 @@ class TestGatewayLoggingMiddleware:
         mock_request.client = Mock(host="127.0.0.1")
         mock_request.headers = {"user-agent": "test-agent"}
 
-        mock_response = Mock(spec=Response)
-        mock_response.status_code = 200
+        async def call_next(request):
+            return Response(status_code=200)
 
         # Test middleware
         middleware = LoggingMiddleware(Mock())
 
         with patch("app.monitoring.logger.api_logger.info") as mock_log:
-            # Simulate middleware behavior
-            start_time = time.time()
-            time.sleep(0.01)  # Small delay
-            process_time = time.time() - start_time
+            response = await middleware.dispatch(mock_request, call_next)
 
-            # Verify logging calls would be made
-            assert mock_log.call_count >= 1
+            assert response.status_code == 200
+            assert mock_log.call_count >= 2
 
 
 if __name__ == "__main__":

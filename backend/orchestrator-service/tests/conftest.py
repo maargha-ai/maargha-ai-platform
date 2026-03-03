@@ -1,8 +1,21 @@
 # tests/conftest.py
 import asyncio
+import os
 from unittest.mock import AsyncMock, patch
 
 import pytest
+
+os.environ.setdefault("USER_SERVICE_URL", "http://localhost:8000")
+os.environ.setdefault("LLM_PROVIDER", "groq")
+os.environ.setdefault("OPENAI_API_KEY", "dummy")
+os.environ.setdefault("GROQ_API_KEY", "dummy")
+os.environ.setdefault(
+    "DATABASE_URL",
+    "postgresql+asyncpg://postgres:postgres@localhost:5432/test_db",
+)
+os.environ.setdefault("GCP_BUCKET_NAME", "dummy")
+os.environ.setdefault("SONG_PATH", "dummy")
+os.environ.setdefault("GCP_TUTOR_BUCKET", "dummy")
 
 
 @pytest.fixture(scope="session")
