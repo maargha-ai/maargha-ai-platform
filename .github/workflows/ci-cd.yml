@@ -35,6 +35,7 @@ jobs:
       working-directory: ./backend/orchestrator-service
       run: |
         pip install -r requirements.txt
+        pip install pylint==3.2.5
         
     - name: Run pylint
       working-directory: ./backend/orchestrator-service
@@ -63,6 +64,7 @@ jobs:
       working-directory: ./backend/gateway-service
       run: |
         pip install -r requirements.txt
+        pip install pylint==3.2.5
         
     - name: Run pylint
       working-directory: ./backend/gateway-service
@@ -91,6 +93,7 @@ jobs:
       working-directory: ./backend/user-service
       run: |
         pip install -r requirements.txt
+        pip install pylint==3.2.5
         
     - name: Run pylint
       working-directory: ./backend/user-service
