@@ -86,19 +86,42 @@ async def chat_live_ws(websocket: WebSocket):
                 text = await transcribe_audio(audio_np)
                 print("[LIVE CHAT] Transcript:", text)
 
-                if not text:
-                    print("[LIVE CHAT] Empty transcript, skipping")
+                # 🔥 1. EMPTY / SHORT TEXT FILTER
+                if not text or len(text.strip().split()) < 3:
+                    print("[LIVE CHAT] Ignored short/invalid speech")
+
                     await websocket.send_text(
                         json.dumps(
                             {
                                 "type": "STATUS",
-                                "content": "No speech detected in audio.",
+                                "content": "Please speak a bit longer.",
                             }
                         )
                     )
+
                     audio_buffer.clear()
                     continue
 
+                # 🔥 2. NOISE WORD FILTER (ADD HERE 👇)
+                noise_words = {"ok", "okay", "yes", "no", "thanks", "thank", "hmm"}
+
+                words = text.lower().split()
+
+                if all(word in noise_words for word in words):
+                    print("[LIVE CHAT] Noise-only speech ignored")
+
+                    await websocket.send_text(
+                        json.dumps(
+                            {
+                                "type": "STATUS",
+                                "content": "Please say something meaningful.",
+                            }
+                        )
+                    )
+
+                    audio_buffer.clear()
+                    continue
+                
                 await websocket.send_text(
                     json.dumps({"type": "USER_TRANSCRIPT", "content": text})
                 )
@@ -107,14 +130,17 @@ async def chat_live_ws(websocket: WebSocket):
                 output = await graph_app.ainvoke(state)
                 state.update(output)
 
-                if state.get("agent_response"):
-                    await websocket.send_text(
-                        json.dumps({"type": "CHAT", "content": state["agent_response"]})
-                    )
-
                 if state.get("navigate"):
                     await websocket.send_text(
                         json.dumps({"navigate": state["navigate"]})
+                    )
+                    # Close the live chat after navigation
+                    await websocket.close()
+                    break
+
+                if state.get("agent_response"):
+                    await websocket.send_text(
+                        json.dumps({"type": "CHAT", "content": state["agent_response"]})
                     )
 
                 state.pop("agent_response", None)

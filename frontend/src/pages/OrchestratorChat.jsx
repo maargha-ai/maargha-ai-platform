@@ -143,6 +143,13 @@ export default function OrchestratorChat() {
             console.log("[TTS] Finished – mic unmuted, listening resumed");
           });
         }
+
+        // Handle navigation from live chat
+        if (data.navigate) {
+          handleNavigation(data.navigate);
+          closeLiveMode();
+          return;
+        }
       };
 
       ws.onclose = () => {
