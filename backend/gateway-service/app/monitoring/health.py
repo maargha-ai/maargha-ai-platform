@@ -1,7 +1,7 @@
 # app/monitoring/health.py
 import time
 from typing import Any, Dict
-
+import httpx
 from fastapi import APIRouter, HTTPException
 
 from app.monitoring.logger import monitoring_logger, performance_monitor
@@ -48,7 +48,6 @@ async def test_external_services() -> Dict[str, str]:
 
     # Test orchestrator service
     try:
-        import httpx
 
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.get("http://localhost:8000/health/")

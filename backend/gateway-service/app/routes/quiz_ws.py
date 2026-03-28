@@ -45,7 +45,7 @@ async def quiz_ws(websocket: WebSocket, token: str = Query(...)):
     t1 = asyncio.create_task(frontend_to_backend())
     t2 = asyncio.create_task(backend_to_frontend())
 
-    done, pending = await asyncio.wait({t1, t2}, return_when=asyncio.FIRST_COMPLETED)
+    pending = await asyncio.wait({t1, t2}, return_when=asyncio.FIRST_COMPLETED)
     for t in pending:
         t.cancel()
 

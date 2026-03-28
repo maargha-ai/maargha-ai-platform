@@ -7,7 +7,6 @@ from jose import JWTError, jwt
 
 from app.config import settings
 
-
 def decode_jwt_token(token: str) -> str | None:
     """Helper function to decode JWT token and extract user_id"""
     try:
@@ -44,7 +43,7 @@ async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
         print("[Gateway] JWT decode failed")
         await websocket.close(code=1008)
         return
-    
+
     print("[Gateway] JWT decoded, user_id =", user_id)
 
     # Register this connection
@@ -135,7 +134,7 @@ async def orchestrator_chat_live(websocket: WebSocket, token: str = Query(...)):
         print("[Gateway Live] JWT decode failed")
         await websocket.close(code=1008)
         return
-    
+
     print("[Gateway Live] JWT decoded, user_id =", user_id)
 
     # NEW: Disconnect any existing text chat for this user
