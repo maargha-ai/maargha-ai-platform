@@ -1,12 +1,28 @@
 import asyncio
 import traceback
-from typing import Dict
-
 import websockets
-from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+from typing import Dict
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from jose import JWTError, jwt
 
 from app.config import settings
+
+
+def decode_jwt_token(token: str) -> str | None:
+    """Helper function to decode JWT token and extract user_id"""
+    try:
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM],
+        )
+        user_id = payload.get("user_id")
+        return user_id
+    except Exception as e:
+        print("[Gateway] JWT ERROR:", e)
+        traceback.print_exc()
+        return None
+
 
 router = APIRouter()
 
@@ -23,25 +39,13 @@ async def orchestrator_ws(websocket: WebSocket, token: str = Query(...)):
     await websocket.accept()
     print("[Gateway] Frontend text WS accepted")
 
-    user_id = None
-
-    try:
-        payload = jwt.decode(
-            token,
-            settings.JWT_SECRET,
-            algorithms=[settings.JWT_ALGORITHM],
-        )
-        user_id = payload.get("user_id")
-        print("[Gateway] JWT decoded, user_id =", user_id)
-
-        if not user_id:
-            raise JWTError("user_id missing")
-
-    except Exception as e:
-        print("[Gateway] JWT ERROR:", e)
-        traceback.print_exc()
+    user_id = decode_jwt_token(token)
+    if not user_id:
+        print("[Gateway] JWT decode failed")
         await websocket.close(code=1008)
         return
+    
+    print("[Gateway] JWT decoded, user_id =", user_id)
 
     # Register this connection
     old_ws = active_text_chats.get(user_id)
@@ -126,22 +130,13 @@ async def orchestrator_chat_live(websocket: WebSocket, token: str = Query(...)):
 
     await websocket.accept()
 
-    user_id = None
-
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id = payload.get("user_id")
-        print("[Gateway Live] JWT decoded, user_id =", user_id)
-
-        if not user_id:
-            await websocket.close(code=1008)
-            return
-
-    except Exception:
+    user_id = decode_jwt_token(token)
+    if not user_id:
+        print("[Gateway Live] JWT decode failed")
         await websocket.close(code=1008)
         return
+    
+    print("[Gateway Live] JWT decoded, user_id =", user_id)
 
     # NEW: Disconnect any existing text chat for this user
     if user_id in active_text_chats:
