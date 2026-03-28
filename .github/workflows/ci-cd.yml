@@ -69,7 +69,7 @@ jobs:
     - name: Run pylint
       working-directory: ./backend/gateway-service
       run: |
-        pylint app/
+        PYTHONPATH=. pylint app/
 
   lint-user-service:
     runs-on: ubuntu-latest
