@@ -10,7 +10,9 @@ from app.agents.emotional_support_agent import (
     transcribe_audio,
 )
 
-IGNORE_SECONDS_AFTER_REPLY = 2.0
+IGNORE_SECONDS_AFTER_REPLY = 3.0  # Increased wait time after AI speaks
+MIN_AUDIO_DURATION = 2.0  # Minimum 2 seconds of audio
+MIN_WORD_COUNT = 3  # Minimum 3 words required
 
 
 async def emotional_support_ws(websocket: WebSocket, user_id: str):
@@ -36,27 +38,29 @@ async def emotional_support_ws(websocket: WebSocket, user_id: str):
                 full_audio = np.concatenate(audio_buffer)
                 audio_buffer.clear()
 
-                # 🔒 SHORT AUDIO GUARD
-                if len(full_audio) < 16000:  # <1s
+                # 🔒 AUDIO DURATION GUARD - Must be at least 2 seconds
+                audio_duration = len(full_audio) / 16000  # 16kHz sample rate
+                if audio_duration < MIN_AUDIO_DURATION:
+                    print(f"[EMO] Audio too short: {audio_duration:.2f}s < {MIN_AUDIO_DURATION}s")
                     continue
 
                 text = await transcribe_audio(full_audio)
 
-                # 🔒 TEXT FILTER
-                if not text or len(text) < 5:
+                # 🔒 WORD COUNT VALIDATION - Must have minimum words
+                words = text.strip().split()
+                if len(words) < MIN_WORD_COUNT:
+                    print(f"[EMO] Too few words: {len(words)} < {MIN_WORD_COUNT} - '{text}'")
                     continue
 
-                if text.lower() in {
-                    "thank you",
-                    "thanks",
-                    "okay",
-                    "yes",
-                    "no",
-                    "um",
-                    "you're welcome",
-                    "how can i help you",
-                    "i'm here for you",
-                }:
+                # 🔒 BACKGROUND NOISE FILTER - Check if it's just noise or filler
+                noise_indicators = {
+                    "thank you", "thanks", "okay", "ok", "yes", "no", "um", "uh", "yeah", 
+                    "hmm", "alright", "sure", "cool", "nice", "good", "great", "fine"
+                }
+                
+                # Only filter if ALL words are noise indicators
+                if all(word.lower() in noise_indicators for word in words):
+                    print(f"[EMO] Background noise detected: '{text}'")
                     continue
 
                 # SEND USER TEXT

@@ -4,6 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  overflow: auto;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 
@@ -197,7 +208,8 @@
 }
 
 /* Optional: better list and blockquote styling */
-.prose-invert ul, .prose-invert ol {
+.prose-invert ul,
+.prose-invert ol {
   margin: 0.75rem 0;
   padding-left: 1.5rem;
 }
@@ -362,6 +374,7 @@
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }

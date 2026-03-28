@@ -56,10 +56,10 @@ export default function OrchestratorChat() {
   const [volume, setVolume] = useState(0);
 
   const suggestions = [
-    "Analyze my resume quality",
+    "I need someone to listen to my feelings",
     "Generate a 6-month study plan",
-    "Mock interview: React Senior Dev",
-    "Find high-paying remote roles"
+    "Give me a assesment for software engineer",
+    "Find me jobs that matches my profile"
   ];
 
   /* TEXT CHAT WS */
@@ -330,7 +330,6 @@ export default function OrchestratorChat() {
               </div>
             </div>
             <p className="footer-note">
-              Maargha AI may provide inaccurate info. Verify important career steps.
             </p>
           </footer>
         </div>

@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { BrainCircuit } from "lucide-react";
 import { Map } from "lucide-react";
-import { Compass  } from "lucide-react";
-import { Route  } from "lucide-react";
-import { Flag  } from "lucide-react";
+import { Compass } from "lucide-react";
+import { Route } from "lucide-react";
+import { Flag } from "lucide-react";
 import {
   Newspaper,
   Briefcase,
@@ -53,8 +53,15 @@ export default function Dashboard() {
   const { theme, setTheme } = useTheme();
   const containerRef = useRef(null);
   const pathRef = useRef(null);
+  const scrollContainerRef = useRef(null);
   const [markerPos, setMarkerPos] = useState({ x: 50, y: 10 });
+
+  useEffect(() => {
+    scrollContainerRef.current = document.getElementById('root');
+  }, []);
+
   const { scrollYProgress } = useScroll({
+    container: scrollContainerRef,
     offset: ["start start", "end end"]
   });
   useEffect(() => {

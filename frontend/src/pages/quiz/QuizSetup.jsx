@@ -13,7 +13,7 @@ export default function QuizSetup({ onStart }) {
       <div className="quiz-content-wrapper">
         <div className="quiz-container">
           {/* Feature Box */}
-          <aside className="quiz-feature-sidebar">
+          {/* <aside className="quiz-feature-sidebar">
             <div className="quiz-feature-box">
               <div className="quiz-feature-header">
                 <BrainCircuit size={24} className="text-purple-600" />
@@ -45,7 +45,7 @@ export default function QuizSetup({ onStart }) {
                 </div>
               </div>
             </div>
-          </aside>
+          </aside> */}
 
           {/* Setup Card */}
           <div className="quiz-setup-engine">
