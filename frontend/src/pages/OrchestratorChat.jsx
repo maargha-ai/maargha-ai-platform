@@ -58,7 +58,7 @@ export default function OrchestratorChat() {
   const suggestions = [
     "I need someone to listen to my feelings",
     "Generate a 6-month study plan",
-    "Give me a assesment for software engineer",
+    "Show me latest events",
     "Find me jobs that matches my profile"
   ];
 
@@ -216,7 +216,9 @@ export default function OrchestratorChat() {
       MusicRecommender: "/music",
       NetworkingEvents: "/networking-events",
       CVGeneration: "/cv",
-      EmotionalSupport: "/emotional-support"
+      EmotionalSupport: "/emotional-support",
+      AITutor: "/tutor",
+      ResumeParser: "/resume-parser"
     };
     if (routes[tool]) navigate(routes[tool], payload ? { state: payload } : {});
   };

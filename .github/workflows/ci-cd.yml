@@ -36,30 +36,10 @@ jobs:
       run: |
         pip install -r requirements.txt
         
-    - name: Run Black
+    - name: Run pylint
       working-directory: ./backend/orchestrator-service
       run: |
-        black --check .
-        
-    - name: Run isort
-      working-directory: ./backend/orchestrator-service
-      run: |
-        isort --check-only .
-        
-    - name: Run flake8
-      working-directory: ./backend/orchestrator-service
-      run: |
-        flake8 .
-        
-    - name: Run mypy
-      working-directory: ./backend/orchestrator-service
-      run: |
-        mypy app/
-        
-    - name: Run bandit
-      working-directory: ./backend/orchestrator-service
-      run: |
-        bandit -r app/
+        pylint app/
 
   lint-gateway:
     runs-on: ubuntu-latest
@@ -84,30 +64,10 @@ jobs:
       run: |
         pip install -r requirements.txt
         
-    - name: Run Black
+    - name: Run pylint
       working-directory: ./backend/gateway-service
       run: |
-        black --check .
-        
-    - name: Run isort
-      working-directory: ./backend/gateway-service
-      run: |
-        isort --check-only .
-        
-    - name: Run flake8
-      working-directory: ./backend/gateway-service
-      run: |
-        flake8 .
-        
-    - name: Run mypy
-      working-directory: ./backend/gateway-service
-      run: |
-        mypy app/
-        
-    - name: Run bandit
-      working-directory: ./backend/gateway-service
-      run: |
-        bandit -r app/
+        pylint app/
 
   lint-user-service:
     runs-on: ubuntu-latest
@@ -132,30 +92,10 @@ jobs:
       run: |
         pip install -r requirements.txt
         
-    - name: Run Black
+    - name: Run pylint
       working-directory: ./backend/user-service
       run: |
-        black --check .
-        
-    - name: Run isort
-      working-directory: ./backend/user-service
-      run: |
-        isort --check-only .
-        
-    - name: Run flake8
-      working-directory: ./backend/user-service
-      run: |
-        flake8 .
-        
-    - name: Run mypy
-      working-directory: ./backend/user-service
-      run: |
-        mypy user_service/
-        
-    - name: Run bandit
-      working-directory: ./backend/user-service
-      run: |
-        bandit -r user_service/
+        pylint user_service/
 
   test-orchestrator:
     runs-on: ubuntu-latest

@@ -22,6 +22,8 @@ You must decide ONE action:
 - NetworkingEvents
 - EmotionalSupport
 - CVGeneration
+- AITutor
+- ResumeParser
 - DONE
 
 Rules:

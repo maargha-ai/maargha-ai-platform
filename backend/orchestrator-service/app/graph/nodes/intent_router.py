@@ -14,6 +14,11 @@ IntentType = Literal[
     "quiz_section",
     "tech_news",
     "emotional_support",
+    "music_recommendation",
+    "networking_events",
+    "cv_generation",
+    "ai_tutor",
+    "resume_parser",
     "general_chat",
     "unknown",
 ]
@@ -29,6 +34,11 @@ Intents:
 - quiz_section
 - tech_news
 - emotional_support
+- music_recommendation
+- networking_events
+- cv_generation
+- ai_tutor
+- resume_parser
 - general_chat
 - unknown
 
