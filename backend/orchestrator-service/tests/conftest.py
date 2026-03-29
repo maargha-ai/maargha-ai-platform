@@ -13,17 +13,7 @@ os.environ.setdefault(
     "DATABASE_URL",
     "postgresql+asyncpg://postgres:postgres@localhost:5432/test_db",
 )
-os.environ.setdefault("GCP_BUCKET_NAME", "dummy")
 os.environ.setdefault("SONG_PATH", "dummy")
-os.environ.setdefault("GCP_TUTOR_BUCKET", "dummy")
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create an instance of the default event loop for the test session."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest.fixture

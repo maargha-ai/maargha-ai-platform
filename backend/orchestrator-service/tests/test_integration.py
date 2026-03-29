@@ -1,7 +1,7 @@
 # tests/test_integration.py
 import json
 from unittest.mock import AsyncMock, Mock, patch
-
+from app.main import app
 import pytest
 from fastapi.testclient import TestClient
 from fastapi.websockets import WebSocket

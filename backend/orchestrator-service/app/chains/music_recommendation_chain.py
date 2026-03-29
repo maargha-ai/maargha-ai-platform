@@ -3,7 +3,7 @@ import random
 from sklearn.metrics.pairwise import cosine_similarity
 
 from app.core.config import settings
-from app.core.embeddings import embedder  # ✅ shared model
+from app.core.embeddings import embedder  # shared model
 from app.utils.gcs import generate_signed_url
 from app.utils.song_dataset_loader import load_songs_from_excel
 

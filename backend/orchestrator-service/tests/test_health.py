@@ -1,7 +1,7 @@
 # tests/test_health.py
 import asyncio
 from unittest.mock import AsyncMock, Mock, patch
-
+from app.db.database import engine
 import pytest
 from fastapi.testclient import TestClient
 
@@ -35,8 +35,7 @@ class TestHealthEndpoints:
     def test_detailed_health_check_success(self):
         """Test detailed health check with all services healthy"""
         with patch("app.monitoring.health.test_database_connection") as mock_db:
-            mock_db.return_value = asyncio.Future()
-            mock_db.return_value.set_result("healthy")
+            mock_db.return_value = "healthy"
 
             with patch("app.monitoring.health.test_external_services") as mock_external:
                 mock_external.return_value = asyncio.Future()
@@ -55,7 +54,7 @@ class TestHealthEndpoints:
         """Test detailed health check with degraded services"""
         with patch("app.monitoring.health.test_database_connection") as mock_db:
             mock_db.return_value = asyncio.Future()
-            mock_db.set_result("unhealthy")
+            mock_db.return_value = "unhealthy"
 
             response = self.client.get("/health/detailed")
 
