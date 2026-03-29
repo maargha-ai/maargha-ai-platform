@@ -241,7 +241,7 @@ jobs:
     - name: Run tests
       working-directory: ./backend/user-service
       run: |
-        export PYTHONPATH=.
+        export PYTHONPATH=./user_service
         export DJANGO_SETTINGS_MODULE=user_service.settings
         pytest --cov=user_service --cov-report=xml --cov-fail-under=30
         
