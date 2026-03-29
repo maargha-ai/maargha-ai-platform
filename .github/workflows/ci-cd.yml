@@ -98,7 +98,7 @@ jobs:
     - name: Run pylint
       working-directory: ./backend/user-service
       run: |
-        PYTHONPATH=. pylint user_service/ --rcfile=../.pylintrc
+        PYTHONPATH=. pylint user_service/
 
   test-orchestrator:
     runs-on: ubuntu-latest
@@ -239,16 +239,16 @@ jobs:
         pip install -r requirements.txt
         
     - name: Run tests
-      working-directory: ./backend/user-service
+      working-directory: ./backend/user-service/user_service
       run: |
-        export PYTHONPATH=.
+        export PYTHONPATH=..
         export DJANGO_SETTINGS_MODULE=user_service.settings
         pytest --cov=user_service --cov-report=xml --cov-fail-under=30
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./backend/user-service/coverage.xml
+        file: ./backend/user-service/user_service/coverage.xml
         flags: unittests
         name: codecov-umbrella
 
