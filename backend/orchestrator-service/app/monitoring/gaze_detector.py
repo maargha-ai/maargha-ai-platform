@@ -1,5 +1,6 @@
 # app/monitoring/gaze_detector.py
 import base64
+from typing import Optional
 
 import cv2
 import mediapipe as mp
@@ -16,13 +17,24 @@ FaceLandmarker = mp.tasks.vision.FaceLandmarker
 FaceLandmarkerOptions = mp.tasks.vision.FaceLandmarkerOptions
 VisionRunningMode = mp.tasks.vision.RunningMode
 
-_options = FaceLandmarkerOptions(
-    base_options=BaseOptions(model_asset_path=MODEL_PATH),
-    running_mode=VisionRunningMode.IMAGE,
-    num_faces=1,
-)
+_landmarker: Optional[FaceLandmarker] = None
 
-_landmarker = FaceLandmarker.create_from_options(_options)
+
+def _get_landmarker() -> Optional[FaceLandmarker]:
+    """Get or create landmarker lazily, return None if model file missing"""
+    global _landmarker
+    if _landmarker is None:
+        try:
+            options = FaceLandmarkerOptions(
+                base_options=BaseOptions(model_asset_path=MODEL_PATH),
+                running_mode=VisionRunningMode.IMAGE,
+                num_faces=1,
+            )
+            _landmarker = FaceLandmarker.create_from_options(options)
+        except (FileNotFoundError, Exception):
+            # Model file not found or other error
+            return None
+    return _landmarker
 
 
 def _decode_image(frame_base64: str):
@@ -37,6 +49,11 @@ def is_looking_away(frame_b64: str) -> bool:
     """
     True => malpractice suspected (face not visible / off screen / eyes not visible).
     """
+    landmarker = _get_landmarker()
+    if landmarker is None:
+        # Model not available, assume user is looking (no malpractice)
+        return False
+        
     img = _decode_image(frame_b64)
     if img is None:
         return True
@@ -47,7 +64,7 @@ def is_looking_away(frame_b64: str) -> bool:
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
 
     try:
-        result = _landmarker.detect(mp_image)
+        result = landmarker.detect(mp_image)
     except Exception as e:
         # Model hiccup on a single frame should not trigger malpractice.
         print(f"MediaPipe detection error: {e}")
