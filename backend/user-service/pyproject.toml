@@ -16,6 +16,8 @@ disable = [
     "W0212",  # protected-access
     "C0103",  # invalid-name
     "W1203",  # logging-fstring-interpolation
+    "E0401",  # import-error
+    "E0611",  # no-name-in-module
 ]
 
 [tool.pylint.format]
