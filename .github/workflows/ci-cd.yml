@@ -98,7 +98,7 @@ jobs:
     - name: Run pylint
       working-directory: ./backend/user-service
       run: |
-        PYTHONPATH=. pylint user_service/
+        PYTHONPATH=. pylint user_service/ --rcfile=.pylintrc
 
   test-orchestrator:
     runs-on: ubuntu-latest
