@@ -141,7 +141,7 @@ jobs:
     - name: Run tests
       working-directory: ./backend/orchestrator-service
       run: |
-        pytest tests/test_health.py::test_basic_health_check -v --cov=app --cov-report=xml --cov-fail-under=25
+        pytest tests/test_health.py::TestHealthEndpoints::test_basic_health_check -v --cov=app --cov-report=xml --cov-fail-under=25
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
