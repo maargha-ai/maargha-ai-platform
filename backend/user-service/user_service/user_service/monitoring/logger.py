@@ -23,13 +23,13 @@ def get_metrics() -> Dict[str, Any]:
 # Mock classes for compatibility with tests
 class PerformanceMonitor:
     """Mock PerformanceMonitor class for test compatibility"""
-    
+
     def __init__(self):
         self.start_time = None
-    
+
     def start(self):
         self.start_time = time.time()
-    
+
     def stop(self):
         if self.start_time:
             duration = time.time() - self.start_time
@@ -39,17 +39,17 @@ class PerformanceMonitor:
 
 class StructuredLogger:
     """Mock StructuredLogger class for test compatibility"""
-    
+
     def __init__(self, name: str):
         self.logger = logging.getLogger(name)
-    
-    def info(self, message: str, **kwargs):
+
+    def info(self, message: str):
         self.logger.info(message)
-    
-    def error(self, message: str, **kwargs):
+
+    def error(self, message: str):
         self.logger.error(message)
-    
-    def warning(self, message: str, **kwargs):
+
+    def warning(self, message: str):
         self.logger.warning(message)
 
 @contextmanager

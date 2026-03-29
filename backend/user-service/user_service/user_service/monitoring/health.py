@@ -3,7 +3,7 @@ import time
 from typing import Any, Dict
 
 from django.http import JsonResponse
-
+from django.db import connection
 from user_service.monitoring.logger import monitoring_logger, performance_monitor
 
 
@@ -16,6 +16,12 @@ def health_check() -> Dict[str, Any]:
             "service": "maargha-user-service",
         }
     )
+
+
+# Django view wrapper for health check
+def health_check_view(request):
+    """Django view wrapper for health check"""
+    return health_check()
 
 
 def detailed_health_check() -> Dict[str, Any]:
@@ -49,13 +55,12 @@ def detailed_health_check() -> Dict[str, Any]:
 def test_database_connection() -> str:
     """Test database connectivity"""
     try:
-        from django.db import connection
 
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
         return "healthy"
     except Exception as e:
-        monitoring_logger.error("Database health check failed", error=e)
+        monitoring_logger.error(f"Database health check failed: {e}")
         return "unhealthy"
 
 
