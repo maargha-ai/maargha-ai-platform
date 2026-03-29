@@ -11,6 +11,10 @@ disable = [
     "C0411",  # import-outside-toplevel
     "W0707",  # raise-missing-from
     "W1514",  # wrong-import-order
+    "C0301",  # line-too-long
+    "C0304",  # missing-final-newline
+    "W0212",  # protected-access
+    "C0103",  # invalid-name
 ]
 
 [tool.pylint.format]

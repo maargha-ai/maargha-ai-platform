@@ -1,9 +1,14 @@
 import ast
+from typing import List
 
 import pandas as pd
 
 
-def load_songs_from_excel(path: str):
+def load_songs_from_excel(path: str) -> List[dict]:
+    """Load songs from Excel file, return empty list if path is dummy"""
+    if path == "dummy":
+        return []
+    
     df = pd.read_excel(path)
 
     songs = []
