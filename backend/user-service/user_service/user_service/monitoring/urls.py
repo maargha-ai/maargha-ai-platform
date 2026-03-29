@@ -1,6 +1,6 @@
 from django.urls import path
 
-from user_service.user_service.monitoring import health
+from user_service.monitoring import health
 
 urlpatterns = [
     path("", health.health_check, name="health_check"),
