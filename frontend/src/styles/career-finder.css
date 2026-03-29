@@ -30,13 +30,12 @@
 
 .career-feature-sidebar {
     width: 320px;
-    padding: 1rem;
+    padding: 1.5rem;
     background: hsl(var(--background));
     border-right: 1px solid hsl(var(--border) / 30%);
     overflow-y: auto;
     overflow-x: hidden;
-    margin-left: auto;
-    margin-right: auto;
+    flex-shrink: 0;
 }
 
 .career-feature-box {
@@ -381,6 +380,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 3rem;
 }
 .career-header {
     text-align: center;
