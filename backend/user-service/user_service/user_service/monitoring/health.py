@@ -19,7 +19,7 @@ def health_check() -> Dict[str, Any]:
 
 
 # Django view wrapper for health check
-def health_check_view(request):
+def health_check_view():
     """Django view wrapper for health check"""
     return health_check()
 
