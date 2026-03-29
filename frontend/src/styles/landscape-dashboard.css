@@ -112,11 +112,11 @@
 
 .map-content-wrapper {
     position: relative;
-    min-height: 500vh;
+    min-height: 330vh;
     width: 100%;
     display: flex;
     justify-content: center;
-    padding-bottom: 0;
+    padding-bottom: 20vh;
 }
 
 .connection-spine-svg {

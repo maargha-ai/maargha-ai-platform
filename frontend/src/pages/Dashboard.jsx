@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { BrainCircuit } from "lucide-react";
 import { Map } from "lucide-react";
 import { Compass } from "lucide-react";
@@ -27,6 +27,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../components/ThemeProvider';
 import { ThemeToggle } from '../components/ThemeToggle';
+import UserProfileModal from '../components/UserProfileModal.jsx';
 
 import '../styles/landscape-dashboard.css';
 import "../styles/dashboard.css";
@@ -55,13 +56,13 @@ export default function Dashboard() {
   const pathRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const [markerPos, setMarkerPos] = useState({ x: 50, y: 10 });
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
-    scrollContainerRef.current = document.getElementById('root');
+    // scrollContainerRef.current = document.getElementById('root');
   }, []);
 
   const { scrollYProgress } = useScroll({
-    container: scrollContainerRef,
     offset: ["start start", "end end"]
   });
   useEffect(() => {
@@ -81,7 +82,7 @@ export default function Dashboard() {
       description: 'Your AI career architect for strategic planning and analysis.',
       icon: Cpu,
       path: '/orchestrator',
-      top: '5%',
+      top: '7.5%',
       left: '50%'
     },
     {
@@ -90,7 +91,7 @@ export default function Dashboard() {
       description: 'Analyze your aptitudes and map your professional trajectory.',
       icon: Search,
       path: '/career',
-      top: '12.5%',
+      top: '18.9%',
       left: '20%'
     },
     {
@@ -99,7 +100,7 @@ export default function Dashboard() {
       description: 'Real-time industry shifts and curated tech insights.',
       icon: Newspaper,
       path: '/news',
-      top: '27.5%',
+      top: '41.6%',
       left: '21%'
     },
     {
@@ -108,7 +109,7 @@ export default function Dashboard() {
       description: 'Clear learning roadmap with skills, tools, and projects.',
       icon: Route,
       path: '/roadmap',
-      top: '15.5%',
+      top: '23.4%',
       left: '51%'
     },
     {
@@ -117,7 +118,7 @@ export default function Dashboard() {
       description: 'Validate your competency through AI-driven evaluation engines.',
       icon: Trophy,
       path: '/quiz',
-      top: '22%',
+      top: '33.2%',
       left: '42%'
     },
     {
@@ -126,7 +127,7 @@ export default function Dashboard() {
       description: 'Strategic role placement and matching based on your unique profile.',
       icon: Briefcase,
       path: '/jobs',
-      top: '64.5%',
+      top: '97.4%',
       left: '60%'
     },
     {
@@ -135,7 +136,7 @@ export default function Dashboard() {
       description: 'Engineered resumes optimized for ATS and human psychology.',
       icon: FileUser,
       path: '/cv',
-      top: '31%',
+      top: '46.8%',
       left: '53%'
     },
     {
@@ -144,7 +145,7 @@ export default function Dashboard() {
       description: 'Deep resume analysis to extract skills, roles, and career signals using AI.',
       icon: FileSearch,
       path: '/resume-parser',
-      top: '38.5%',
+      top: '58.2%',
       left: '23%'
     },
     {
@@ -153,7 +154,7 @@ export default function Dashboard() {
       description: 'Maximize your profile impact and build high-value connections.',
       icon: Zap,
       path: '/linkedin',
-      top: '37.3%',
+      top: '56.3%',
       left: '51%'
     },
     {
@@ -162,7 +163,7 @@ export default function Dashboard() {
       description: 'Real-time networking, hackathons, and virtual summits.',
       icon: Users,
       path: '/networking-events',
-      top: '45%',
+      top: '67.9%',
       left: '40%'
     },
     {
@@ -171,7 +172,7 @@ export default function Dashboard() {
       description: 'Structured AI tutoring for true concept mastery.',
       icon: BrainCircuit,
       path: '/tutor',
-      top: '20.7%',
+      top: '31.3%',
       left: '77%'
     },
     {
@@ -180,7 +181,7 @@ export default function Dashboard() {
       description: 'AI-composed soundscapes for deep focus and mental clarity.',
       icon: Music,
       path: '/music',
-      top: '52%',
+      top: '78.5%',
       left: '50%'
     },
     {
@@ -189,7 +190,7 @@ export default function Dashboard() {
       description: 'Your conversational companion for emotional support and wellness.',
       icon: Heart,
       path: '/emotional-support',
-      top: '58%',
+      top: '87.6%',
       left: '36%'
     }
   ];
@@ -203,7 +204,7 @@ export default function Dashboard() {
       </div>
       <div className="map-canvas" ref={containerRef}>
         <div className="map-content-wrapper">
-          <svg className="connection-spine-svg" viewBox="0 0 100 200" preserveAspectRatio="none">
+          <svg className="connection-spine-svg" viewBox="0 0 100 132" preserveAspectRatio="none">
             <defs>
               <linearGradient id="activeGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="currentColor" stopOpacity="0.2" />
@@ -299,7 +300,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="dashboard-hud">
-        <div className="hud-profile" onClick={() => navigate('/profile')}>
+        <div className="hud-profile" onClick={() => setIsProfileModalOpen(true)}>
           <div className="profile-avatar">
             {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
           </div>
@@ -315,6 +316,15 @@ export default function Dashboard() {
           <LogOut size={20} className="text-destructive" />
         </div>
       </div>
+
+      <AnimatePresence>
+        {isProfileModalOpen && (
+          <UserProfileModal 
+            isOpen={isProfileModalOpen} 
+            onClose={() => setIsProfileModalOpen(false)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

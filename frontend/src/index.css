@@ -6,13 +6,11 @@
 
 html,
 body {
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
 }
 
 #root {
-  height: 100%;
-  overflow: auto;
+  min-height: 100%;
 }
 
 ::-webkit-scrollbar {
