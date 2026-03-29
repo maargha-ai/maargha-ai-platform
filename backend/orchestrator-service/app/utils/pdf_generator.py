@@ -19,8 +19,6 @@ def cv_text_to_pdf(cv_text: str) -> bytes:
         bottomMargin=40,
     )
 
-    styles = getSampleStyleSheet()
-
     # ---------------- STYLES ----------------
 
     name_style = ParagraphStyle(
@@ -39,14 +37,14 @@ def cv_text_to_pdf(cv_text: str) -> bytes:
         spaceAfter=8,
     )
 
-    contact_style = ParagraphStyle(
-        "ContactStyle",
-        fontName="Helvetica",
-        fontSize=9,
-        alignment=TA_CENTER,
-        textColor=HexColor("#1f4fd8"),
-        spaceAfter=14,
-    )
+    # contact_style = ParagraphStyle(
+    #     "ContactStyle",
+    #     fontName="Helvetica",
+    #     fontSize=9,
+    #     alignment=TA_CENTER,
+    #     textColor=HexColor("#1f4fd8"),
+    #     spaceAfter=14,
+    # )
 
     section_style = ParagraphStyle(
         "SectionStyle",

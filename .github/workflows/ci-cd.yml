@@ -98,7 +98,7 @@ jobs:
     - name: Run pylint
       working-directory: ./backend/user-service
       run: |
-        PYTHONPATH=. pylint user_service/ --rcfile=.pylintrc
+        PYTHONPATH=. pylint user_service/ --rcfile=../.pylintrc
 
   test-orchestrator:
     runs-on: ubuntu-latest
@@ -241,6 +241,8 @@ jobs:
     - name: Run tests
       working-directory: ./backend/user-service
       run: |
+        export PYTHONPATH=.
+        export DJANGO_SETTINGS_MODULE=user_service.settings
         pytest --cov=user_service --cov-report=xml --cov-fail-under=30
         
     - name: Upload coverage to Codecov

@@ -60,7 +60,6 @@ app.include_router(resume_parser.router)
 
 @app.websocket("/ws/career/{user_id}")
 async def career_ws(websocket: WebSocket, user_id: str):
-    start_time = time.time()
     performance_monitor.record_websocket_connection()
 
     try:
@@ -82,7 +81,6 @@ async def career_ws(websocket: WebSocket, user_id: str):
 
 @app.websocket("/ws/quiz/{user_id}")
 async def quiz_ws(websocket: WebSocket, user_id: str):
-    start_time = time.time()
     performance_monitor.record_websocket_connection()
 
     try:
@@ -104,7 +102,6 @@ async def quiz_ws(websocket: WebSocket, user_id: str):
 
 @app.websocket("/ws/emotional-support/{user_id}")
 async def emotional_support_ws_route(websocket: WebSocket, user_id: str):
-    start_time = time.time()
     performance_monitor.record_websocket_connection()
 
     try:
@@ -126,7 +123,6 @@ async def emotional_support_ws_route(websocket: WebSocket, user_id: str):
 
 @app.websocket("/ws/linkedin/{user_id}")
 async def linkedin_ws(websocket: WebSocket, user_id: str):
-    start_time = time.time()
     performance_monitor.record_websocket_connection()
 
     try:
@@ -148,7 +144,6 @@ async def linkedin_ws(websocket: WebSocket, user_id: str):
 
 @app.websocket("/ws/tutor/{user_id}")
 async def tutor_ws(websocket: WebSocket, user_id: str):
-    start_time = time.time()
     performance_monitor.record_websocket_connection()
 
     try:
@@ -183,7 +178,6 @@ async def on_startup():
 
 @app.websocket("/ws/chat/live")
 async def chat_live(websocket: WebSocket):
-    start_time = time.time()
     performance_monitor.record_websocket_connection()
 
     try:
@@ -198,7 +192,6 @@ async def chat_live(websocket: WebSocket):
 
 @app.websocket("/ws/chat")
 async def chat_ws(websocket: WebSocket):
-    start_time = time.time()
     performance_monitor.record_websocket_connection()
 
     await websocket.accept()

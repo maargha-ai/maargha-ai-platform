@@ -16,10 +16,11 @@ class TestHealthEndpoints:
     """Test cases for health check endpoints"""
 
     def setup_method(self):
-        """Setup test client"""
-        from app.main import app
-
-        self.client = TestClient(app)
+        """Setup test client with mocked dependencies"""
+        with patch('app.utils.gcs.get_storage_client') as mock_gcs:
+            mock_gcs.return_value = Mock()
+            from app.main import app
+            self.client = TestClient(app)
 
     def test_basic_health_check(self):
         """Test basic health check endpoint"""
