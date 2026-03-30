@@ -6,6 +6,7 @@ import {
   FileText,
   CheckCircle2,
   AlertCircle,
+  Target,
   Loader2
 } from "lucide-react";
 import { useTheme } from "../components/ThemeProvider";
@@ -55,7 +56,7 @@ export default function ResumeParser() {
   };
 
   return (
-    <div className={`min-h-screen w-full bg-background text-foreground font-sans ${theme}`}>
+    <div className={`resume-layout min-h-screen w-full bg-background text-foreground font-sans ${theme}`}>
       <div className="fixed inset-0 pointer-events-none opacity-20">
         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/10 blur-[120px]" />
@@ -67,7 +68,7 @@ export default function ResumeParser() {
             variant="ghost"
             size="icon"
             onClick={() => navigate("/dashboard")}
-            className="rounded-full absolute left-6"
+            className="rounded-full"
           >
             <ArrowLeft size={20} />
           </Button>
@@ -78,98 +79,134 @@ export default function ResumeParser() {
         </div>
       </header>
 
-      <main className="container max-w-4xl mx-auto px-6 py-12 relative z-10">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-3 tracking-tight">Extract Career Data</h2>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            Upload your resume to identify key entities, skills, and experience markers.
-          </p>
-        </div>
-
-        <div className="grid gap-8">
-          <div className={`border-2 border-dashed rounded-3xl p-12 text-center transition-all ${file ? 'border-primary/50 bg-primary/5' : 'border-border/60 hover:border-primary/30'}`}>
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept="application/pdf"
-              onChange={handleFileChange}
-            />
-
-            {!file ? (
-              <div className="flex flex-col items-center gap-4 cursor-pointer" onClick={() => fileInputRef.current.click()}>
-                <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center text-primary">
-                  <Upload size={32} />
-                </div>
-                <div>
-                  <p className="text-lg font-semibold">Drop your resume here</p>
-                  <p className="text-sm text-muted-foreground">or click to browse from your computer (PDF only)</p>
+      <div className="resume-content-wrapper">
+        <aside className="resume-feature-sidebar">
+          <div className="resume-feature-box">
+            <div className="resume-feature-header">
+              <FileText size={24} className="text-blue-500" />
+              <h3>Resume Intelligence Engine</h3>
+            </div>
+            
+            <div className="resume-feature-content">
+              <p className="resume-feature-description">
+                Deep resume analysis to extract signals, optimize keywords, and boost ATS performance.
+              </p>
+              
+              <div className="resume-feature-sections">
+                <div className="resume-feature-section">
+                  <h4 className="feature-title">How It Works</h4>
+                  <ul className="resume-feature-steps">
+                    <li>Upload your current CV</li>
+                    <li>Extract key skills & roles</li>
+                    <li>Get optimization feedback</li>
+                    <li>Match with market trends</li>
+                  </ul>
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center justify-center gap-6">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                  <FileText size={32} />
+              
+              <div className="resume-feature-footer">
+                <div className="resume-feature-tip">
+                  <Target size={16} className="text-blue-500" />
+                  <span>Tip: Use standard PDF formats for best accuracy!</span>
                 </div>
-                <div className="text-left">
-                  <p className="text-lg font-semibold uppercase tracking-tight">{file.name}</p>
-                  <p className="text-sm text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB • Ready</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <div className="resume-main-engine">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-3 tracking-tight">Extract Career Data</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Upload your resume to identify key entities, skills, and experience markers.
+            </p>
+          </div>
+
+          <div className="grid gap-8">
+            <div className={`border-2 border-dashed rounded-3xl p-12 text-center transition-all ${file ? 'border-primary/50 bg-primary/5' : 'border-border/60 hover:border-primary/30'}`}>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="application/pdf"
+                onChange={handleFileChange}
+              />
+
+              {!file ? (
+                <div className="flex flex-col items-center gap-4 cursor-pointer" onClick={() => fileInputRef.current.click()}>
+                  <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center text-primary">
+                    <Upload size={32} />
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold">Drop your resume here</p>
+                    <p className="text-sm text-muted-foreground">or click to browse from your computer (PDF only)</p>
+                  </div>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setFile(null)} className="ml-4 rounded-xl">Replace</Button>
+              ) : (
+                <div className="flex items-center justify-center gap-6">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <FileText size={32} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-lg font-semibold uppercase tracking-tight">{file.name}</p>
+                    <p className="text-sm text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB • Ready</p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => setFile(null)} className="ml-4 rounded-xl">Replace</Button>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-center">
+              <Button
+                size="lg"
+                onClick={submit}
+                disabled={!file || loading}
+                className="px-12 rounded-2xl h-14 text-base font-semibold transition-all hover:scale-105 active:scale-95"
+              >
+                {loading ? (
+                  <div className="flex items-center gap-3">
+                    <Loader2 size={20} className="animate-spin" />
+                    Processing...
+                  </div>
+                ) : "Start Analysis"}
+              </Button>
+            </div>
+
+            {error && (
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-2xl flex items-center gap-3">
+                <AlertCircle size={20} />
+                <p className="text-sm font-medium">{error}</p>
+              </div>
+            )}
+
+            {result && (
+              <div className="bg-card border border-border/50 rounded-3xl p-8 shadow-xl shadow-black/5">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center">
+                    <CheckCircle2 size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold tracking-tight">Extracted Information</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(result).map(([key, value]) => (
+                    <div key={key} className="p-4 rounded-2xl bg-secondary/30 border border-border/30">
+                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">{key}</p>
+                      <p className="text-sm font-semibold">{Array.isArray(value) ? value.join(", ") : String(value)}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-8 p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    These entities were identified from your document. You can use these insights to refine your career roadmap or professional profile.
+                  </p>
+                </div>
               </div>
             )}
           </div>
-
-          <div className="flex justify-center">
-            <Button
-              size="lg"
-              onClick={submit}
-              disabled={!file || loading}
-              className="px-12 rounded-2xl h-14 text-base font-semibold transition-all hover:scale-105 active:scale-95"
-            >
-              {loading ? (
-                <div className="flex items-center gap-3">
-                  <Loader2 size={20} className="animate-spin" />
-                  Processing...
-                </div>
-              ) : "Start Analysis"}
-            </Button>
-          </div>
-
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-2xl flex items-center gap-3">
-              <AlertCircle size={20} />
-              <p className="text-sm font-medium">{error}</p>
-            </div>
-          )}
-
-          {result && (
-            <div className="bg-card border border-border/50 rounded-3xl p-8 shadow-xl shadow-black/5">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center">
-                  <CheckCircle2 size={24} />
-                </div>
-                <h3 className="text-xl font-bold tracking-tight">Extracted Information</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(result).map(([key, value]) => (
-                  <div key={key} className="p-4 rounded-2xl bg-secondary/30 border border-border/30">
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">{key}</p>
-                    <p className="text-sm font-semibold">{Array.isArray(value) ? value.join(", ") : String(value)}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 p-4 rounded-2xl bg-primary/5 border border-primary/10">
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  These entities were identified from your document. You can use these insights to refine your career roadmap or professional profile.
-                </p>
-              </div>
-            </div>
-          )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
