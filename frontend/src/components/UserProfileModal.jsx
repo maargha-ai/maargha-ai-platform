@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { 
-  X, 
-  User, 
-  Mail, 
-  Phone, 
-  Linkedin, 
-  Github, 
-  Twitter, 
-  Trophy, 
-  GraduationCap, 
-  Edit3, 
-  Save, 
+import {
+  X,
+  User,
+  Mail,
+  Phone,
+  Linkedin,
+  Github,
+  Twitter,
+  Trophy,
+  GraduationCap,
+  Edit3,
+  Save,
   LogOut,
   ChevronLeft
 } from "lucide-react";
@@ -55,16 +55,16 @@ export default function UserProfileModal({ isOpen, onClose }) {
 
   return (
     <div className="profile-modal-overlay">
-      <motion.div 
+      <motion.div
         className="profile-modal-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       />
-      
-      <motion.div 
-        className="profile-modal-content" 
+
+      <motion.div
+        className="profile-modal-content"
         initial={{ opacity: 0, scale: 0.9, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 30 }}
@@ -94,7 +94,7 @@ export default function UserProfileModal({ isOpen, onClose }) {
         <div className="profile-modal-body" data-lenis-prevent>
           <AnimatePresence mode="wait">
             {view === "display" ? (
-              <motion.div 
+              <motion.div
                 key="display"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -109,7 +109,7 @@ export default function UserProfileModal({ isOpen, onClose }) {
                 <InfoItem icon={<GraduationCap size={16} />} label="Education" value={profile.education} wide />
               </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 key="edit"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -121,7 +121,7 @@ export default function UserProfileModal({ isOpen, onClose }) {
                   </button>
                   <h3 className="font-bold text-xl">Edit Profile</h3>
                 </div>
-                
+
                 <div className="edit-grid">
                   <Input name="phone" value={form.phone} onChange={handleChange} label="Phone" />
                   <Input name="linkedin" value={form.linkedin} onChange={handleChange} label="LinkedIn" />
@@ -183,7 +183,7 @@ const InfoItem = ({ icon, label, value, wide }) => (
 const Input = ({ label, name, value, onChange }) => (
   <div className="space-y-1">
     <label className="input-group-label">{label}</label>
-    <input 
+    <input
       className="modal-input"
       name={name}
       value={value}
@@ -195,7 +195,7 @@ const Input = ({ label, name, value, onChange }) => (
 const TextArea = ({ label, name, value, onChange }) => (
   <div className="space-y-1">
     <label className="input-group-label">{label}</label>
-    <textarea 
+    <textarea
       className="modal-input modal-textarea"
       name={name}
       value={value}
