@@ -339,7 +339,8 @@
 /* Roadmap Feature Box Styles */
 .roadmap-feature-section {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   padding: 1rem 0;
 }
 
