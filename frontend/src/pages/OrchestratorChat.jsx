@@ -230,7 +230,7 @@ export default function OrchestratorChat() {
         <div className="orch-gradient-sphere pulse-2"></div>
       </div>
 
-      <main className="orch-main w-full h-full flex flex-col">
+      <main className="orch-main">
         <header className="orch-header border-b border-border/40 backdrop-blur-md bg-background/50">
           <div className="flex items-center justify-between w-full px-6">
             <Button
@@ -252,95 +252,129 @@ export default function OrchestratorChat() {
           </div>
         </header>
 
-        {/* Chat Area - Full Width */}
-        <div className="orchestrator-chat-full">
-          {/* Scrollable messages area */}
-          <div className="messages-area" ref={scrollRef}>
-            {messages.map((m, i) => (
-              <div key={i} className={`msg-wrapper ${m.role === 'assistant' ? 'ai' : 'user'}`}>
-                <div className="msg-avatar">
-                  {m.role === "assistant" ? <Bot size={20} /> : <User size={20} />}
-                </div>
-                <div className="msg-content">
-                  <div className="msg-bubble">
-                    {m.content}
-                  </div>
-                  <span className="msg-time">{m.timestamp}</span>
-                </div>
+        <div className="orchestrator-content-wrapper">
+          <aside className="orchestrator-feature-sidebar">
+            <div className="orchestrator-feature-box">
+              <div className="orchestrator-feature-header">
+                <Cpu size={24} className="text-indigo-500" />
+                <h3>Maargha Orchestrator</h3>
               </div>
-            ))}
-
-            {messages.length === 1 && (
-              <div className="suggestions-grid">
-                {suggestions.map((s, i) => (
-                  <button
-                    key={i}
-                    className="suggestion-chip"
-                    onClick={() => {
-                      if (chatWsRef.current?.readyState === WebSocket.OPEN) {
-                        chatWsRef.current.send(s);
-                        setMessages(p => [...p, { role: "user", content: s, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
-                        setIsTyping(true);
-                      }
-                    }}
-                  >
-                    {s}
-                    <ArrowRight size={14} />
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {isTyping && (
-              <div className="msg-wrapper ai">
-                <div className="msg-avatar">
-                  <Bot size={20} />
-                </div>
-                <div className="msg-content">
-                  <div className="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+              
+              <div className="orchestrator-feature-content">
+                <p className="orchestrator-feature-description">
+                  Your central AI command center for seamless career management and multi-agent coordination.
+                </p>
+                
+                <div className="orchestrator-feature-sections">
+                  <div className="orchestrator-feature-section">
+                    <h4 className="feature-title">How It Works</h4>
+                    <ul className="orchestrator-feature-steps">
+                      <li>Ask any career question</li>
+                      <li>Coordinate between AI agents</li>
+                      <li>Get real-time data & insights</li>
+                      <li>Execute strategic plans</li>
+                    </ul>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-
-          <footer className="orch-footer">
-            <div className="input-container glass-morphism">
-              <textarea
-                placeholder="Message Maargha Orchestrator..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
-                }}
-                rows={1}
-              />
-              <div className="input-actions flex items-center gap-2">
-                <button
-                  className={`mic-btn ${liveMode ? 'active' : ''}`}
-                  onClick={toggleLiveMode}
-                  title="Voice Mode"
-                >
-                  <Mic size={18} />
-                </button>
-                <button
-                  className={`send-btn ${input.trim() ? 'active' : ''}`}
-                  onClick={sendMessage}
-                  disabled={!input.trim()}
-                >
-                  <Send size={18} />
-                </button>
+                
+                <div className="orchestrator-feature-footer">
+                  <div className="orchestrator-feature-tip">
+                    <Target size={16} className="text-blue-500" />
+                    <span>Tip: Use natural language for best results!</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <p className="footer-note">
-            </p>
-          </footer>
+          </aside>
+
+          <div className="orchestrator-chat-engine">
+            <div className="orchestrator-chat-full">
+              <div className="messages-area" ref={scrollRef}>
+                {messages.map((m, i) => (
+                  <div key={i} className={`msg-wrapper ${m.role === 'assistant' ? 'ai' : 'user'}`}>
+                    <div className="msg-avatar">
+                      {m.role === "assistant" ? <Bot size={20} /> : <User size={20} />}
+                    </div>
+                    <div className="msg-content">
+                      <div className="msg-bubble">
+                        {m.content}
+                      </div>
+                      <span className="msg-time">{m.timestamp}</span>
+                    </div>
+                  </div>
+                ))}
+
+                {messages.length === 1 && (
+                  <div className="suggestions-grid">
+                    {suggestions.map((s, i) => (
+                      <button
+                        key={i}
+                        className="suggestion-chip"
+                        onClick={() => {
+                          if (chatWsRef.current?.readyState === WebSocket.OPEN) {
+                            chatWsRef.current.send(s);
+                            setMessages(p => [...p, { role: "user", content: s, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+                            setIsTyping(true);
+                          }
+                        }}
+                      >
+                        {s}
+                        <ArrowRight size={14} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {isTyping && (
+                  <div className="msg-wrapper ai">
+                    <div className="msg-avatar">
+                      <Bot size={20} />
+                    </div>
+                    <div className="msg-content">
+                      <div className="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <footer className="orch-footer">
+                <div className="input-container glass-morphism">
+                  <textarea
+                    placeholder="Message Maargha Orchestrator..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                      }
+                    }}
+                    rows={1}
+                  />
+                  <div className="input-actions flex items-center gap-2">
+                    <button
+                      className={`mic-btn ${liveMode ? 'active' : ''}`}
+                      onClick={toggleLiveMode}
+                      title="Voice Mode"
+                    >
+                      <Mic size={18} />
+                    </button>
+                    <button
+                      className={`send-btn ${input.trim() ? 'active' : ''}`}
+                      onClick={sendMessage}
+                      disabled={!input.trim()}
+                    >
+                      <Send size={18} />
+                    </button>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
         </div>
       </main>
 
