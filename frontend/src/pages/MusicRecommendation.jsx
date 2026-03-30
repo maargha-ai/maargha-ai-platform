@@ -7,6 +7,7 @@ import {
   SkipBack, 
   SkipForward, 
   Sparkles,
+  Target ,
   Music4
 } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -102,75 +103,112 @@ export default function MusicRecommendation() {
   };
   return (
     <div className="music-layout">
-      {}
       <div className="music-bg"></div>
-      {}
       <canvas ref={canvasRef} className="equalizer-canvas"></canvas>
-      <button className="back-btn-abs" onClick={() => navigate("/dashboard")}>
-        <ArrowLeft size={24} />
-      </button>
-      <div className="music-content">
-        {!song ? (
-          <div className="emotion-input-container">
-             <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 rounded-full bg-indigo-500/20 flex items-center justify-center animate-pulse">
-                   <Music4 size={40} className="text-indigo-400" />
+      
+      <div className="music-content-wrapper">
+        <aside className="music-feature-sidebar">
+          <div className="music-feature-box">
+            <div className="music-feature-header">
+              <Music4 size={24} className="text-indigo-400" />
+              <h3>Sonic Therapy</h3>
+            </div>
+            
+            <div className="music-feature-content">
+              <p className="music-feature-description">
+                AI-curated soundscapes optimized for focus, relaxation, and cognitive performance.
+              </p>
+              
+              <div className="music-feature-sections">
+                <div className="music-feature-section">
+                  <h4 className="feature-title">How It Works</h4>
+                  <ul className="music-feature-steps">
+                    <li>Detect your current mood</li>
+                    <li>Generate AI playlists</li>
+                    <li>Enhance your deep work</li>
+                    <li>Achieve mental clarity</li>
+                  </ul>
                 </div>
-             </div>
-             <h1 className="music-title">Sonic Therapy</h1>
-             <p className="music-subtitle">Describe your current mood, and let our AI compose your soundscape.</p>
-             <div className="input-box">
-               <input 
-                 placeholder="e.g. Feeling stressed about deadlines..." 
-                 value={text}
-                 onChange={(e) => setText(e.target.value)}
-                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && isValid) submit();
-                }}
-               />
-                 <button
-                    className="play-btn"
-                    onClick={submit}
-                    disabled={loading || !isValid}
-                  >
-                    <Play size={20} fill="currentColor" />
-                    {loading ? "Composing..." : "Play"}
-                  </button>
+              </div>
+              
+              <div className="music-feature-footer">
+                <div className="music-feature-tip">
+                  <Target size={16} className="text-blue-500" />
+                  <span>Tip: Use headphones for full immersion!</span>
                 </div>
+              </div>
+            </div>
+          </div>
+        </aside>
 
-                <div className={`char-hint ${isValid ? "ok" : "warn"}`}>
-                  {charCount}/{MIN_CHARS} characters
-                  {!isValid && " — please describe your mood in more detail"}
+        <div className="music-main-engine">
+          <button className="back-btn-abs" onClick={() => navigate("/dashboard")}>
+            <ArrowLeft size={24} />
+          </button>
+          
+          <div className="music-content">
+            {!song ? (
+              <div className="emotion-input-container">
+                 <div className="flex justify-center mb-6">
+                    <div className="w-20 h-20 rounded-full bg-indigo-500/20 flex items-center justify-center animate-pulse">
+                       <Music4 size={40} className="text-indigo-400" />
+                    </div>
+                 </div>
+                 <h1 className="music-title">Sonic Therapy</h1>
+                 <p className="music-subtitle">Describe your current mood, and let our AI compose your soundscape.</p>
+                 <div className="input-box">
+                   <input 
+                     placeholder="e.g. Feeling stressed about deadlines..." 
+                     value={text}
+                     onChange={(e) => setText(e.target.value)}
+                     onKeyDown={(e) => {
+                      if (e.key === "Enter" && isValid) submit();
+                    }}
+                   />
+                     <button
+                        className="play-btn"
+                        onClick={submit}
+                        disabled={loading || !isValid}
+                      >
+                        <Play size={20} fill="currentColor" />
+                        {loading ? "Composing..." : "Play"}
+                      </button>
+                    </div>
+
+                    <div className={`char-hint ${isValid ? "ok" : "warn"}`}>
+                      {charCount}/{MIN_CHARS} characters
+                      {!isValid && " — please describe your mood in more detail"}
+                    </div>
+              </div>
+            ) : (
+              <div className="player-container">
+                <div className="song-info">
+                   <h2 className="song-title">{song.title}</h2>
+                   <div className="song-tags">
+                     {song.song_emotions?.map((tag, i) => (
+                       <span key={i} className="tag">{tag}</span>
+                     ))}
+                   </div>
                 </div>
+                <audio 
+                  ref={audioRef} 
+                  src={song.audio_url} 
+                  autoPlay 
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  onEnded={() => setIsPlaying(false)}
+                />
+                <div className="controls">
+                   <button className="ctrl-btn"><SkipBack size={32} /></button>
+                   <button className="ctrl-btn main" onClick={togglePlay}>
+                     {isPlaying ? <Pause size={36} fill="currentColor" /> : <Play size={36} fill="currentColor" className="ml-1" />}
+                   </button>
+                   <button className="ctrl-btn"><SkipForward size={32} /></button>
+                </div>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="player-container">
-            {}
-            <div className="song-info">
-               <h2 className="song-title">{song.title}</h2>
-               <div className="song-tags">
-                 {song.song_emotions?.map((tag, i) => (
-                   <span key={i} className="tag">{tag}</span>
-                 ))}
-               </div>
-            </div>
-            <audio 
-              ref={audioRef} 
-              src={song.audio_url} 
-              autoPlay 
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onEnded={() => setIsPlaying(false)}
-            />
-            <div className="controls">
-               <button className="ctrl-btn"><SkipBack size={32} /></button>
-               <button className="ctrl-btn main" onClick={togglePlay}>
-                 {isPlaying ? <Pause size={36} fill="currentColor" /> : <Play size={36} fill="currentColor" className="ml-1" />}
-               </button>
-               <button className="ctrl-btn"><SkipForward size={32} /></button>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
