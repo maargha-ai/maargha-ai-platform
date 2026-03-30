@@ -95,15 +95,6 @@ export default function Dashboard() {
       left: '20%'
     },
     {
-      id: 'news',
-      title: 'Tech Pulse Digest',
-      description: 'Real-time industry shifts and curated tech insights.',
-      icon: Newspaper,
-      path: '/news',
-      top: '41.6%',
-      left: '21%'
-    },
-    {
       id: 'roadmap',
       title: 'Career Path Intelligence',
       description: 'Clear learning roadmap with skills, tools, and projects.',
@@ -111,6 +102,15 @@ export default function Dashboard() {
       path: '/roadmap',
       top: '23.4%',
       left: '51%'
+    },
+    {
+      id: 'ai-tutor',
+      title: 'Knowledge Mastery Engine',
+      description: 'Structured AI tutoring for true concept mastery.',
+      icon: BrainCircuit,
+      path: '/tutor',
+      top: '31.3%',
+      left: '77%'
     },
     {
       id: 'quiz',
@@ -122,13 +122,13 @@ export default function Dashboard() {
       left: '42%'
     },
     {
-      id: 'jobs',
-      title: 'AI Job Architect',
-      description: 'Strategic role placement and matching based on your unique profile.',
-      icon: Briefcase,
-      path: '/jobs',
-      top: '97.4%',
-      left: '60%'
+      id: 'news',
+      title: 'Tech Pulse Digest',
+      description: 'Real-time industry shifts and curated tech insights.',
+      icon: Newspaper,
+      path: '/news',
+      top: '41.6%',
+      left: '21%'
     },
     {
       id: 'cv-architect',
@@ -140,15 +140,6 @@ export default function Dashboard() {
       left: '53%'
     },
     {
-      id: 'resume-parser',
-      title: 'Resume Intelligence Engine',
-      description: 'Deep resume analysis to extract skills, roles, and career signals using AI.',
-      icon: FileSearch,
-      path: '/resume-parser',
-      top: '58.2%',
-      left: '23%'
-    },
-    {
       id: 'linkedin',
       title: 'LinkedIn Growth AI',
       description: 'Maximize your profile impact and build high-value connections.',
@@ -158,6 +149,15 @@ export default function Dashboard() {
       left: '51%'
     },
     {
+      id: 'resume-parser',
+      title: 'Resume Intelligence Engine',
+      description: 'Deep resume analysis to extract skills, roles, and career signals using AI.',
+      icon: FileSearch,
+      path: '/resume-parser',
+      top: '58.2%',
+      left: '23%'
+    },
+    {
       id: 'networking',
       title: 'Global Tech Events',
       description: 'Real-time networking, hackathons, and virtual summits.',
@@ -165,15 +165,6 @@ export default function Dashboard() {
       path: '/networking-events',
       top: '67.9%',
       left: '40%'
-    },
-    {
-      id: 'ai-tutor',
-      title: 'Knowledge Mastery Engine',
-      description: 'Structured AI tutoring for true concept mastery.',
-      icon: BrainCircuit,
-      path: '/tutor',
-      top: '31.3%',
-      left: '77%'
     },
     {
       id: 'music',
@@ -190,8 +181,17 @@ export default function Dashboard() {
       description: 'Your conversational companion for emotional support and wellness.',
       icon: Heart,
       path: '/emotional-support',
-      top: '87.6%',
+      top: '86%',
       left: '36%'
+    },
+    {
+      id: 'jobs',
+      title: 'AI Job Architect',
+      description: 'Strategic role placement and matching based on your unique profile.',
+      icon: Briefcase,
+      path: '/jobs',
+      top: '96%',
+      left: '60%'
     }
   ];
   return (
@@ -281,7 +281,7 @@ export default function Dashboard() {
                 style={{ top: node.top, left: node.left }}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
+                viewport={{ once: true, margin: "0px" }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 onClick={() => navigate(node.path)}
               >

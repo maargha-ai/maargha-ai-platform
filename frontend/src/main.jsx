@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "./MockBridge";
 import App from "./App";
 import Lenis from "@studio-freight/lenis";
 import "./index.css";
