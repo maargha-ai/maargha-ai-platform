@@ -1,0 +1,45 @@
+uvicorn[standard]==0.30.6
+fastapi==0.124.2
+pydantic 
+
+# LLM / LangChain
+langchain==1.1.0
+langchain-community==0.4.1
+langchain-groq==1.1.0
+langgraph==1.0.4
+groq>=0.30.0,<1.0.0
+openai==2.9.0
+
+# Vector DB & Embeddings
+faiss-cpu==1.13.0
+
+# Audio & PDF
+# pydub==0.25.1
+pypdf==6.4.0
+pypdf2==3.0.1
+pdfplumber==0.11.9
+
+# Database
+asyncpg==0.31.0
+psycopg2-binary==2.9.11     # Better than psycopg2 for Docker
+
+# Utils
+numpy
+pandas==2.3.3
+openpyxl==3.1.5
+python-multipart==0.0.20
+httpx==0.27.0
+reportlab==4.4.9
+google-cloud-storage==3.8.0
+dash==4.0.0
+feedparser==6.0.12
+structlog==24.1.0
+
+scikit-learn
+soundfile==0.13.1
+plotly==6.6.0
+requests
+SQLAlchemy==2.0.48
+typing_extensions==4.15.0
+typing-inspect==0.9.0
+typing-inspection==0.4.2

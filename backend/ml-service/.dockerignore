@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.git/
+.gitignore
+
+# VERY IMPORTANT
+models/
+data/
+datasets/
+*.csv
+*.parquet
+*.pkl
+*.h5
+
+# caches
+.cache/
+huggingface/

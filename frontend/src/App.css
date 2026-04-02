@@ -1,0 +1,98 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+.card {
+  padding: 2em;
+}
+.read-the-docs {
+  color: #888;
+}
+.career-page {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+}
+.career-question-card,
+.career-card,
+.career-confirmation {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+  text-align: left;
+}
+.answer-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.answer-buttons button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 15px;
+}
+.answer-buttons button:hover {
+  background: rgba(255,255,255,0.25);
+}
+.question-progress {
+  margin-top: 12px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+.career-result h3 {
+  margin-top: 30px;
+}
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.skill-tag {
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+}
+.select-btn {
+  margin-top: 16px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.12);
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.select-btn:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-1px);
+}
+.career-confirmation h2 {
+  margin-top: 12px;
+  color: #7dd3fc;
+}
+.career-confirmation button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255,255,255,0.18);
+  color: white;
+  font-size: 15px;
+}
+.career-confirmation button:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+

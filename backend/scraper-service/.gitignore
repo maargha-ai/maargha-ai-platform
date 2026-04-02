@@ -1,0 +1,8 @@
+
+scraperenv/
+
+# Environment files
+.env
+
+# SentenceTransformer / HF models
+models/
