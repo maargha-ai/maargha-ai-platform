@@ -1,6 +1,6 @@
 const GATEWAY_API_URL  = import.meta.env.VITE_API_BASE_URL;
 export async function registerUser(data) {
-  const response = await fetch(`${GATEWAY_API_URL }/register/`, {
+  const response = await fetch(`${GATEWAY_API_URL}/auth/register/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -19,7 +19,7 @@ export async function registerUser(data) {
   return response.json();
 }
 export async function loginUser(data) {
-  const response = await fetch(`${GATEWAY_API_URL}/login/`, {
+  const response = await fetch(`${GATEWAY_API_URL}/auth/login/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
