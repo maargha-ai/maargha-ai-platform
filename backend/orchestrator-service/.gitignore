@@ -1,2 +1,16 @@
-.env
+
 orchesenv/
+
+# Environment files
+.env
+env.yaml
+
+# Secrets
+secrets/
+*.json
+
+# SentenceTransformer / HF models
+orchestrator-service/models/
+models/
+
+runs/

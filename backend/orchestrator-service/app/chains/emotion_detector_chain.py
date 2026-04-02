@@ -1,18 +1,18 @@
-from transformers import pipeline
+import httpx
+from app.core.config import settings
 
-emotion_pipeline = pipeline(
-    "text-classification",
-    model="bhadresh-savani/distilbert-base-uncased-emotion",
-    device=-1
-)
 
-def detect_text_emotion(text: str):
+async def detect_text_emotion(text: str) -> list[str]:
     try:
-        result = emotion_pipeline(text)
-        label = result[0]["label"].lower()
-        score = result[0]["score"]
-        return label if score > 0.6 else "neutral"
-    except Exception:
-        return "neutral"
-    
-    
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.post(
+                f"{settings.ML_SERVICE_URL}/emotion/detect-emotion",
+                json={"text": text},
+            )
+
+            data = response.json()
+            return data.get("emotions", ["Calm"])
+
+    except Exception as e:
+        print("[Emotion API ERROR]", e)
+        return ["Calm"]

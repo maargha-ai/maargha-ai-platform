@@ -1,6 +1,14 @@
 django==5.2.9
 psycopg2-binary==2.9.11
-python-dotenv==1.2.1
 djangorestframework==3.16.1
 djangorestframework-simplejwt==5.5.1
 django-cors-headers==4.9.0
+gunicorn==21.2.0
+python-dotenv==1.2.1
+structlog==24.1.0
+
+# Dev tools - comment out for production build
+# pytest==8.2.2
+# pytest-django==4.8.0
+
+dj_database_url

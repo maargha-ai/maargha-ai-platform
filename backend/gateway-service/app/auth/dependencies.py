@@ -1,22 +1,21 @@
 # JWT Validation
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
-from app.config import settings
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
 
+from app.config import settings
 
 security = HTTPBearer()
 
-def get_current_user(
-        creds: HTTPAuthorizationCredentials = Depends(security)
-):
-    token = creds.credentials
 
+def get_current_user(creds: HTTPAuthorizationCredentials = Depends(security)):
+    token = creds.credentials
+    print("AUTH HEADER:", creds.credentials[:20])
     try:
         payload = jwt.decode(
-            token, 
+            token,
             settings.JWT_SECRET,
-            algorithms=[settings.JWT_ALGORITHM],   
+            algorithms=[settings.JWT_ALGORITHM],
         )
         return payload  # contains user_id, email, etc
     except JWTError:
@@ -24,4 +23,3 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
         )
-    

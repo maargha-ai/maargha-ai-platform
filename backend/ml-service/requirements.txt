@@ -1,0 +1,14 @@
+# Force CPU-only PyTorch FIRST (critical!)
+torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+transformers
+# NER
+gliner==0.2.24
+# CV
+mediapipe==0.10.32
+opencv-python-headless==4.12.0.88
+# Server
+fastapi==0.124.2
+uvicorn[standard]==0.30.6
+pydantic
+
+numpy

@@ -1,6 +1,7 @@
 # app/chains/linkedin_chain.py
-from app.core.llm_client import llm  
 from langchain_core.messages import HumanMessage, SystemMessage
+
+from app.core.llm_client import llm
 
 LINKEDIN_SYSTEM_PROMPT = """
 You are a senior LinkedIn Growth & Personal Branding Expert.
@@ -34,10 +35,11 @@ Style rules:
 - Answer exactly what the user asks
 """
 
+
 async def run_linkedin_assistant(user_message: str) -> str:
     messages = [
         SystemMessage(content=LINKEDIN_SYSTEM_PROMPT),
-        HumanMessage(content=user_message)
+        HumanMessage(content=user_message),
     ]
 
     response = await llm.ainvoke(messages)

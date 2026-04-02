@@ -1,8 +1,10 @@
 # app/chains/career_chain.py
 import json
-from app.core.llm_client import llm  
 from typing import Dict, List
+
 from langchain_core.messages import HumanMessage
+
+from app.core.llm_client import llm
 
 QUESTIONS = [
     "Do you enjoy solving mathematical problems? (yes/no)",
@@ -19,8 +21,9 @@ QUESTIONS = [
     "Do you enjoy detecting edge cases and breaking applications? (yes/no)",
     "Do you enjoy configuring routers, switches and firewalls? (yes/no)",
     "Are you interested in game engines like Unity or Unreal Engine? (yes/no)",
-    "Would you enjoy a role in teaching, mentorship, or educational content creation? (yes/no)"
+    "Would you enjoy a role in teaching, mentorship, or educational content creation? (yes/no)",
 ]
+
 
 def build_prompt(answers: Dict[str, str]) -> str:
     bullet_text = "\n".join([f"- {q}: {a}" for q, a in answers.items()])
@@ -42,12 +45,19 @@ def build_prompt(answers: Dict[str, str]) -> str:
     ]
     """
 
+
 async def predict_careers_from_answers(answers: Dict[str, str]) -> List[Dict]:
     prompt = build_prompt(answers)
     response = await llm.ainvoke([HumanMessage(content=prompt)])
     raw = response.content.strip()
-    
+
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
-        return [{"title": "Software Engineer", "reason": "Versatile role", "skills": ["Python", "Git", "DSA"]}]
+        return [
+            {
+                "title": "Software Engineer",
+                "reason": "Versatile role",
+                "skills": ["Python", "Git", "DSA"],
+            }
+        ]

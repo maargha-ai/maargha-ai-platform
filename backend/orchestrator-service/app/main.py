@@ -1,17 +1,35 @@
 # app/main.py
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File
-from fastapi.middleware.cors import CORSMiddleware
-from app.graph.orchestrator_graph import app as graph_app
-from app.core.state import AgentState
-from app.db.database import engine, Base
+import json
+import os
+import time
 from pathlib import Path
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.core.session_store import USER_STATE
-import shutil
-from app.intent.intent_router import route_intent
-from app.intent.planner_gate import should_enter_planner
+
+from app.core.state import AgentState
+from app.db.database import Base, engine
+from app.graph.orchestrator_graph import app as graph_app
+from app.monitoring.health import router as health_router
+
+# Import monitoring and logging
+from app.monitoring.logger import (
+    LoggingMiddleware,
+    orchestrator_logger,
+    performance_monitor,
+    websocket_logger,
+)
+from app.router import cv, jobs, music, news, resume_parser, roadmap
+from app.ws import career, emotional_support, linkedin, live_chat, quiz, tutor
+
+load_dotenv()
 
 app = FastAPI(title="MAARGHA AI Orchestrator")
+
+# Add logging middleware
+app.add_middleware(LoggingMiddleware)
 
 # Allow frontend (React) to connect
 app.add_middleware(
@@ -29,113 +47,209 @@ STATIC_DIR.mkdir(parents=True, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
+# Include health check endpoints
+app.include_router(health_router)
+
+app.include_router(music.router)
+app.include_router(roadmap.router)
+app.include_router(jobs.router)
+app.include_router(news.router)
+app.include_router(cv.router)
+app.include_router(resume_parser.router)
+
+
+@app.websocket("/ws/career/{user_id}")
+async def career_ws(websocket: WebSocket, user_id: str):
+    performance_monitor.record_websocket_connection()
+
+    try:
+        orchestrator_logger.info(
+            "Career WebSocket connection started",
+            extra={"user_id": user_id, "endpoint": "/ws/career"},
+        )
+        await career.career_ws_handler(websocket, user_id)
+    except Exception as e:
+        orchestrator_logger.error(
+            "Career WebSocket error", error=e, extra={"user_id": user_id}
+        )
+    finally:
+        performance_monitor.record_websocket_disconnection()
+        websocket_logger.info(
+            "Career WebSocket connection closed", extra={"user_id": user_id}
+        )
+
+
+@app.websocket("/ws/quiz/{user_id}")
+async def quiz_ws(websocket: WebSocket, user_id: str):
+    performance_monitor.record_websocket_connection()
+
+    try:
+        orchestrator_logger.info(
+            "Quiz WebSocket connection started",
+            extra={"user_id": user_id, "endpoint": "/ws/quiz"},
+        )
+        await quiz.quiz_ws_handler(websocket, user_id)
+    except Exception as e:
+        orchestrator_logger.error(
+            "Quiz WebSocket error", error=e, extra={"user_id": user_id}
+        )
+    finally:
+        performance_monitor.record_websocket_disconnection()
+        websocket_logger.info(
+            "Quiz WebSocket connection closed", extra={"user_id": user_id}
+        )
+
+
+@app.websocket("/ws/emotional-support/{user_id}")
+async def emotional_support_ws_route(websocket: WebSocket, user_id: str):
+    performance_monitor.record_websocket_connection()
+
+    try:
+        orchestrator_logger.info(
+            "Emotional Support WebSocket connection started",
+            extra={"user_id": user_id, "endpoint": "/ws/emotional-support"},
+        )
+        await emotional_support.emotional_support_ws(websocket, user_id)
+    except Exception as e:
+        orchestrator_logger.error(
+            "Emotional Support WebSocket error", error=e, extra={"user_id": user_id}
+        )
+    finally:
+        performance_monitor.record_websocket_disconnection()
+        websocket_logger.info(
+            "Emotional Support WebSocket connection closed", extra={"user_id": user_id}
+        )
+
+
+@app.websocket("/ws/linkedin/{user_id}")
+async def linkedin_ws(websocket: WebSocket, user_id: str):
+    performance_monitor.record_websocket_connection()
+
+    try:
+        orchestrator_logger.info(
+            "LinkedIn WebSocket connection started",
+            extra={"user_id": user_id, "endpoint": "/ws/linkedin"},
+        )
+        await linkedin.linkedin_ws_handler(websocket, user_id)
+    except Exception as e:
+        orchestrator_logger.error(
+            "LinkedIn WebSocket error", error=e, extra={"user_id": user_id}
+        )
+    finally:
+        performance_monitor.record_websocket_disconnection()
+        websocket_logger.info(
+            "LinkedIn WebSocket connection closed", extra={"user_id": user_id}
+        )
+
+
+@app.websocket("/ws/tutor/{user_id}")
+async def tutor_ws(websocket: WebSocket, user_id: str):
+    performance_monitor.record_websocket_connection()
+
+    try:
+        orchestrator_logger.info(
+            "Tutor WebSocket connection started",
+            extra={"user_id": user_id, "endpoint": "/ws/tutor"},
+        )
+        await tutor.tutor_ws_handler(websocket, user_id)
+    except Exception as e:
+        orchestrator_logger.error(
+            "Tutor WebSocket error", error=e, extra={"user_id": user_id}
+        )
+    finally:
+        performance_monitor.record_websocket_disconnection()
+        websocket_logger.info(
+            "Tutor WebSocket connection closed", extra={"user_id": user_id}
+        )
+
+
 @app.on_event("startup")
 async def on_startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    orchestrator_logger.info("Maargha Orchestrator starting up")
 
-# WebSocket endpoint for real-time chat
-@app.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        orchestrator_logger.info("Database initialized successfully")
+    except Exception as e:
+        orchestrator_logger.error("Database initialization failed", error=e)
+        raise
+
+
+@app.websocket("/ws/chat/live")
+async def chat_live(websocket: WebSocket):
+    performance_monitor.record_websocket_connection()
+
+    try:
+        orchestrator_logger.info("Live chat WebSocket connection started")
+        await live_chat.chat_live_ws(websocket)
+    except Exception as e:
+        orchestrator_logger.error("Live chat WebSocket error", error=e)
+    finally:
+        performance_monitor.record_websocket_disconnection()
+        websocket_logger.info("Live chat WebSocket connection closed")
+
+
+@app.websocket("/ws/chat")
+async def chat_ws(websocket: WebSocket):
+    performance_monitor.record_websocket_connection()
+
     await websocket.accept()
+    orchestrator_logger.info("Chat WebSocket connection established")
 
-    if user_id not in USER_STATE:
-        USER_STATE[user_id] = {}
-
-    # Initial state
     state: AgentState = {
+        "user_id": id(websocket),
         "messages": [],
-        "user_id": user_id,
-
-        # agent loop
-        "agent_thought": None,
-        "agent_action": None,
-        "agent_action_input": None,
         "agent_done": False,
-        "agent_waiting_for_user": False,
-
-        # domain state
-        "selected_career": None,
-        "roadmap_generated": False,
-
-        "career_answers": {},
-        "career_question_idx": 0,
-        "career_options": None,
-
-        # jobs
-        "cv_path": USER_STATE[user_id].get("cv_path"),
-        "job_role": None,
-        "job_location": None,
-
-        # News
-        "tech_news_completed": False,
     }
 
     try:
         while True:
-            data = await websocket.receive_text()
-            print(f"[DEBUG main] Received user message: {data}")
-
-            state["messages"].append({"role": "user", "content": data})
-            # Reset waiting flag
-            state["agent_waiting_for_user"] = False
-            # Route intent
-            intent = await route_intent(data)
-            print(f"[INTENT] Detected intent: {intent}")
-
-            enter_planner = (
-                intent != "general_chat"
-                or state.get("career_question_idx") is not 0
-                or state.get("career_options") is not None
-                or state.get("selected_career") is not None
+            text = await websocket.receive_text()
+            orchestrator_logger.info(
+                "Chat message received",
+                extra={"user_id": state["user_id"], "message_length": len(text)},
             )
 
-            # Planner gate
-            if not enter_planner:
-                # Casual chat response (NO LangGraph)
-                await websocket.send_text(
-                    "Got it! Whenever you're ready, I can help with careers, roadmaps, or jobs."
-                )
-                continue
-            
-            print(f"[DEBUG main] Received user message: {data}")
-            # print(f"[DEBUG main] Pre-ainvoke state: {state}")
+            state["messages"].append({"role": "user", "content": text})
 
-            output = await graph_app.ainvoke(
-                state,
-                config={"recursion_limit": 10}
-                )
-            print(f"\n[DEBUG main] Graph output: {output}")
+            output = await graph_app.ainvoke(state)
             state.update(output)
 
-            # print(f"[DEBUG main] Post-ainvoke state: {state}")
-            if state["messages"] and state["messages"][-1]["role"] == "assistant":
-                reply = state["messages"][-1]["content"]
-                print(f"\n[DEBUG main] Sending assistant reply: {reply}")
-                await websocket.send_text(reply)
-            
-            if state.get("agent_done"):
-                print("\n[DEBUG main] Agent done — breaking")
-                break
+            if state.get("agent_response"):
+                await websocket.send_text(
+                    json.dumps({"type": "CHAT", "content": state["agent_response"]})
+                )
+
+                orchestrator_logger.info(
+                    "Chat response sent",
+                    extra={
+                        "user_id": state["user_id"],
+                        "response_length": len(state["agent_response"]),
+                    },
+                )
+
+            if state.get("navigate"):
+                await websocket.send_text(json.dumps({"navigate": state["navigate"]}))
+
+                orchestrator_logger.info(
+                    "Navigation command sent",
+                    extra={
+                        "user_id": state["user_id"],
+                        "navigate_to": state["navigate"],
+                    },
+                )
+
+            state.pop("agent_response", None)
+            state.pop("navigate", None)
 
     except WebSocketDisconnect:
-        print(f"[main 6] User disconnected: {user_id}")
-
-# @app.post("/upload-cv/{user_id}")
-# async def upload_cv(user_id: str, file: UploadFile = File(...)):
-#     user_dir = STATIC_DIR / "cvs" / user_id
-#     user_dir.mkdir(parents=True, exist_ok=True)
-
-#     cv_path = user_dir / file.filename
-#     with open(cv_path, "wb") as f:
-#         shutil.copyfileobj(file.file, f)
-
-#     # THIS IS THE CRITICAL PART
-#     if user_id not in USER_STATE:
-#         USER_STATE[user_id] = {}
-
-#     USER_STATE[user_id]["cv_path"] = str(cv_path)
-#     return {
-#         "message": "CV uploaded successfully",
-#         "cv_path": str(cv_path)
-#     }
+        orchestrator_logger.info(
+            "Chat WebSocket disconnected", extra={"user_id": state["user_id"]}
+        )
+    except Exception as e:
+        orchestrator_logger.error(
+            "Chat WebSocket error", error=e, extra={"user_id": state["user_id"]}
+        )
+    finally:
+        performance_monitor.record_websocket_disconnection()

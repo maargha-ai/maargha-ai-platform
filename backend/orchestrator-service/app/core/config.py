@@ -1,12 +1,23 @@
-""" Settings loader """
+"""Settings loader"""
 
-from pydantic_settings import BaseSettings
-from pydantic import Field, AnyUrl
 from typing import Optional
+
 from dotenv import load_dotenv
+from pydantic import AnyUrl, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 load_dotenv()
 
+
 class Settings(BaseSettings):
+
+    # only app-level settings here
+    SOME_APP_SETTING: str | None = None
+
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
+
     # App
     APP_NAME: str = "Orchestrator-service"
     DEBUG: bool = False
@@ -17,6 +28,12 @@ class Settings(BaseSettings):
     USER_SERVICE_URL: AnyUrl = Field(env="USER_SERVICE_URL")
     USER_SERVICE_API_KEY: Optional[str] = None
 
+    # ML service
+    ML_SERVICE_URL: AnyUrl = Field(env="ML_SERVICE_URL")
+
+    # Scraper service
+    SCRAPER_SERVICE_URL: AnyUrl = Field(env="SCRAPER_SERVICE_URL")
+
     DATABASE_URL: str = Field(env="DATABASE_URL")
 
     # LLM / AI provider
@@ -24,7 +41,6 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = Field(env="OPENAI_API_KEY")
     GROQ_API_KEY: Optional[str] = Field(env="GROQ_API_KEY")
     LLM_BASE_URL: Optional[AnyUrl] = None  # if using custom endpoint
-
     # Playwright / scraping config
     PLAYWRIGHT_HEADLESS: bool = True
 
@@ -32,9 +48,12 @@ class Settings(BaseSettings):
     HTTP_TIMEOUT_SECONDS: int = 30
     HTTP_RETRIES: int = 2
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    # Song recommendation
+    GCP_BUCKET_NAME: str
+    SONG_PATH: str
+
+    # Tutor
+    GCP_TUTOR_BUCKET: str
 
 
 settings = Settings()

@@ -3,15 +3,12 @@ import { useTheme } from './ThemeProvider';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { ThemeToggle } from './ThemeToggle';
-
 import { useAuth } from '../context/AuthContext';
-
 export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
   const { theme, setTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
-
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -19,13 +16,11 @@ export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
   const navLinks = [
     { name: 'Features', href: '#features' },
     { name: 'How it Works', href: '#how-it-works' },
-    { name: 'Career Path', href: '#career-path' },
+    // { name: 'Career Path', href: '#career-path' },
   ];
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -41,7 +36,6 @@ export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
           </div>
           <span>MAARGHA.AI</span>
         </div>
-
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <a
@@ -53,7 +47,6 @@ export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
             </a>
           ))}
         </div>
-
         <div className="hidden md:flex items-center gap-4">
           <ThemeToggle theme={theme} setTheme={setTheme} />
           <button 
@@ -70,7 +63,6 @@ export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
             Get Started
           </Button>
         </div>
-
         <button
           className="md:hidden text-foreground"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -78,7 +70,6 @@ export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
-
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b border-border p-6 flex flex-col gap-4 animate-in slide-in-from-top-4 shadow-xl">
           {navLinks.map((link) => (
@@ -106,4 +97,5 @@ export default function PremiumNavbar({ onOpenAuth, onGetStarted }) {
     </nav>
   );
 }
+
 

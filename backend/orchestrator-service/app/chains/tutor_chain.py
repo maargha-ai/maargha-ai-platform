@@ -1,84 +1,96 @@
-import os
-from langchain_groq import ChatGroq
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import SentenceTransformerEmbeddings
+# app/chains/tutor_chain.py
+
+from pathlib import Path
+
+import requests
 from langchain_community.vectorstores import FAISS
-from langchain_classic.chains import create_retrieval_chain  
-from langchain_classic.chains.combine_documents import create_stuff_documents_chain  
+from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
-from dotenv import load_dotenv
 
-load_dotenv()
+from app.core.config import settings
+from app.core.langchain_embeddings import LangchainSentenceEmbeddings
+from app.core.llm_client import llm
+from app.utils.gcs import generate_signed_url
 
-# Load Qwen Model 
-def load_llm():
-    llm = ChatGroq(
-        groq_api_key=os.getenv("career-growth"),
-        model="qwen2.5-72b-instruct",
-        temperature=0.2
-    )
-    return llm
+GCP_BUCKET_NAME = settings.GCP_TUTOR_BUCKET
+GCP_VECTOR_DB_PREFIX = "tutor_faiss"
 
-# Load textbook and create Vector DB
-def build_vector_db(pdf_path="./books/Hands-On-Machine-Learning.pdf"):
-    print("Loading textbook...")
-    loader = PyPDFLoader(pdf_path)
-    docs = loader.load()
+LOCAL_VECTOR_DB_PATH = Path("app/static/vectordb/tutor_faiss")
+LOCAL_VECTOR_DB_PATH.mkdir(parents=True, exist_ok=True)
 
-    print("Splitting into chunks...")
-    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
-    chunks = splitter.split_documents(docs)
-
-    print("Creating embeddings...")
-    embedding = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-
-    print("Building FAISS vector database....")
-    vectordb = FAISS.from_documents(chunks, embedding)
-    return vectordb.as_retriever(search_type="similarity", k=4)
+_retriever = None
 
 
-# Build RAG Tutor Chain
-def build_tutor_chain(llm, retriever):
-    prompt = PromptTemplate.from_template(
-    """
+PROMPT_TEMPLATE = PromptTemplate.from_template(
+    """\
     You are an AI Tutor teaching IT concepts clearly and simply.
     Use ONLY the provided context from the textbook.
-                                          
-    Question: {input}
-    
+
+    Question:
+    {question}
+
     CONTEXT:
     {context}
 
     Your response must include:
     - Beginner-level explanation
-    - Real-world analogy or example
+    - Real-world analogy
     - 3-step learning plan
     - A short quiz with answers
     """
-    )
-
-    document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)
-    retrieval_chain = create_retrieval_chain(retriever, document_chain)
-    return retrieval_chain
+)
 
 
-# Tutor Ask Function
-def ask_tutor(chain, question):
+def download_vector_db():
+    for filename in ["index.faiss", "index.pkl"]:
+        local_file = LOCAL_VECTOR_DB_PATH / filename
+        if local_file.exists():
+            continue
 
-    print("\nStudent Question: {question}")
-    response = chain.invoke({"input": question})
-    print("\n Tutor Response: \n")
-    print(response["answer"])
-    return response["answer"]
+        signed_url = generate_signed_url(
+            GCP_BUCKET_NAME, f"{GCP_VECTOR_DB_PREFIX}/{filename}"
+        )
+
+        response = requests.get(signed_url, timeout=60)
+        response.raise_for_status()
+
+        with open(local_file, "wb") as f:
+            f.write(response.content)
 
 
-if __name__ == "__main__":
-    llm = load_llm()
-    retriever = build_vector_db()
-    tutor_chain = build_tutor_chain(llm, retriever)
+def get_retriever():
+    global _retriever
 
-    rslt = ask_tutor(
-        tutor_chain,
-        "Explain about cybersecurity."
-    )
+    if _retriever is None:
+        print("[Tutor] Loading FAISS vector DB")
+        download_vector_db()
+
+        embeddings = LangchainSentenceEmbeddings()
+
+        vectordb = FAISS.load_local(
+            folder_path=str(LOCAL_VECTOR_DB_PATH),
+            embeddings=embeddings,
+            allow_dangerous_deserialization=True,
+        )
+
+        _retriever = vectordb.as_retriever(search_type="similarity", k=4)
+
+        print("[Tutor] Successfully loaded vectorDB")
+
+    return _retriever
+
+
+async def ask_tutor(question: str) -> str:
+    retriever = get_retriever()
+
+    # Retrieve context
+    docs = retriever.invoke(question)
+    context = "\n\n".join(doc.page_content for doc in docs)
+
+    # Build prompt
+    prompt = PROMPT_TEMPLATE.format(question=question, context=context)
+
+    # Call LLM (same style as roadmap_chain)
+    response = await llm.ainvoke([HumanMessage(content=prompt)])
+
+    return response.content

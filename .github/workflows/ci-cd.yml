@@ -1,0 +1,307 @@
+# .github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, dev ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  lint-orchestrator:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Load test environment variables
+      run: cat .github/test.env >> $GITHUB_ENV
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y portaudio19-dev ffmpeg
+
+    - name: Install dependencies
+      working-directory: ./backend/orchestrator-service
+      run: |
+        pip install -r requirements.txt
+        pip install pylint==3.2.5
+        
+    - name: Run pylint
+      working-directory: ./backend/orchestrator-service
+      run: |
+        pylint app/
+
+  lint-gateway:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Load test environment variables
+      run: cat .github/test.env >> $GITHUB_ENV
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+
+    - name: Install dependencies
+      working-directory: ./backend/gateway-service
+      run: |
+        pip install -r requirements.txt
+        pip install pylint==3.2.5
+        
+    - name: Run pylint
+      working-directory: ./backend/gateway-service
+      run: |
+        PYTHONPATH=. pylint app/
+
+  lint-user-service:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Load test environment variables
+      run: cat .github/test.env >> $GITHUB_ENV
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+
+    - name: Install dependencies
+      working-directory: ./backend/user-service
+      run: |
+        pip install -r requirements.txt
+        pip install pylint==3.2.5
+        
+    - name: Run pylint
+      working-directory: ./backend/user-service
+      run: |
+        PYTHONPATH=./user_service:. pylint user_service/
+
+  test-orchestrator:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Load test environment variables
+      run: cat .github/test.env >> $GITHUB_ENV
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y portaudio19-dev ffmpeg
+
+    - name: Install dependencies
+      working-directory: ./backend/orchestrator-service
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Run tests
+      working-directory: ./backend/orchestrator-service
+      run: |
+        pytest tests/test_health.py::TestHealthEndpoints::test_basic_health_check -v --cov=app --cov-report=xml --cov-fail-under=25
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/orchestrator-service/coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  test-gateway:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Load test environment variables
+      run: cat .github/test.env >> $GITHUB_ENV
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        
+    - name: Install dependencies
+      working-directory: ./backend/gateway-service
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Run tests
+      working-directory: ./backend/gateway-service
+      run: |
+        pytest --cov=app --cov-report=xml --cov-fail-under=30
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/gateway-service/coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  test-user-service:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Load test environment variables
+      run: |
+        cat .github/test.env >> $GITHUB_ENV
+        echo "DJANGO_SETTINGS_MODULE=user_service.settings" >> $GITHUB_ENV
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        
+    - name: Install dependencies
+      working-directory: ./backend/user-service
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Run tests
+      working-directory: ./backend/user-service
+      run: |
+        export PYTHONPATH=./user_service
+        export DJANGO_SETTINGS_MODULE=user_service.settings
+        pytest tests/test_user_service_health.py::test_database_connection -v --cov=user_service --cov-report=xml --cov-fail-under=15
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/user-service/coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  build-and-deploy:
+    needs: [lint-orchestrator, lint-gateway, lint-user-service, test-orchestrator, test-gateway, test-user-service]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Login to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Build and push orchestrator-service
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend/orchestrator-service
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:orchestrator-latest
+        cache-from: type=gha
+        cache-to: type=gha
+    
+    - name: Build and push gateway-service
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend/gateway-service
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:gateway-latest
+        cache-from: type=gha
+        cache-to: type=gha
+    
+    - name: Build and push user-service
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend/user-service
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:user-service-latest
+        cache-from: type=gha
+        cache-to: type=gha
+    
+    - name: Deploy to production
+      run: |
+        echo "🚀 Deployment completed!"
+        echo "Images pushed to registry:"
+        echo "- ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:orchestrator-latest"
+        echo "- ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:gateway-latest"
+        echo "- ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:user-service-latest"

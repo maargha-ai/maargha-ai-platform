@@ -4,6 +4,38 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  min-height: 100%;
+}
+
+#root {
+  min-height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(var(--foreground) / 20%);
+
+  border-radius: 99px;
+  border: 2px solid transparent;
+
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsla(var(--foreground) / 40%);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -121,4 +153,161 @@
 
 .animate-pulse-soft {
   animation: pulse-soft 4s ease-in-out infinite;
+}
+
+.tutor-layout, .resume-layout, .music-layout, .quiz-layout, .orchestrator-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.tutor-content-wrapper, .resume-content-wrapper, .music-content-wrapper, .quiz-content-wrapper, .orchestrator-content-wrapper {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  flex: 1;
+  padding: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.tutor-feature-sidebar, .resume-feature-sidebar, .music-feature-sidebar, .quiz-feature-sidebar, .orchestrator-feature-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 100px;
+}
+
+.tutor-feature-box, .resume-feature-box, .music-feature-box, .quiz-feature-box, .orchestrator-feature-box {
+  background: hsla(var(--card) / 80%);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 50%);
+  border-radius: 24px;
+  padding: 1.75rem;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tutor-feature-header, .resume-feature-header, .music-feature-header, .quiz-feature-header, .orchestrator-feature-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid hsl(var(--border) / 30%);
+}
+
+.tutor-feature-header h3, .resume-feature-header h3, .music-feature-header h3, .quiz-feature-header h3, .orchestrator-feature-header h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.tutor-feature-description, .resume-feature-description, .music-feature-description, .quiz-feature-description, .orchestrator-feature-description {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
+}
+
+.tutor-feature-section, .resume-feature-section, .music-feature-section, .quiz-feature-section, .orchestrator-feature-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.tutor-feature-section h4, .resume-feature-section h4, .music-feature-section h4, .quiz-feature-section h4, .orchestrator-feature-section h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: hsl(var(--foreground));
+  text-align: left;
+}
+
+.tutor-feature-steps, .resume-feature-steps, .music-feature-steps, .quiz-feature-steps, .orchestrator-feature-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: f-counter;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.tutor-feature-steps li, .resume-feature-steps li, .music-feature-steps li, .quiz-feature-steps li, .orchestrator-feature-steps li {
+  counter-increment: f-counter;
+  display: flex;
+  gap: 0.85rem;
+  font-size: 0.9rem;
+  color: hsl(var(--foreground));
+  line-height: 1.5;
+  align-items: flex-start;
+}
+
+.tutor-feature-steps li::before, .resume-feature-steps li::before, .music-feature-steps li::before, .quiz-feature-steps li::before, .orchestrator-feature-steps li::before {
+  content: counter(f-counter);
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.tutor-feature-footer, .resume-feature-footer, .music-feature-footer, .quiz-feature-footer, .orchestrator-feature-footer {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid hsl(var(--border) / 30%);
+}
+
+.tutor-feature-tip, .resume-feature-tip, .music-feature-tip, .quiz-feature-tip, .orchestrator-feature-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: hsl(var(--muted-foreground));
+  background: hsla(var(--secondary) / 30%);
+  padding: 0.85rem;
+  border-radius: 12px;
+}
+
+.tutor-chat-engine, .orchestrator-chat-engine {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 64px);
+}
+
+.resume-main-engine, .quiz-setup-engine, .music-main-engine {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-top: 1rem;
+}
+
+.resume-main-engine > *, .quiz-setup-engine > * {
+  width: 100%;
+  max-width: 800px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }

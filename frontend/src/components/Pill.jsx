@@ -1,5 +1,4 @@
 import '../styles/pill.css'; 
-
 const Pill = () => {
   return (
     <div className="pill">
@@ -7,5 +6,6 @@ const Pill = () => {
     </div>
   );
 };
-
 export default Pill;
+
+

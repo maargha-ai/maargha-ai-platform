@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.env
+node_modules/
+.git
+.gitignore
+*.log
+frontend/
+**/.pytest_cache
+**/__pycache__
+models/
+data/
+*.pkl
+*.h5
+tests/
+notebooks/
