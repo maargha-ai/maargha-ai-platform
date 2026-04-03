@@ -21,7 +21,6 @@ pdfplumber==0.11.9
 
 # Database
 asyncpg==0.31.0
-psycopg2-binary==2.9.11     # Better than psycopg2 for Docker
 
 # Utils
 numpy

@@ -157,24 +157,24 @@ export default function Dashboard() {
       top: '58.2%',
       left: '23%'
     },
-    {
-      id: 'networking',
-      title: 'Global Tech Events',
-      description: 'Real-time networking, hackathons, and virtual summits.',
-      icon: Users,
-      path: '/networking-events',
-      top: '67.9%',
-      left: '40%'
-    },
-    {
-      id: 'music',
-      title: 'Sonic Therapy',
-      description: 'AI-composed soundscapes for deep focus and mental clarity.',
-      icon: Music,
-      path: '/music',
-      top: '78.5%',
-      left: '50%'
-    },
+    // {
+    //   id: 'networking',
+    //   title: 'Global Tech Events',
+    //   description: 'Real-time networking, hackathons, and virtual summits.',
+    //   icon: Users,
+    //   path: '/networking-events',
+    //   top: '67.9%',
+    //   left: '40%'
+    // },
+    // {
+    //   id: 'music',
+    //   title: 'Sonic Therapy',
+    //   description: 'AI-composed soundscapes for deep focus and mental clarity.',
+    //   icon: Music,
+    //   path: '/music',
+    //   top: '78.5%',
+    //   left: '50%'
+    // },
     {
       id: 'wellness',
       title: 'Empathetic AI',
