@@ -58,7 +58,7 @@ export default function OrchestratorChat() {
   const suggestions = [
     "I need someone to listen to my feelings",
     "Generate a 6-month study plan",
-    "Show me latest events",
+    "Lets take an assessment",
     "Find me jobs that matches my profile"
   ];
 
