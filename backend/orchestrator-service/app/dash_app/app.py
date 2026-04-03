@@ -11,7 +11,7 @@ from app.dash_app.transforms import (
 )
 
 app = Dash(__name__)
-
+server = app.server 
 
 # ========================= LAYOUT =========================
 app.layout = html.Div(
@@ -145,4 +145,4 @@ def update_dashboard(modes, start, end):
 
 # ========================= RUN =========================
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8050, debug=True)
+    app.run(host="0.0.0.0", port=8050)
